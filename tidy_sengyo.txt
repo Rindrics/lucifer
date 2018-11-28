@@ -6,7 +6,56 @@
   library(readxl)
   getwd()
   indir <- "./data/鮮魚関係"
+  list.files(indir, pattern = ".+[カタクチイワシ|マイワシ|マアジ]\\.xls", recursive = TRUE)
 
+#+END_SRC
+
+#+RESULTS:
+| 鮮魚測定06/カタクチイワシ.xls |
+| 鮮魚測定06/マアジ.xls         |
+| 鮮魚測定06/マイワシ.xls       |
+| 鮮魚測定07/カタクチイワシ.xls |
+| 鮮魚測定07/マアジ.xls         |
+| 鮮魚測定07/マイワシ.xls       |
+| 鮮魚測定08/カタクチイワシ.xls |
+| 鮮魚測定08/マアジ.xls         |
+| 鮮魚測定08/マイワシ.xls       |
+| 鮮魚測定09/カタクチイワシ.xls |
+| 鮮魚測定09/マアジ.xls         |
+| 鮮魚測定09/マイワシ.xls       |
+| 鮮魚測定10/カタクチイワシ.xls |
+| 鮮魚測定10/マアジ.xls         |
+| 鮮魚測定10/マイワシ.xls       |
+| 鮮魚測定11/カタクチイワシ.xls |
+| 鮮魚測定11/マアジ.xls         |
+| 鮮魚測定11/マイワシ.xls       |
+| 鮮魚測定12/カタクチイワシ.xls |
+| 鮮魚測定12/マアジ.xls         |
+| 鮮魚測定12/マイワシ.xls       |
+| 鮮魚測定13/カタクチイワシ.xls |
+| 鮮魚測定13/マアジ.xls         |
+| 鮮魚測定13/マイワシ.xls       |
+| 鮮魚測定14/カタクチイワシ.xls |
+| 鮮魚測定14/マアジ.xls         |
+| 鮮魚測定14/マイワシ.xls       |
+| 鮮魚測定15/カタクチイワシ.xls |
+| 鮮魚測定15/マアジ.xls         |
+| 鮮魚測定15/マイワシ.xls       |
+| 鮮魚測定16/カタクチイワシ.xls |
+| 鮮魚測定16/マアジ.xls         |
+| 鮮魚測定16/マイワシ.xls       |
+| 鮮魚測定17/カタクチイワシ.xls |
+| 鮮魚測定17/マアジ.xls         |
+| 鮮魚測定17/マイワシ.xls       |
+| 鮮魚測定18/カタクチイワシ.xls |
+| 鮮魚測定18/マアジ.xls         |
+| 鮮魚測定18/マイワシ.xls       |
+| 鮮魚測定19/カタクチイワシ.xls |
+| 鮮魚測定19/マアジ.xls         |
+| 鮮魚測定19/マイワシ.xls       |
+
+* 関数定義
+#+BEGIN_SRC R :session *R:tidyNAS*
   get_year <- function(indir) {
    yearlist <- list.files(indir, pattern = "鮮魚") %>%
      str_sub(5, 6) %>%
@@ -56,21 +105,52 @@
       }
       out
       }
+#+END_SRC
 
-  data <- format_sengyo(indir, "カタクチイワシ") %>%
+#+RESULTS:
+
+* 整形して出力
+#+BEGIN_SRC R :session *R:tidyNAS*
+  data_anchovy <- format_sengyo(indir, "カタクチイワシ") %>%
     mutate(year = year(date))
 
-  data %>%
+  data_anchovy %>%
     filter(!is.na(備考))
-  data %>%
+  data_anchovy %>%
     filter(year == 2019)
 
 
-  data %>%
+  p_blbw <- data_anchovy %>%
     ggplot(aes(BL, BW)) +
     geom_point() +
     facet_wrap(~ year)
+  ggsave("./figs/anchovy_blbw.pdf", p_blbw)
+
+  p_blhist <- data_anchovy %>%
+    ggplot(aes(BL)) +
+    geom_histogram() +
+    facet_wrap(~ year)
+  ggsave("./figs/anchovy_blhist.pdf", p_blhist)
+
+  data_sardine <- format_sengyo(indir, "マイワシ") %>%
+    mutate(year = year(date))
+
+  data_sardine %>%
+    filter(!is.na(備考))
+  data_sardine %>%
+    filter(year == 2019)
+
+
+    ggplot(aes(BL, BW)) +
+    geom_point() +
+    facet_wrap(~ year)
+  head(data)
 #+END_SRC
-* 読み込んでみる
-* 関数定義
-* 整形して出力
+
+#+RESULTS:
+| 1 | 96 | 8.7 | 3 | 0.03 | nil               |               nil | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
+| 2 | 93 | 8.1 | 1 | 0.02 | 0.246913580246914 |               nil | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
+| 3 | 96 | 8.8 | 2 | 0.13 | nil               |  1.47727272727273 | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
+| 4 | 87 | 6.5 | 3 | 0.02 | nil               |               nil | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
+| 5 | 93 | 8.2 | 2 | 0.07 | nil               | 0.853658536585366 | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
+| 6 | 82 |   5 | 2 | 0.03 | nil               |               0.6 | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
