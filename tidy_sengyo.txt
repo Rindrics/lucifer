@@ -141,16 +141,19 @@
     filter(year == 2019)
 
 
+  p_blbw <- data_sardine %>%
     ggplot(aes(BL, BW)) +
     geom_point() +
     facet_wrap(~ year)
+  ggsave("./figs/sardine_blbw.pdf", p_blbw)
+
+  p_blhist <- data_sardine %>%
+    ggplot(aes(BL)) +
+    geom_histogram() +
+    facet_wrap(~ year)
+  ggsave("./figs/sardine_blhist.pdf", p_blhist)
   head(data)
 #+END_SRC
 
 #+RESULTS:
-| 1 | 96 | 8.7 | 3 | 0.03 | nil               |               nil | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
-| 2 | 93 | 8.1 | 1 | 0.02 | 0.246913580246914 |               nil | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
-| 3 | 96 | 8.8 | 2 | 0.13 | nil               |  1.47727272727273 | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
-| 4 | 87 | 6.5 | 3 | 0.02 | nil               |               nil | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
-| 5 | 93 | 8.2 | 2 | 0.07 | nil               | 0.853658536585366 | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
-| 6 | 82 |   5 | 2 | 0.03 | nil               |               0.6 | 2006-01-25 | ./data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls | 125 | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | nil | 2006 |
+: /Users/ahayashi/Documents/GitHub/tidyNAS
