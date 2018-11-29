@@ -122,28 +122,28 @@
     facet_wrap(~ year)
   ggsave("./figs/anchovy_blhist.pdf", p_blhist)
 
-  data_sardine <- format_sengyo(indir, "マイワシ") %>%
-    mutate(year = year(date))
+  # data_sardine <- format_sengyo(indir, "マイワシ") %>%
+  #   mutate(year = year(date))
 
-  data_sardine %>%
-    filter(!is.na(備考))
-  data_sardine %>%
-    filter(year == 2019)
+  # data_sardine %>%
+  #   filter(!is.na(備考))
+  # data_sardine %>%
+  #   filter(year == 2019)
 
 
-  p_blbw <- data_sardine %>%
-    ggplot(aes(BL, BW)) +
-    geom_point() +
-    facet_wrap(~ year)
-  ggsave("./figs/sardine_blbw.pdf", p_blbw)
+  # p_blbw <- data_sardine %>%
+  #   ggplot(aes(BL, BW)) +
+  #   geom_point() +
+  #   facet_wrap(~ year)
+  # ggsave("./figs/sardine_blbw.pdf", p_blbw)
 
-  p_blhist <- data_sardine %>%
-    ggplot(aes(BL)) +
-    geom_histogram() +
-    facet_wrap(~ year)
-  ggsave("./figs/sardine_blhist.pdf", p_blhist)
-  head(data)
+  # p_blhist <- data_sardine %>%
+  #   ggplot(aes(BL)) +
+  #   geom_histogram() +
+  #   facet_wrap(~ year)
+  # ggsave("./figs/sardine_blhist.pdf", p_blhist)
+  # head(data)
 #+END_SRC
 
 #+RESULTS:
-: /Users/ahayashi/Documents/GitHub/tidyNAS
+
