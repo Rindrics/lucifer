@@ -1,0 +1,218 @@
+#+TITLE: 調査船で採集された標本の計測データを整理する
+#+STARTUP: contents
+* データのリストを作ってみる
+#+NAME: load_data
+#+BEGIN_SRC R :session *R:tidyNAS* :var indir = "./data/調査船・冷凍サンプル（いわし・むろあじ・さば）"
+  library(tidyverse)
+  library(lubridate)
+  library(readxl)
+  flist1 <- list.files(indir, pattern = ".+[カタクチ|マイワシ|マアジ].+測定.*\\.xls", recursive = TRUE)
+  flist2 <- list.files(indir, pattern = ".+[カタクチ|マイワシ|マアジ].+\\.xls", recursive = TRUE)
+
+  flist2[(flist2 %in% flist1) == FALSE]
+  flist2
+#+END_SRC
+
+#+RESULTS: load_data
+| 京都いわし/京都カタクチイワシ/カタクチイワシ測定2005.xls                          |
+| 京都いわし/京都マイワシ/マイワシ測定2005.xls                                      |
+| 俊鷹丸/カタクチ測定2016SHU.xls                                                    |
+| 北光丸/ウルメイワシ測定2010.xls                                                   |
+| 北光丸/カタクチイワシ測定2010.xls                                                 |
+| 北光丸/マアジ測定2010.xls                                                       |
+| 境港測定/マイワシ境港測定2009.xls                                                 |
+| 境港測定/マイワシ境港測定2010.xls                                                 |
+| 富山いわし/富山水研(立山丸)/マイワシ測定2018(立山丸).xls                          |
+| 富山いわし/新湊マイワシ/マイワシ測定2013.xls                                      |
+| 富山いわし/氷見マイワシ/マイワシ測定2011.xls                                      |
+| 富山いわし/氷見マイワシ/マイワシ測定2012.xls                                      |
+| 富山いわし/氷見マイワシ/マイワシ測定2013.xls                                      |
+| 日水研(但州丸)/マイワシ測定2018(但州丸）.xls                                      |
+| 熊本丸/イワシ類/カタクチイワシ測定2009.xls                                        |
+| 熊本丸/イワシ類/カタクチイワシ測定2010.xls                                        |
+| 熊本丸/イワシ類/カタクチイワシ測定2011.xls                                        |
+| 熊本丸/イワシ類/カタクチイワシ測定2012.xls                                        |
+| 熊本丸/イワシ類/カタクチイワシ測定2013.xls                                        |
+| 熊本丸/イワシ類/カタクチイワシ測定2014.xls                                        |
+| 熊本丸/イワシ類/カタクチイワシ測定2015.xls                                        |
+| 熊本丸/イワシ類/カタクチイワシ測定2016.xls                                        |
+| 熊本丸/イワシ類/カタクチイワシ測定2017.xls                                        |
+| 熊本丸/カタクチイワシ測定2009.xls                                                 |
+| 熊本丸/カタクチイワシ測定2010.xls                                                 |
+| 熊本丸/カタクチイワシ測定2011.xls                                                 |
+| 熊本丸/カタクチイワシ測定2012.xls                                                 |
+| 熊本丸/カタクチイワシ測定2013.xls                                                 |
+| 熊本丸/カタクチイワシ測定2014.xls                                                 |
+| 熊本丸/カタクチイワシ測定2015.xls                                                 |
+| 熊本丸/カタクチイワシ測定2016.xls                                                 |
+| 熊本丸/カタクチイワシ測定2017.xls                                                 |
+| 熊本丸/マアジ測定2013.xls                                                       |
+| 石川いわし/石川カタクチイワシ/カタクチイワシ測定2008.xls                          |
+| 石川いわし/石川マイワシ/マイワシ測定1998.xls                                      |
+| 石川いわし/石川マイワシ/マイワシ測定1999.xls                                      |
+| 石川いわし/石川マイワシ/マイワシ測定2001.xls                                      |
+| 石川いわし/石川マイワシ/マイワシ測定2008.xls                                      |
+| 石川いわし/石川マイワシ/マイワシ測定2011.xls                                      |
+| 石川いわし/石川マイワシ/マイワシ測定2012.xls                                      |
+| 石川いわし/石川マイワシ/マイワシ測定2013.xls                                      |
+| 第5開洋丸/カタクチ測定2016Dai5.xls                                                |
+| 第7開洋丸測定データ/カタクチイワシ測定2005.xls                                  |
+| 第7開洋丸測定データ/カタクチイワシ測定2008.xls                                  |
+| 第7開洋丸測定データ/カタクチイワシ測定2009.xls                                  |
+| 第7開洋丸測定データ/マアジ測定2008.xls                                        |
+| 第7開洋丸測定データ/マアジ測定2009.xls                                        |
+| 第7開洋丸測定データ/第七開洋丸カタクチイワシ/第七開洋2009カタクチイワシ測定.xls |
+| 長崎近海カタクチイワシ測定データ/2008春サンプル(長崎近海カタクチ測定).xls     |
+| 長崎近海カタクチイワシ測定データ/2009サンプル(長崎近海カタクチ測定).xls       |
+| 陽光丸マイワシ耳石.xlsx                                                           |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2004.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2005.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2006.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2007.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2008.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2009.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2011.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2012.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2013.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2014.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2015.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2016.xls                      |
+| 陽光丸測定データ/カタクチイワシ/カタクチイワシ測定2017.xls                      |
+| 陽光丸測定データ/マアジ/マアジ測定2004.xls                                  |
+| 陽光丸測定データ/マアジ/マアジ測定2009.xls                                  |
+| 陽光丸測定データ/マアジ/マアジ測定2011.xls                                  |
+| 陽光丸測定データ/マアジ/マアジ測定2014.xls                                  |
+| 陽光丸測定データ/マアジ/マアジ測定2015.xls                                  |
+| 陽光丸測定データ/マアジ/マアジ測定2016.xls                                  |
+| 陽光丸測定データ/マアジ/マアジ測定2017.xls                                  |
+| 陽光丸測定データ/マアジ/マアジ測定2018.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2006.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2007.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2008.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2009.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2011.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2012.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2013.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2015.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2016.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2017.xls                                  |
+| 陽光丸測定データ/マイワシ/マイワシ測定2018.xls                                  |
+| 鳥取いわし/鳥取カタクチイワシ/カタクチイワシ測定2011.xls                          |
+| 鳥海丸/マイワシ測定2018(鳥海丸).xls                                               |
+| 鹿児島測定データ/マイワシ測定2007.xls                                           |
+| 鹿児島測定データ/マイワシ測定2008.xls                                           |
+| 鹿児島測定データ/マイワシ測定2009.xls                                           |
+| 鹿児島測定データ/マイワシ測定2010.xls                                           |
+| 鹿児島測定データ/マイワシ測定2011.xls                                           |
+
+
+* 関数定義
+#+NAME: functions
+#+BEGIN_SRC R :session *R:tidyNAS* :tangle "/Users/ahayashi/Documents/GitHub/tidyNAS/tidyNAS/R/tidy_survey.R"
+  get_year_survey <- function(indir) {
+   yearlist <- list.files(indir, pattern = ".+[カタクチ|マイワシ|マアジ].+測定.*\\.xls", recursive = TRUE) %>%
+     str_replace("\\D*([5|7]開洋丸)?\\D*", "") %>%
+     str_sub(1, 4) %>%
+     parse_number()
+   yearlist
+  }
+
+  get_filelist_survey <- function(indir, spcs_name) {
+    regexp   <- paste0(".*", str_sub(spcs_name, 1, 4), ".*測定.*\\.xls")
+    filelist <- list.files(indir, pattern = regexp, recursive = TRUE, full.names = TRUE)
+    filelist
+  }
+
+  get_sheet2read <- function(infile) {
+    all_sheets <- excel_sheets(infile)
+    sheets2read <- all_sheets[gregexpr("[^Sheet][^体長][^0000(1)].+", all_sheets) > 0]
+    sheets2read
+  }
+  get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/京都いわし/京都カタクチイワシ/カタクチイワシ測定2005.xls")
+
+  get_date <- function(year, sheetname) {
+    date_char <- if_else(str_length(sheetname) >= 9,
+                         paste0(20, str_sub(sheetname, 1, 6)),
+                         paste0(year, str_sub(sheetname, 1, 4)))
+    date <- ymd(date_char)
+    date
+  }
+
+  format_sengyo <- function(indir, spcs_name) {
+    out      <- NULL
+    yearlist <- get_year_survey(indir)
+    filelist <- get_filelist(indir, spcs_name)
+    for (i in seq_along(filelist)) {
+      infile      <- filelist[i]
+      year        <- yearlist[i]
+      sheets2read <- get_sheet2read(infile)
+      print(year)
+      for (j in seq_along(sheets2read)) {
+        sheetname <- sheets2read[j]
+        date <- get_date(year, sheetname)
+        data <- read_xls(infile, sheet = sheetname) %>%
+          mutate(date = date,
+                 original.fname = infile,
+                 original.sheetname = sheetname)
+        print(sheetname)
+        out  <- bind_rows(out, data)
+      }
+    }
+    out
+  }
+#+END_SRC
+
+#+RESULTS: functions
+
+#+RESULTS:
+
+* 整形して出力
+#+call: load_data(indir = "./data/鮮魚関係") :session *R:tidyNAS* :results silent
+#+call: functions() :session *R:tidyNAS* :results silent
+#+BEGIN_SRC R :session *R:tidyNAS*
+  data_anchovy <- format_sengyo(indir, "カタクチイワシ") %>%
+    mutate(year = year(date))
+
+  data_anchovy %>%
+    filter(!is.na(備考))
+  data_anchovy %>%
+    filter(year == 2019)
+
+
+  p_blbw <- data_anchovy %>%
+    ggplot(aes(BL, BW)) +
+    geom_point() +
+    facet_wrap(~ year)
+  ggsave("./figs/anchovy_blbw.pdf", p_blbw)
+
+  p_blhist <- data_anchovy %>%
+    ggplot(aes(BL)) +
+    geom_histogram() +
+    facet_wrap(~ year)
+  ggsave("./figs/anchovy_blhist.pdf", p_blhist)
+
+  # data_sardine <- format_sengyo(indir, "マイワシ") %>%
+  #   mutate(year = year(date))
+
+  # data_sardine %>%
+  #   filter(!is.na(備考))
+  # data_sardine %>%
+  #   filter(year == 2019)
+
+
+  # p_blbw <- data_sardine %>%
+  #   ggplot(aes(BL, BW)) +
+  #   geom_point() +
+  #   facet_wrap(~ year)
+  # ggsave("./figs/sardine_blbw.pdf", p_blbw)
+
+  # p_blhist <- data_sardine %>%
+  #   ggplot(aes(BL)) +
+  #   geom_histogram() +
+  #   facet_wrap(~ year)
+  # ggsave("./figs/sardine_blhist.pdf", p_blhist)
+  # head(data)
+#+END_SRC
+
+#+RESULTS:
+
