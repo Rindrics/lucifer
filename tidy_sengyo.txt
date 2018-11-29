@@ -43,7 +43,7 @@
 
 * 関数定義
 #+NAME: functions
-#+BEGIN_SRC R :session *R:tidyNAS*
+#+BEGIN_SRC R :session *R:tidyNAS* :tangle "./tidyNAS/R/tidy_sengyo.R"
   get_year <- function(indir) {
    yearlist <- list.files(indir, pattern = "鮮魚") %>%
      str_sub(5, 6) %>%
