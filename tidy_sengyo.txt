@@ -89,10 +89,10 @@
                  original.sheetname = sheetname)
         print(sheetname)
         out  <- bind_rows(out, data)
-          }
       }
-      out
-      }
+    }
+    out
+  }
 #+END_SRC
 
 #+RESULTS:
