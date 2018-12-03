@@ -152,7 +152,8 @@
       infile      <- filelist[i]
       year        <- yearlist[i]
       sheets2read <- get_sheet2read(infile)
-      print(year)
+    #  print(year)
+      print(infile)
       for (j in seq_along(sheets2read)) {
         sheetname <- sheets2read[j]
         date <- get_date(year, sheetname)
@@ -166,7 +167,7 @@
     }
     out
   }
-print("All functions loaded successfully.")
+  print("All functions loaded successfully.")
 #+END_SRC
 
 #+RESULTS: functions
