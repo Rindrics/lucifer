@@ -131,10 +131,10 @@
 
   get_sheet2read <- function(infile) {
     all_sheets <- excel_sheets(infile)
-    sheets2read <- all_sheets[gregexpr("[^Sheet][^体長][^0000(1)].+", all_sheets) > 0]
+    sheets2read <- all_sheets[gregexpr("^(\\(MT|[0-9]).+$", all_sheets) > 0]
     sheets2read
   }
-  get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/京都いわし/京都カタクチイワシ/カタクチイワシ測定2005.xls")
+  get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/陽光丸測定データ/マイワシ/マイワシ測定2016.xls")
 
   get_date <- function(year, sheetname) {
     date_char <- if_else(str_length(sheetname) >= 9,
