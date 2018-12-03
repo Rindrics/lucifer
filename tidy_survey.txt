@@ -3,7 +3,7 @@
 * 下のコードを実行する
 #+call: load_data(indir = "./data/調査船・冷凍サンプル（いわし・むろあじ・さば）") :session *R:tidyNAS* :results silent
 #+call: functions() :session *R:tidyNAS* :results silent
-#+CALL: fmt&output() :session *R:tidyNAS*
+#+call: fmt&output() :session *R:tidyNAS*
 
 #+RESULTS:
 
