@@ -144,10 +144,10 @@
     date
   }
 
-  format_sengyo <- function(indir, spcs_name) {
+  format_survey <- function(indir, spcs_name) {
     out      <- NULL
     yearlist <- get_year_survey(indir)
-    filelist <- get_filelist(indir, spcs_name)
+    filelist <- get_filelist_survey(indir, spcs_name)
     for (i in seq_along(filelist)) {
       infile      <- filelist[i]
       year        <- yearlist[i]
@@ -176,7 +176,7 @@
 #+call: load_data(indir = "./data/鮮魚関係") :session *R:tidyNAS* :results silent
 #+call: functions() :session *R:tidyNAS* :results silent
 #+BEGIN_SRC R :session *R:tidyNAS*
-  data_anchovy <- format_sengyo(indir, "カタクチイワシ") %>%
+  data_anchovy <- format_survey(indir, "カタクチイワシ") %>%
     mutate(year = year(date))
 
   data_anchovy %>%
