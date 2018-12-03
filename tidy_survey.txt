@@ -1,5 +1,12 @@
 #+TITLE: 調査船で採集された標本の計測データを整理する
 #+STARTUP: contents
+* 下のコードを実行する
+#+call: load_data(indir = "./data/調査船・冷凍サンプル（いわし・むろあじ・さば）") :session *R:tidyNAS* :results silent
+#+call: functions() :session *R:tidyNAS* :results silent
+#+CALL: fmt&output() :session *R:tidyNAS*
+
+#+RESULTS:
+
 * データのリストを作ってみる
 #+NAME: load_data
 #+BEGIN_SRC R :session *R:tidyNAS* :var indir = "./data/調査船・冷凍サンプル（いわし・むろあじ・さば）"
@@ -104,7 +111,6 @@
 | 鹿児島測定データ/マイワシ測定2009.xls                                           |
 | 鹿児島測定データ/マイワシ測定2010.xls                                           |
 | 鹿児島測定データ/マイワシ測定2011.xls                                           |
-
 
 * 関数定義
 #+NAME: functions
