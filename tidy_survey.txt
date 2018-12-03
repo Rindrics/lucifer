@@ -178,48 +178,48 @@
 * 整形して出力
 #+NAME: fmt&output
 #+BEGIN_SRC R :session *R:tidyNAS*
-  data_anchovy <- format_survey(indir, "カタクチイワシ") %>%
-    mutate(year = year(date))
-
-  data_anchovy %>%
-    filter(!is.na(備考))
-  data_anchovy %>%
-    filter(year == 2019)
-
-
-  p_blbw <- data_anchovy %>%
-    ggplot(aes(BL, BW)) +
-    geom_point() +
-    facet_wrap(~ year)
-  ggsave("./figs/anchovy_blbw.pdf", p_blbw)
-
-  p_blhist <- data_anchovy %>%
-    ggplot(aes(BL)) +
-    geom_histogram() +
-    facet_wrap(~ year)
-  ggsave("./figs/anchovy_blhist.pdf", p_blhist)
-
-  # data_sardine <- format_sengyo(indir, "マイワシ") %>%
+  # data_anchovy <- format_survey(indir, "カタクチイワシ") %>%
   #   mutate(year = year(date))
 
-  # data_sardine %>%
+  # data_anchovy %>%
   #   filter(!is.na(備考))
-  # data_sardine %>%
+  # data_anchovy %>%
   #   filter(year == 2019)
 
 
-  # p_blbw <- data_sardine %>%
+  # p_blbw <- data_anchovy %>%
   #   ggplot(aes(BL, BW)) +
   #   geom_point() +
   #   facet_wrap(~ year)
-  # ggsave("./figs/sardine_blbw.pdf", p_blbw)
+  # ggsave("./figs/anchovy_blbw.pdf", p_blbw)
 
-  # p_blhist <- data_sardine %>%
+  # p_blhist <- data_anchovy %>%
   #   ggplot(aes(BL)) +
   #   geom_histogram() +
   #   facet_wrap(~ year)
-  # ggsave("./figs/sardine_blhist.pdf", p_blhist)
-  # head(data)
+  # ggsave("./figs/anchovy_blhist.pdf", p_blhist)
+
+  data_sardine <- format_survey(indir, "マイワシ") %>%
+    mutate(year = year(date))
+
+  data_sardine %>%
+    filter(!is.na(備考))
+  data_sardine %>%
+    filter(year == 2019)
+
+
+  p_blbw <- data_sardine %>%
+    ggplot(aes(BL, BW)) +
+    geom_point() +
+    facet_wrap(~ year)
+  ggsave("./figs/sardine_blbw.pdf", p_blbw)
+
+  p_blhist <- data_sardine %>%
+    ggplot(aes(BL)) +
+    geom_histogram() +
+    facet_wrap(~ year)
+  ggsave("./figs/sardine_blhist.pdf", p_blhist)
+  head(data)
 #+END_SRC
 
 #+RESULTS:
