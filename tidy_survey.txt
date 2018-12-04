@@ -157,10 +157,13 @@
       for (j in seq_along(sheets2read)) {
         sheetname <- sheets2read[j]
         date <- get_date(year, sheetname)
-        data <- read_xls(infile, sheet = sheetname) %>%
+        data <- read_xls(infile, sheet = sheetname, skip = 4) %>%
           mutate(date = date,
                  original.fname = infile,
-                 original.sheetname = sheetname)
+                 original.sheetname = sheetname,
+                 "ホルマリン" = parse_character("ホルマリン"),
+                 "Sex（♂1♀2）" = parse_character("Sex（♂1♀2）"),
+                 "ヒレ" = parse_character("ヒレ"))
         print(sheetname)
         out  <- bind_rows(out, data)
       }
