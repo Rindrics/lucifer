@@ -3,9 +3,8 @@
 * 下のコードを実行する
 #+call: load_data(indir = "./data/調査船・冷凍サンプル（いわし・むろあじ・さば）") :session *R:tidyNAS* :results silent
 #+call: functions() :session *R:tidyNAS* :results silent
-#+call: fmt&output() :session *R:tidyNAS*
+#+call: fmt&output() :session *R:tidyNAS* :results silent
 
-#+RESULTS:
 
 * データのリストを作ってみる
 #+NAME: load_data
@@ -134,7 +133,7 @@
     sheets2read <- all_sheets[gregexpr("^(\\(MT|[0-9]).+$", all_sheets) > 0]
     sheets2read
   }
-  get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/陽光丸測定データ/マイワシ/マイワシ測定2016.xls")
+  # get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/陽光丸測定データ/マイワシ/マイワシ測定2016.xls")
 
   get_date <- function(year, sheetname) {
     date_char <- if_else(str_length(sheetname) >= 9,
@@ -205,8 +204,6 @@
   data_sardine <- format_survey(indir, "マイワシ") %>%
     mutate(year = year(date))
 
-  data_sardine %>%
-    filter(!is.na(備考))
   data_sardine %>%
     filter(year == 2019)
 
