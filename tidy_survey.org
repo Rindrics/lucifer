@@ -135,7 +135,7 @@
   }
 
   get_station <- function(sheetname) {
-    station <- str_extract(sheetname, "[A-Z].*[0-9]") %>%
+    station <- str_extract(sheetname, "([A-Z]|[a-z]).*[0-9]") %>%
       str_replace("-", "")
   }
   sheets <- get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/陽光丸測定データ/マイワシ/マイワシ測定2017.xls")
