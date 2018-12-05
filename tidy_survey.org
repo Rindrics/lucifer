@@ -135,12 +135,10 @@
   }
   # get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/陽光丸測定データ/マイワシ/マイワシ測定2016.xls")
 
-  get_date <- function(year, sheetname) {
-    date_char <- if_else(str_length(sheetname) >= 9,
-                         paste0(20, str_sub(sheetname, 1, 6)),
-                         paste0(year, str_sub(sheetname, 1, 4)))
-    date <- ymd(date_char)
-    date
+
+  get_station <- function(sheetname) {
+    station <- str_extract(sheetname, "[A-Z].*[0-9]") %>%
+      str_replace("-", "")
   }
 
   format_survey <- function(indir, spcs_name) {
@@ -155,15 +153,15 @@
       print(infile)
       for (j in seq_along(sheets2read)) {
         sheetname <- sheets2read[j]
-        date <- get_date(year, sheetname)
+        station <- get_station(sheetname)
         data <- read_xls(infile, sheet = sheetname, skip = 4) %>%
-          mutate(date = date,
+          mutate(station = station,
                  original.fname = infile,
                  original.sheetname = sheetname,
                  "ホルマリン" = parse_character("ホルマリン"),
                  "Sex（♂1♀2）" = parse_character("Sex（♂1♀2）"),
                  "ヒレ" = parse_character("ヒレ"))
-        print(sheetname)
+        cat(sheetname, station, "\n")
         out  <- bind_rows(out, data)
       }
     }
