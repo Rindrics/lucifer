@@ -130,16 +130,17 @@
 
   get_sheet2read <- function(infile) {
     all_sheets <- excel_sheets(infile)
-    sheets2read <- all_sheets[gregexpr("^(\\(MT|[0-9]).+$", all_sheets) > 0]
+    sheets2read <- all_sheets[gregexpr("^(\\(MT|[0-9]|st).+$", all_sheets) > 0]
     sheets2read
   }
-  # get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/陽光丸測定データ/マイワシ/マイワシ測定2016.xls")
-
 
   get_station <- function(sheetname) {
     station <- str_extract(sheetname, "[A-Z].*[0-9]") %>%
       str_replace("-", "")
   }
+  sheets <- get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/陽光丸測定データ/マイワシ/マイワシ測定2017.xls")
+  sheets <- get_sheet2read("/Users/ahayashi/Documents/GitHub/tidyNAS/data/調査船・冷凍サンプル（いわし・むろあじ・さば）/陽光丸測定データ/マイワシ/マイワシ測定2016.xls")
+  length(sheets)
 
   format_survey <- function(indir, spcs_name) {
     out      <- NULL
