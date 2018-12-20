@@ -1,0 +1,42 @@
+#+TITLE: reform_oldr 開発プロジェクトノート
+* パッケージ開発の準備
+:LOGBOOK:
+CLOCK: [2018-12-16 Sun 12:45]--[2018-12-16 Sun 13:13] =>  0:28
+:END:
+** DONE 本ファイルをagenda に追加
+
+* 関数群
+** merge_oldr()
+*** make_params(type = c("sengyo", "cruise"))
+*** get_year(param)
+*** get_filelist(param)
+*** get_sheet2read()
+*** get_date()
+*** get_station()
+*** format_sengyo(param)
+*** merge_oldr(param)
+** conv2entsheet()
+*** load_tidied(data)
+*** conv2entsheet(tidied)
+** export_entsheet()
+*** load_entsheet(entsheet)
+*** split_year(entsheet)
+*** export_entsheet(entsheet, outdir)
+* データ整備状況
+** マアジ高精度化
+*** TODO 測定台帳 [66%]
+**** DONE 島根稚魚
+**** DONE 鳥取稚魚
+**** TODO 陽光丸稚魚
+:LOGBOOK:
+CLOCK: [2018-12-14 Fri 15:14]--[2018-12-14 Fri 16:57] =>  1:43
+- 2011から2013まで完了
+:END:
+[[/Users/ahayashi/Documents/GitHub/jm/tidy_data.org][データ整理プロジェクト]]
+*** TODO 調査結果 [0%]
+**** FUTURE 島根
+**** FUTURE 鳥取
+**** 陽光丸
+***** TODO 大下さんに聞いてみる
+*** 不足データを追加し，データを統合する
+** NAS
