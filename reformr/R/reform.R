@@ -1,3 +1,5 @@
+# This script is tangled from reformr.org.
+# Do not edit by hand!!!
 make_params <- function(indir, type){
   if (type %in% c("sengyo", "cruise") == TRUE) {
     param <- list(type = type)
@@ -33,18 +35,18 @@ get_filelist <- function(param) {
 
 get_sheet2read <- function(infile) {
   all_sheets <- readxl::excel_sheets(infile)
-  sheets2read <- as.vector(na.omit(str_match(all_sheets, "^(?!.*0000)(?!体長)(?!Sheet).+")))
+  sheets2read <- as.vector(na.omit(stringr::str_match(all_sheets, "^(?!.*0000)(?!体長)(?!Sheet).+")))
   sheets2read
 }
-# get_date <- function(year, sheetname) {
-#   date_char <- if_else(str_length(sheetname) >= 9,
-#                        paste0(20, str_sub(sheetname, 1, 6)),
-#                        paste0(year, str_sub(sheetname, 1, 4)))
-#   date <- ymd(date_char)
-#   date
-# }
+get_date <- function(year, sheetname) {
+  date_char <- dplyr::if_else(str_length(sheetname) >= 9,
+                       paste0(20, str_sub(sheetname, 1, 6)),
+                       paste0(year, str_sub(sheetname, 1, 4)))
+  date <- lubridate::ymd(date_char)
+  date
+}
 
-# format_sengyo <- function(indir, spcs_name) {
+# format_sengyo <- function(indir, spcs) {
 #   out      <- NULL
 #   yearlist <- get_year(indir)
 #   filelist <- get_filelist(indir, spcs_name)
@@ -65,4 +67,4 @@ get_sheet2read <- function(infile) {
 #     }
 #   }
 #   out
-                                      # }
+# }
