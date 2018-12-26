@@ -1,26 +1,138 @@
-#+TITLE: reform_oldr 開発プロジェクトノート
+#+TITLE: reformr 開発プロジェクトノート
+#+PROPERTY: header-args :session *R:tidyNAS
+
+#+call: load-packages() :results silent
+
+* パッケージ読み込み
+#+name: load-packages
+#+BEGIN_SRC R :results silent
+  library(tidyverse)
+  library(lubridate)
+  library(readxl)
+#+END_SRC
+
 * パッケージ開発の準備
 :LOGBOOK:
 CLOCK: [2018-12-16 Sun 12:45]--[2018-12-16 Sun 13:13] =>  0:28
 :END:
-** DONE 本ファイルをagenda に追加
+** DONE このファイルをagenda に追加する
+** R パッケージの開発環境を整える
+*** DONE パッケージ dir を作る
+:LOGBOOK:
+CLOCK: [2018-12-26 Wed 11:49]--[2018-12-26 Wed 12:18] =>  0:29
+:END:
+#+BEGIN_SRC R
+  setwd("/Users/ahayashi/Documents/GitHub/tidyNAS/")
+  list.files()
+#  devtools::create("reformr")
+#+END_SRC
 
-* 関数群
-** merge_oldr()
+#+RESULTS:
+
+
+*** DONE テスト dir を作る
+#+BEGIN_SRC R
+devtools::use_testthat("reformr")
+#+END_SRC
+
+#+RESULTS:
+: TRUE
+
+*** 依存パッケージを宣言する
+#+BEGIN_SRC R
+  devtools::use_package("tidyverse", type = "Imports", pkg = "reformr")
+  devtools::use_package("lubridate", type = "Imports", pkg = "reformr")
+  devtools::use_package("readxl", type = "Imports", pkg = "reformr")
+#+END_SRC
+
+#+RESULTS:
+
+*** dir 確認
+#+BEGIN_SRC bash
+ls reformr/
+#+END_SRC
+
+#+RESULTS:
+| DESCRIPTION   |
+| NAMESPACE     |
+| R             |
+| reformr.Rproj |
+| tests         |
+* データのリストを作ってみる
+#+NAME: load_data
+#+BEGIN_SRC R :session *R:tidyNAS* :var indir = "./data/鮮魚関係"
+  list.files(indir, pattern = ".+[カタクチイワシ|マイワシ|マアジ]\\.xls", recursive = TRUE)
+#+END_SRC
+
+#+RESULTS: load_data
+| 鮮魚測定06/カタクチイワシ.xls |
+| 鮮魚測定06/マイワシ.xls       |
+| 鮮魚測定07/カタクチイワシ.xls |
+| 鮮魚測定07/マイワシ.xls       |
+| 鮮魚測定08/カタクチイワシ.xls |
+| 鮮魚測定08/マイワシ.xls       |
+| 鮮魚測定09/カタクチイワシ.xls |
+| 鮮魚測定09/マイワシ.xls       |
+| 鮮魚測定10/カタクチイワシ.xls |
+| 鮮魚測定10/マイワシ.xls       |
+| 鮮魚測定11/カタクチイワシ.xls |
+| 鮮魚測定11/マイワシ.xls       |
+| 鮮魚測定12/カタクチイワシ.xls |
+| 鮮魚測定12/マイワシ.xls       |
+| 鮮魚測定13/カタクチイワシ.xls |
+| 鮮魚測定13/マイワシ.xls       |
+| 鮮魚測定14/カタクチイワシ.xls |
+| 鮮魚測定14/マイワシ.xls       |
+| 鮮魚測定15/カタクチイワシ.xls |
+| 鮮魚測定15/マイワシ.xls       |
+| 鮮魚測定16/カタクチイワシ.xls |
+| 鮮魚測定16/マイワシ.xls       |
+| 鮮魚測定17/カタクチイワシ.xls |
+| 鮮魚測定17/マイワシ.xls       |
+| 鮮魚測定18/カタクチイワシ.xls |
+| 鮮魚測定18/マイワシ.xls       |
+| 鮮魚測定19/カタクチイワシ.xls |
+| 鮮魚測定19/マイワシ.xls       |
+
+* 関数群を開発する
+** reform(indir, type)
+*** コードを書く
+*** 再ロードしてテストする
+[[/Users/ahayashi/Documents/GitHub/tidyNAS/reformr/R/reform.R][スクリプト]]
+#+BEGIN_SRC R :results output verbatim
+  devtools::load_all("reformr")
+  devtools::test("reformr")
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Loading reformr
+Loading reformr
+Testing reformr
+✔ | OK [31mF[39m [35mW[39m [34mS[39m | Context
+⠏ |  0       | Format old data⠋ |  1       | Format old data[32m✔[39m |  1       | Format old data
+
+══ [1mResults[22m ═════════════════════════════════════════════════════════════════════
+OK:       [32m1[39m
+Failed:   [32m0[39m
+Warnings: [32m0[39m
+Skipped:  [32m0[39m
+#+end_example
+
 *** make_params(type = c("sengyo", "cruise"))
 *** get_year(param)
 *** get_filelist(param)
 *** get_sheet2read()
 *** get_date()
 *** get_station()
-*** format_sengyo(param)
-*** merge_oldr(param)
+*** format(param)
+*** merge_old(param)
 ** conv2entsheet()
 *** load_tidied(data)
-*** conv2entsheet(tidied)
-** export_entsheet()
-*** load_entsheet(entsheet)
-*** split_year(entsheet)
+*** conv2inputSheet(tidied)
+** export_inputSheet()
+*** load_inputSheet(entsheet)
+*** split_year(inputSheet)
 *** export_entsheet(entsheet, outdir)
 * データ整備状況
 ** マアジ高精度化
@@ -33,10 +145,10 @@ CLOCK: [2018-12-14 Fri 15:14]--[2018-12-14 Fri 16:57] =>  1:43
 - 2011から2013まで完了
 :END:
 [[/Users/ahayashi/Documents/GitHub/jm/tidy_data.org][データ整理プロジェクト]]
-*** TODO 調査結果 [0%]
+*** TODO 調査結果 [33%]
 **** FUTURE 島根
 **** FUTURE 鳥取
-**** 陽光丸
-***** TODO 大下さんに聞いてみる
+**** DONE 陽光丸
+大下さんが既にやってくれている
 *** 不足データを追加し，データを統合する
 ** NAS
