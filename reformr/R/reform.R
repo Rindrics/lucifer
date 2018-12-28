@@ -16,9 +16,9 @@ make_params <- function(indir, type, spcs){
   param$indir <- indir
   param
 }
-make_datlist <- function(param){
-  if (param$type == "sengyo") {
-    datlist <- list.files(param$indir, pattern = "鮮魚")
+make_datlist <- function(indir, type){
+  if (type == "sengyo") {
+    datlist <- list.files(indir, pattern = "鮮魚")
   }
   datlist
 }
@@ -30,13 +30,13 @@ parse_year <- function(datlist){
   yearlist
 }
 
-get_filelist <- function(param) {
-  if (is.na(param$spcs)) {
+get_filelist <- function(indir, spcs) {
+  if (is.na(spcs)) {
     stop("Give me Japanese species name")
   } else {
-    regexp   <- paste0(param$spcs, ".+")
+    regexp   <- paste0(spcs, ".+")
   }
-  filelist <- list.files(param$indir, pattern = regexp, recursive = TRUE, full.names = TRUE)
+  filelist <- list.files(indir, pattern = regexp, recursive = TRUE, full.names = TRUE)
   filelist
 }
 
@@ -53,7 +53,14 @@ get_date <- function(year, sheetname) {
   date
 }
 
-# format_sengyo <- function(indir, spcs) {
+format <- function(infile, sheet) {
+  data <- readxl::read_xls(infile, sheet = sheet) %>%
+    mutate(original.fname = infile,
+           original.sheetname = sheet)
+  data
+}
+
+# format <- function(infile, sheet) {
 #   out      <- NULL
 #   yearlist <- get_year(indir)
 #   filelist <- get_filelist(indir, spcs_name)

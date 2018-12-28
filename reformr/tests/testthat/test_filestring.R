@@ -1,27 +1,28 @@
 library(tidyverse)
-param <- list()
-param$indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係"
-param$type  <- "sengyo"
+context("Parse file and sheet names")
+indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係"
+type  <- "sengyo"
 test_that("make_datlist make data list correctly", {
-  expect_match(make_datlist(param), "鮮魚測定06", all = FALSE)
-  expect_match(make_datlist(param), "鮮魚測定07", all = FALSE)
+  expect_match(make_datlist(indir, type), "鮮魚測定06", all = FALSE)
+  expect_match(make_datlist(indir, type), "鮮魚測定07", all = FALSE)
 })
 
-datlist <- make_datlist(param)
+datlist <- make_datlist(indir, type)
 
 test_that("parse_year() puts year list correctly", {
   expect_match(parse_year(datlist), "2008", all = FALSE)
   expect_match(parse_year(datlist), "2009", all = FALSE)
+  expect_match(parse_year("鮮魚測定11"), "2011")
+  expect_match(parse_year("鮮魚測定99"), "2099")
+  expect_match(parse_year("aaaa99"), "2099")
+  expect_match(parse_year("____99"), "2099")
+  expect_match(parse_year("123499"), "2099")
 })
 
-anchovy <- param; anchovy$spcs <- "カタクチイワシ"
-sardine <- param; sardine$spcs <- "カタクチイワシ"
-noname  <- param; noname$spcs <- NA
-
 test_that("get_filelist() puts species file list correctly", {
-  expect_match(get_filelist(anchovy), "カタクチイワシ.xls", all = FALSE)
-  expect_match(get_filelist(sardine), "カタクチイワシ.xls", all = FALSE)
-  expect_error(get_filelist(noname), "Give me Japanese species name", fixed = TRUE)
+  expect_match(get_filelist(indir, "カタクチイワシ"), "カタクチイワシ.xls", all = FALSE)
+  expect_match(get_filelist(indir, "マイワシ"), "マイワシ.xls", all = FALSE)
+  expect_error(get_filelist(indir, NA), "Give me Japanese species name", fixed = TRUE)
 })
 
 infile06 <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls"

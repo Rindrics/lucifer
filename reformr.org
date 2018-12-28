@@ -1,5 +1,5 @@
 #+TITLE: reformr 開発プロジェクトノート
-#+PROPERTY: header-args :session *R:tidyNAS
+#+PROPERTY: header-args :session *R:tidyNAS*
 
 #+call: load-packages() :results silent
 
@@ -94,23 +94,115 @@ ls reformr/
 | 鮮魚測定19/カタクチイワシ.xls |
 | 鮮魚測定19/マイワシ.xls       |
 
+* テストを書く
+** パラメータ作成関数
+#+BEGIN_SRC R :tangle reformr/tests/testthat/test_param.R
+library(tidyverse)
+context("Handle param object")
+test_that("make_params accept only 'sengyo' or 'cruise'", {
+  expect_error(make_params(indir = "./", "a"), "Tell me the correct type of data. Is it 'sengyo', or 'cruise?'", fixed = TRUE)
+  expect_error(make_params(indir = "./", 1), "Tell me the correct type of data. Is it 'sengyo', or 'cruise?'", fixed = TRUE)
+})
+test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or 'マアジ' ", {
+  expect_error(make_params(indir = "./", "sengyo", 1), "Tell me the correct Japanese species name.", fixed = TRUE)
+  expect_error(make_params(indir = "./", "sengyo", "Anchovy"),  "Tell me the correct Japanese species name.", fixed = TRUE)
+})
+#+END_SRC
+
+** 文字列パース
+#+BEGIN_SRC R :tangle reformr/tests/testthat/test_filestring.R
+  library(tidyverse)
+  context("Parse file and sheet names")
+  indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係"
+  type  <- "sengyo"
+  test_that("make_datlist make data list correctly", {
+    expect_match(make_datlist(indir, type), "鮮魚測定06", all = FALSE)
+    expect_match(make_datlist(indir, type), "鮮魚測定07", all = FALSE)
+  })
+
+  datlist <- make_datlist(indir, type)
+
+  test_that("parse_year() puts year list correctly", {
+    expect_match(parse_year(datlist), "2008", all = FALSE)
+    expect_match(parse_year(datlist), "2009", all = FALSE)
+    expect_match(parse_year("鮮魚測定11"), "2011")
+    expect_match(parse_year("鮮魚測定99"), "2099")
+    expect_match(parse_year("aaaa99"), "2099")
+    expect_match(parse_year("____99"), "2099")
+    expect_match(parse_year("123499"), "2099")
+  })
+
+  test_that("get_filelist() puts species file list correctly", {
+    expect_match(get_filelist(indir, "カタクチイワシ"), "カタクチイワシ.xls", all = FALSE)
+    expect_match(get_filelist(indir, "マイワシ"), "マイワシ.xls", all = FALSE)
+    expect_error(get_filelist(indir, NA), "Give me Japanese species name", fixed = TRUE)
+  })
+
+  infile06 <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls"
+  infile17 <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/鮮魚測定17/カタクチイワシ.xls"
+
+  test_that("get_sheet2read() puts sheets to read", {
+    expect_match(get_sheet2read(infile06), "0125", all = FALSE)
+    expect_match(get_sheet2read(infile06), "0207", all = FALSE)
+    expect_equal(length(get_sheet2read(infile06)), 10)
+    expect_equal(length(get_sheet2read(infile17)), 0)
+  })
+
+  test_that("get_date() parses dates correctly", {
+    expect_equal(get_date(2012, "0201"), as.Date("2012-02-01"))
+    expect_equal(get_date(2012, "0201(1)"), as.Date("2012-02-01"))
+    expect_equal(get_date(2017, "170201(1)"), as.Date("2017-02-01"))
+    expect_equal(get_date(2017, "170201(11)"), as.Date("2017-02-01"))
+  })
+
+#+END_SRC
+
+** データ整形関数
+#+BEGIN_SRC R :tangle reformr/tests/testthat/test_format.R
+  library(tidyverse)
+  context("Formatting loaded data")
+  param <- list()
+  param$indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係"
+  param$type  <- "sengyo"
+  param$spcs  <- "カタクチイワシ"
+  # get_filelist(param)
+  infile <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls"
+  # get_sheet2read(infile)
+  sheet  <- "0125"
+  data   <- format(infile, sheet)
+  test_that("format() cleanses data", {
+                                          # expect_match(object, regexp, ignore.case = TRUE)
+                                          # expect_output(object, regexp, fixed = TRUE)
+                                          # expect_error()
+                                          # expect_message()
+                                          # expect_is(model, "lm")
+  })
+
+#+END_SRC
 * 関数群を開発する
 ** reform(indir, type)
 #+BEGIN_SRC R :tangle reformr/R/reform.R
   # This script is tangled from reformr.org.
   # Do not edit by hand!!!
-  make_params <- function(indir, type){
+  make_params <- function(indir, type, spcs){
+    spcs_list <- c("カタクチイワシ", "マイワシ", "マアジ")
+    param <- list()
     if (type %in% c("sengyo", "cruise") == TRUE) {
-      param <- list(type = type)
+      param$type = type
     } else {
       stop("Tell me the correct type of data. Is it 'sengyo', or 'cruise?'")
+    }
+    if (spcs %in% spcs_list) {
+      param$spcs <- spcs
+    } else {
+      stop("Tell me the correct Japanese species name.")
     }
     param$indir <- indir
     param
   }
-  make_datlist <- function(param){
-    if (param$type == "sengyo") {
-      datlist <- list.files(param$indir, pattern = "鮮魚")
+  make_datlist <- function(indir, type){
+    if (type == "sengyo") {
+      datlist <- list.files(indir, pattern = "鮮魚")
     }
     datlist
   }
@@ -122,13 +214,13 @@ ls reformr/
     yearlist
   }
 
-  get_filelist <- function(param) {
-    if (is.na(param$spcs)) {
+  get_filelist <- function(indir, spcs) {
+    if (is.na(spcs)) {
       stop("Give me Japanese species name")
     } else {
-      regexp   <- paste0(param$spcs, ".+")
+      regexp   <- paste0(spcs, ".+")
     }
-    filelist <- list.files(param$indir, pattern = regexp, recursive = TRUE, full.names = TRUE)
+    filelist <- list.files(indir, pattern = regexp, recursive = TRUE, full.names = TRUE)
     filelist
   }
 
@@ -145,7 +237,14 @@ ls reformr/
     date
   }
 
-  # format_sengyo <- function(indir, spcs) {
+  format <- function(infile, sheet) {
+    data <- readxl::read_xls(infile, sheet = sheet) %>%
+      mutate(original.fname = infile,
+             original.sheetname = sheet)
+    data
+  }
+
+  # format <- function(infile, sheet) {
   #   out      <- NULL
   #   yearlist <- get_year(indir)
   #   filelist <- get_filelist(indir, spcs_name)
@@ -168,13 +267,10 @@ ls reformr/
   #   out
   # }
 #+END_SRC
-*** コードを書く
 
-*** make_params(type = c("sengyo", "cruise"))
-*** get_year(param)
-*** get_filelist(param)
-*** get_sheet2read()
-*** get_date()
+#+RESULTS:
+
+*** コードを書く
 *** get_station()
 *** format(param)
 *** merge_old(param)
@@ -186,22 +282,30 @@ ls reformr/
 *** split_year(inputSheet)
 *** export_entsheet(entsheet, outdir)
 * 再ロードしてテストする
-#+BEGIN_SRC R :results silent
+#+BEGIN_SRC R :results table
   devtools::load_all("reformr")
   devtools::test("reformr")
 #+END_SRC
 
+#+RESULTS:
+| test_filestring.R | Parse file and sheet names | make_datlist make data list correctly                            | 0 | 0 | FALSE | TRUE  | 0 | 0.000999999999999446 | 0 | 0.00100000000020373 |
+| test_format.R     | Formatting loaded data     | format() cleanses data                                           | 1 | 0 | TRUE  | FALSE | 0 |                    0 | 0 | 0.00100000000020373 |
+| test_param.R      | Handle param object        | make_params accept only 'sengyo' or 'cruise'                     | 2 | 0 | FALSE | FALSE | 0 |  0.00200000000000067 | 0 | 0.00199999999676947 |
+| test_param.R      | Handle param object        | make_params accept only 'カタクチイワシ', 'マイワシ' or 'マアジ' | 2 | 0 | FALSE | FALSE | 0 |  0.00199999999999889 | 0 | 0.00200000000040745 |
+
 * データ整備状況
 ** マアジ高精度化
-*** TODO 測定台帳 [66%]
+*** DONE 測定台帳 [100%]
+[[/Users/ahayashi/Documents/GitHub/jm/tidy_data.org][データ整理プロジェクト]]
 **** DONE 島根稚魚
 **** DONE 鳥取稚魚
-**** TODO 陽光丸稚魚
+**** DONE 陽光丸稚魚
 :LOGBOOK:
+CLOCK: [2018-12-28 Fri 11:05]--[2018-12-28 Fri 15:44] =>  4:39
 CLOCK: [2018-12-14 Fri 15:14]--[2018-12-14 Fri 16:57] =>  1:43
 - 2011から2013まで完了
 :END:
-[[/Users/ahayashi/Documents/GitHub/jm/tidy_data.org][データ整理プロジェクト]]
+
 *** TODO 調査結果 [33%]
 **** FUTURE 島根
 **** FUTURE 鳥取
