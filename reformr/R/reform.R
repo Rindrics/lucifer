@@ -1,10 +1,17 @@
 # This script is tangled from reformr.org.
 # Do not edit by hand!!!
-make_params <- function(indir, type){
+make_params <- function(indir, type, spcs){
+  spcs_list <- c("カタクチイワシ", "マイワシ", "マアジ")
+  param <- list()
   if (type %in% c("sengyo", "cruise") == TRUE) {
-    param <- list(type = type)
+    param$type = type
   } else {
     stop("Tell me the correct type of data. Is it 'sengyo', or 'cruise?'")
+  }
+  if (spcs %in% spcs_list) {
+    param$spcs <- spcs
+  } else {
+    stop("Tell me the correct Japanese species name.")
   }
   param$indir <- indir
   param
