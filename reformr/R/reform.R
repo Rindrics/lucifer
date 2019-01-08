@@ -57,7 +57,7 @@ format <- function(infile, sheet) {
   data_org <- readxl::read_xls(infile, sheet = sheet)
   col_names <- colnames(data_org)
   if (col_names[1] == "番号") data_org <- rename(data_org, No = "番号")
-  if (any(regexpr("耳石", col_names) >0 ) == FALSE) data_org <- mutate(data_org, 耳石 = 0) 
+  if (any(regexpr("耳石", col_names) >0 ) == FALSE) data_org <- mutate(data_org, 耳石 = 0)
   data <- data_org %>%
     transmute(sample.no = parse_integer(No),
               bl_mm = parse_double(BL),
