@@ -327,10 +327,212 @@ CLOCK: [2018-12-14 Fri 15:14]--[2018-12-14 Fri 16:57] =>  1:43
 - 2011から2013まで完了
 :END:
 
-*** TODO 調査結果 [33%]
-**** FUTURE 島根
-**** FUTURE 鳥取
-**** DONE 陽光丸
+*** TODO 調査結果 [66%]
+
+***** DONE 島根                                                :要関数化:
+****** 関数定義
+dfを読み込むのではなく，ファイル名を読み込むように変更するべき．
+:PROPERTIES:
+:ORDERED:  t
+:END:
+#+BEGIN_SRC R
+  format_trawl_shimane <- function(df) {
+      df %>%
+        transmute(date.collected = ymd(`月日`),
+                  cruise.number = `回次`,
+               station = Stn.,
+               lat.trawl.start_org = 曳網開始位置,
+               lon.trawl.start_org = 曳網開始位置__1,
+               tow.duration_min = 曳網時間,
+               tow.speed_kt = 曳網速度,
+               tow.depth_m = `曳網水深（最大）`,
+               n.Trachurus.japonicus = マアジ,
+               t0   = `0m`,
+               t10  = `10m`,
+               t20  = `20m`,
+               t30  = `30m`,
+               t50  = `50m`,
+               t75  = `75m`,
+               t100 = `100m`,
+               t150 = `150m`,
+               t200 = `200m`,
+               t300 = `300m`,
+               s0   = `0m (1m)`,
+               s10  = `10m__1`,
+               s20  = `20m__1`,
+               s30  = `30m__1`,
+               s50  = `50m__1`,
+               s75  = `75m__1`,
+               s100 = `100m__1`,
+               s150 = `150m__1`,
+               s200 = `200m__1`,
+               s300 = `300m__1`) %>%
+        mutate(year = year(date.collected),
+               month = month(date.collected) %>%
+                 formatC(width=2, flag="0"),
+               day = day(date.collected),
+               pseudo.month = ifelse(cruise.number == 1, "05",
+                                      ifelse(cruise.number == 2, "06", "07")),
+               cruise.name = paste0("Shimane", substr(year, 3, 4), pseudo.month, "JM"),
+               id1 = paste(cruise.name, station, sep="_"),
+               lat.trawl.start_deg = str_sub(lat.trawl.start_org, 1, 2) %>%
+                 parse_number(),
+               lat.trawl.start_min = str_sub(lat.trawl.start_org, 3, -1) %>%
+                 parse_number(),
+               lat.trawl.start_decimal = lat.trawl.start_deg + lat.trawl.start_min/60,
+               lon.trawl.start_deg = str_sub(lon.trawl.start_org, 1, 3) %>%
+                 parse_number(),
+               lon.trawl.start_min = str_sub(lon.trawl.start_org, 4, -1) %>%
+                 parse_number(),
+               lon.trawl.start_decimal = lon.trawl.start_deg + lon.trawl.start_min/60
+               ) %>%
+        select(-lat.trawl.start_org, -lon.trawl.start_org)
+    }
+#+END_SRC
+
+:LOGBOOK:
+CLOCK: [2019-01-08 Tue 11:51]--[2019-01-08 Tue 12:25] =>  0:34
+:END:
+****** 各年のデータを整形
+いずれは島根の元データを直接処理する関数が必要
+******* 2011, 2013, 2015年を関数で整形
+ただし読み込み元のシート'forR'も手作業を介している．要改善．
+#+BEGIN_SRC R :results silent
+  trawl_shimane2011 <- read_xlsx(paste0(datdir_jm_org, "/2011島根県マアジ加入量調査データ.xlsx"),
+                                sheet="forR",
+                                col_types = c("text", "numeric", "date", rep("text", 15), rep("numeric", 31))) %>%
+    format_trawl_shimane()
+  trawl_shimane2013 <- read_xlsx(paste0(datdir_jm_org, "島根県_マアジ加入量_2013.xlsx"),
+                                sheet="forR", range = "A1:AV44",
+                                col_types = c("text", "numeric", "date", rep("text", 15), rep("numeric", 30))) %>%
+    format_trawl_shimane()
+  trawl_shimane2015 <- read_xlsx(paste0(datdir_jm_org, "島根県_マアジ加入量_2015ver3.xlsx"),
+                                sheet="forR", range = "A1:AS44",
+                                col_types = c("text", "date", "numeric", rep("text", 11), rep("numeric", 31))) %>%
+    format_trawl_shimane()
+#+END_SRC
+
+******* 2012年を力技で整形
+:LOGBOOK:
+CLOCK: [2019-01-08 Tue 13:05]--[2019-01-08 Tue 14:11] =>  1:06
+:END:
+#+BEGIN_SRC R :results silent
+  year                    <- 2012
+  border_may_jun          <- as.Date(paste(year, "-05-25", sep=""))
+  border_jun_jul          <- as.Date(paste(year, "-06-25", sep=""))
+
+  trawl_shimane2012_org <- read_xlsx(paste0(datdir_jm_org, "2012島根県マアジ加入量調査データ.xlsx"), sheet="for me", skip=1,
+                            col_types = c("text", "numeric", "date", "text",
+                                          rep("numeric", 4), "date", rep("numeric", 6)))
+  trawl_shimane2012 <- trawl_shimane2012_org %>%
+    rename(prefec = X__1,
+           no = X__2,
+           date.collected = X__3,
+           station = X__4,
+           lat.obs = 北緯,
+           lon.obs = 東経,
+           lat.trawl.start_degmin = 北緯__1,
+           lon.trawl.start_degmin = 東経__1,
+           time.trawl.start = X__5,
+           t0  = `0m`,
+           t10 = `10m`,
+           t20 = `20m`,
+           t30 = `30m`,
+           t50 = `50m`,
+           n.Trachurus.japonicus = マアジ) %>%
+    mutate(date.collected = ymd(date.collected),
+           year = year(date.collected),
+           month = month(date.collected) %>%
+                     formatC(width = 2, flag = 0),
+           day = day(date.collected),
+           lat.trawl.start_degmin = parse_number(lat.trawl.start_degmin),
+           lon.trawl.start_degmin = parse_number(lon.trawl.start_degmin),
+           lat.trawl.start_deg = floor(lat.trawl.start_degmin),
+           lat.trawl.start_min = (lat.trawl.start_degmin-lat.trawl.start_deg)*100,
+           lon.trawl.start_deg = floor(lon.trawl.start_degmin),
+           lon.trawl.start_min = (lon.trawl.start_degmin-lon.trawl.start_deg)*100,
+           tow.speed_kt = 3.0,
+           tow.duration_min = 30,
+           cruise.name = paste0("Shimane", substr(year,3,4), ifelse(date.collected < border_may_jun, "05JM",
+                                   ifelse(date.collected > border_jun_jul, "07JM",
+                                           "06JM"))))
+#+END_SRC
+
+******* 2014年を力技で整形
+#+BEGIN_SRC R :results silent
+  year                    <- 2014
+  border_may_jun          <- as.Date(paste(year, "-05-25", sep=""))
+  border_jun_jul          <- as.Date(paste(year, "-06-25", sep=""))
+  trawl_shimane2014_org <- read_xlsx(paste0(datdir_jm_org, "Shimane_sampling_2014_MayJun.xlsx"), sheet=4)
+  trawl_shimane2014 <- trawl_shimane2014_org %>%
+    rename(date.collected = date,
+           station = `stn#`,
+           lat.trawl.start_deg = Lat,
+           lat.trawl.start_min = `Lat-min`,
+           lon.trawl.start_deg = Lon,
+           lon.trawl.start_min = `Lon-min`,
+           tow.duration_min = `towing time`,
+           tow.speed_kt = `Towing speed (knot)`,
+           tow.distance_km = `曳網距離（km）`,
+           tow.depth_m = `towing depth`,
+           t20 = T20,
+           t50 = T50,
+           mouth.opening_m2 = `開口面積(m2)`,
+           n.Trachurus.japonicus = `マアジ（固体/haul）`) %>%
+    mutate(date.collected = ymd(date.collected),
+           year = year(date.collected),
+           month = month(date.collected) %>%
+                     formatC(width = 2, flag = 0),
+           day = day(date.collected),
+           cruise.name = paste0("Shimane", substr(year,3,4), ifelse(date.collected < border_may_jun, "05JM",
+                                   ifelse(date.collected > border_jun_jul, "07JM",
+                                           "06JM"))))
+
+#+END_SRC
+
+
+****** 島根データを統合
+#+BEGIN_SRC R :results output
+  trawl_shimane <- bind_rows(trawl_shimane2011,
+                             trawl_shimane2012,
+                             trawl_shimane2013,
+                             trawl_shimane2014,
+                             trawl_shimane2015) %>%
+    mutate(date.collected = as.Date(date.collected),
+           year = year(date.collected),
+           month = month(date.collected) %>%
+             formatC(width=2, flag="0"),
+           day = day(date.collected),
+           mouth.opening_m2 = 100,
+           lat.trawl.start_decimal = lat.trawl.start_deg + lat.trawl.start_min/60,
+           lon.trawl.start_decimal = lon.trawl.start_deg + lon.trawl.start_min/60,
+           id1 = paste(cruise.name, station, sep="_"),
+           tow.distance_km = tow.speed_kt * 1.85 * tow.duration_min / 60,
+           water.vol.trawled_m3 = tow.distance_km * mouth.opening_m2 * 1000,
+           d.Trachurus.japonicus_inds.per.m3 = n.Trachurus.japonicus / water.vol.trawled_m3) %>%
+    arrange(date.collected)
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC R
+  trawl_shimane %>%
+    ggplot(aes(d.Trachurus.japonicus_inds.per.m3)) +
+    geom_histogram() +
+    facet_grid(year ~ .)
+
+  # ggplot(shimane, aes(x = lon.trawl.start_decimal, y=lat.trawl.start_decimal, size=log10(d.Trachurus.japonicus_inds.per.m3+1))) +
+  #   geom_point() +
+  #   facet_wrap(~ year)
+
+  # write.csv(shimane, "./output/dist_shimane.csv", row.names=FALSE)
+  # unique(shimane$id1)
+#+END_SRC
+
+#+RESULTS:
+
+***** FUTURE 鳥取
+***** DONE 陽光丸
 大下さんが既にやってくれている
 *** 不足データを追加し，データを統合する
 ** NAS
