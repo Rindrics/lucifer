@@ -49,36 +49,26 @@ get_date <- function(year, sheetname) {
   date_char <- dplyr::if_else(str_length(sheetname) >= 9,
                        paste0(20, str_sub(sheetname, 1, 6)),
                        paste0(year, str_sub(sheetname, 1, 4)))
-  date <- lubridate::ymd(date_char)
+  date      <- lubridate::ymd(date_char)
   date
 }
 
 format <- function(infile, sheet) {
-  data <- readxl::read_xls(infile, sheet = sheet) %>%
+  data_org <- readxl::read_xls(infile, sheet = sheet)
+  col_names <- colnames(data_org)
+  if (col_names[1] == "番号") data_org <- rename(data_org, No = "番号")
+  if (any(regexpr("耳石", col_names) >0 ) == FALSE) data_org <- mutate(data_org, 耳石 = 0) 
+  data <- data_org %>%
+    transmute(sample.no = parse_integer(No),
+              bl_mm = parse_double(BL),
+              bw_g = parse_double(BW),
+              sex = parse_integer(Sex),
+              gw_g = parse_double(GW),
+              gsi = gw_g / bw_g * 100,
+              otolith.taken = 耳石 %>%
+                str_replace("y", "1") %>%
+                parse_integer()) %>%
     mutate(original.fname = infile,
            original.sheetname = sheet)
   data
 }
-
-# format <- function(infile, sheet) {
-#   out      <- NULL
-#   yearlist <- get_year(indir)
-#   filelist <- get_filelist(indir, spcs_name)
-#   for (i in seq_along(filelist)) {
-#     infile      <- filelist[i]
-#     year        <- yearlist[i]
-#     sheets2read <- get_sheet2read(infile)
-#     print(year)
-#     for (j in seq_along(sheets2read)) {
-#       sheetname <- sheets2read[j]
-#       date <- get_date(year, sheetname)
-#       data <- read_xls(infile, sheet = sheetname) %>%
-#         mutate(date = date,
-#                original.fname = infile,
-#                original.sheetname = sheetname)
-#       print(sheetname)
-#       out  <- bind_rows(out, data)
-#     }
-#   }
-#   out
-# }

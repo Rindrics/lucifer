@@ -1,18 +1,36 @@
 library(tidyverse)
 context("Formatting loaded data")
 param <- list()
-param$indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係"
-param$type  <- "sengyo"
-param$spcs  <- "カタクチイワシ"
+indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/"
+type  <- "sengyo"
+spcs  <- "カタクチイワシ"
 # get_filelist(param)
-infile <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls"
+col_names <- c("sample.no", "bl_mm", "bw_g", "sex", "gw_g", "gsi", "otolith.taken", "original.fname", "original.sheetname")
 # get_sheet2read(infile)
-sheet  <- "0125"
-data   <- format(infile, sheet)
-test_that("format() cleanses data", {
-                                        # expect_match(object, regexp, ignore.case = TRUE)
-                                        # expect_output(object, regexp, fixed = TRUE)
-                                        # expect_error()
-                                        # expect_message()
-                                        # expect_is(model, "lm")
+test_that("format() make datcols correctly", {
+  expect_equal(length(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125"))), length(col_names))
+  expect_equal(length(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325"))), length(col_names))
+  expect_equal(length(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0116"))), length(col_names))
+  expect_equal(length(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0117"))), length(col_names))
+  expect_equal(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")), col_names, ignore.case = FALSE)
+  expect_equal(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0116")), col_names, ignore.case = FALSE)
+  expect_equal(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0117")), col_names, ignore.case = FALSE)
+})
+
+test_that("format() cleanses length and weight columns correctly", {
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$sample.no), "integer")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$bl_mm), "double")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$bw_g), "double")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$sex), "integer")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$gw_g), "double")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$gsi), "double")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$sample.no), "integer")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$bl_mm), "double")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$bw_g), "double")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$sex), "integer")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$gw_g), "double")
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$gsi), "double")
+})
+test_that("format() cleanses otolith and scale columns correctly", {
+  expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$otolith.taken), "integer")
 })

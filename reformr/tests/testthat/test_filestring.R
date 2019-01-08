@@ -22,6 +22,7 @@ test_that("parse_year() puts year list correctly", {
 test_that("get_filelist() puts species file list correctly", {
   expect_match(get_filelist(indir, "カタクチイワシ"), "カタクチイワシ.xls", all = FALSE)
   expect_match(get_filelist(indir, "マイワシ"), "マイワシ.xls", all = FALSE)
+  expect_error(get_filelist(indir), "argument \"spcs\" is missing, with no default", fixed = TRUE)
   expect_error(get_filelist(indir, NA), "Give me Japanese species name", fixed = TRUE)
 })
 
