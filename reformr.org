@@ -166,9 +166,9 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
   library(tidyverse)
   context("Formatting loaded data")
   param <- list()
-  param$indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係"
-  param$type  <- "sengyo"
-  param$spcs  <- "カタクチイワシ"
+  indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/"
+  type  <- "sengyo"
+  spcs  <- "カタクチイワシ"
   # get_filelist(param)
   infile <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls"
   # get_sheet2read(infile)
