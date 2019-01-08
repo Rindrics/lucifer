@@ -55,16 +55,12 @@ devtools::use_testthat("reformr")
 #+RESULTS:
 
 *** dir 確認
-#+BEGIN_SRC bash
-ls reformr/
+#+BEGIN_SRC bash :session nil :results output
+ls reformr
 #+END_SRC
 
 #+RESULTS:
-| DESCRIPTION   |
-| NAMESPACE     |
-| R             |
-| reformr.Rproj |
-| tests         |
+: DESCRIPTION	NAMESPACE	R		reformr.Rproj	tests
 * データのリストを作ってみる
 #+NAME: load_data
 #+BEGIN_SRC R :session *R:tidyNAS* :var indir = "./data/鮮魚関係"
