@@ -1,7 +1,16 @@
 #+TITLE: reformr 開発プロジェクトノート
 #+PROPERTY: header-args :session *R:tidyNAS*
 
-#+call: load-packages() :results silent
+#+call: load-packages()
+#+call: constants()
+
+* このパッケージでやらないこと
+外部機関から送付されたデータの整形
+- マアジ高精度化の島根，鳥取 -> jm
+- 漁海況各県データ -> gyokaikyo
+
+** なぜか？
+reformr で扱うデータは，当研究室で生み出されたデータなので，原本をきれいに保つ意義がある．
 
 * パッケージ読み込み
 #+name: load-packages
@@ -162,7 +171,7 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
 #+END_SRC
 
 ** データ整形関数
-#+BEGIN_SRC R :tangle reformr/tests/testthat/test_format.R
+#+BEGIN_SRC R :tangle reformr/tests/testthat/test_format.R :results silent
   library(tidyverse)
   context("Formatting loaded data")
   param <- list()
@@ -200,6 +209,7 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
     expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$otolith.taken), "integer")
   })
 #+END_SRC
+
 * 関数群を開発する
 ** reform(indir, type)
 #+BEGIN_SRC R :tangle reformr/R/reform.R
@@ -299,10 +309,16 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
 #+END_SRC
 
 #+RESULTS:
-| test_filestring.R | Parse file and sheet names | make_datlist make data list correctly                            | 0 | 0 | FALSE | TRUE  | 0 | 0.000999999999999446 | 0 | 0.00100000000020373 |
-| test_format.R     | Formatting loaded data     | format() cleanses data                                           | 1 | 0 | TRUE  | FALSE | 0 |                    0 | 0 | 0.00100000000020373 |
-| test_param.R      | Handle param object        | make_params accept only 'sengyo' or 'cruise'                     | 2 | 0 | FALSE | FALSE | 0 |  0.00200000000000067 | 0 | 0.00199999999676947 |
-| test_param.R      | Handle param object        | make_params accept only 'カタクチイワシ', 'マイワシ' or 'マアジ' | 2 | 0 | FALSE | FALSE | 0 |  0.00199999999999889 | 0 | 0.00200000000040745 |
+| test_filestring.R | Parse file and sheet names | make_datlist make data list correctly                            |  2 | 0 | FALSE | FALSE | 0 |  0.00199999999999889 |                   0 | 0.00199999999949796 |
+| test_filestring.R | Parse file and sheet names | parse_year() puts year list correctly                            |  7 | 0 | FALSE | FALSE | 0 |  0.00600000000000023 | 0.00099999999999989 | 0.00700000000051659 |
+| test_filestring.R | Parse file and sheet names | get_filelist() puts species file list correctly                  |  4 | 0 | FALSE | FALSE | 0 |  0.00499999999999901 | 0.00100000000000011 | 0.00599999999940337 |
+| test_filestring.R | Parse file and sheet names | get_sheet2read() puts sheets to read                             |  4 | 0 | FALSE | FALSE | 0 |  0.00400000000000134 | 0.00099999999999989 | 0.00700000000051659 |
+| test_filestring.R | Parse file and sheet names | get_date() parses dates correctly                                |  4 | 0 | FALSE | FALSE | 0 |  0.00900000000000034 |                   0 | 0.00900000000001455 |
+| test_format.R     | Formatting loaded data     | format() make datcols correctly                                  |  7 | 0 | FALSE | FALSE | 0 |   0.0399999999999991 | 0.00099999999999989 |  0.0420000000003711 |
+| test_format.R     | Formatting loaded data     | format() cleanses length and weight columns correctly            | 12 | 0 | FALSE | FALSE | 0 |    0.116000000000003 | 0.00299999999999989 |   0.118999999999687 |
+| test_format.R     | Formatting loaded data     | format() cleanses otolith and scale columns correctly            |  1 | 0 | FALSE | FALSE | 0 |  0.00999999999999801 | 0.00100000000000011 |   0.011000000000422 |
+| test_param.R      | Handle param object        | make_params accept only 'sengyo' or 'cruise'                     |  2 | 0 | FALSE | FALSE | 0 |  0.00200000000000244 |                   0 | 0.00200000000040745 |
+| test_param.R      | Handle param object        | make_params accept only 'カタクチイワシ', 'マイワシ' or 'マアジ' |  2 | 0 | FALSE | FALSE | 0 | 0.000999999999997669 |                   0 | 0.00199999999949796 |
 
 * データ整備状況
 ** マアジ高精度化
