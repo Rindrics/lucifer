@@ -1,5 +1,5 @@
-#:TITLE: tidyNAS
-#:STARTUP: overview
+#+TITLE: tidyNAS
+#+STARTUP: overview
 * これは何か？
 浮魚資源グループの NAS 内のデータを，使いやすい形で蓄積していくためのプロジェクト．
 
