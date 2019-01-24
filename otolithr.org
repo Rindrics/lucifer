@@ -1,0 +1,10 @@
+#+TITLE: reformr 開発プロジェクトノート
+#+PROPERTY: header-args :cache yes :exports code :results scalar
+#+STARTUP: contents
+* 開発準備
+#+BEGIN_SRC R
+getwd()
+# devtools::create("otolithr")
+#+END_SRC
+
+* 古いコード
