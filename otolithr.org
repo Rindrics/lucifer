@@ -97,14 +97,6 @@ Imports:
                  "'extension' must begin with '.'")
   })
 
-  test_that("get_info.survey() makes sample metadata correctly", {
-    fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
-    info  <- get_info.survey(fname)
-    expect_is(info, "survey")
-    expect_equal(info$spcs, "Sardinops-melanostictus")
-    expect_equal(info$crs.name, "YK1508")
-    expect_equal(info$stn, "MT6")
-    expect_equal(info$sampleno, "10")
   })
 #+END_SRC
 
