@@ -184,6 +184,17 @@ Imports:
     expect_equal(info$sampleno, "005")
   })
 
+  test_that("get_info.reared() makes sample metadata correctly", {
+    fname <- "Sardinops-melanostictus_20160810_temp14_01.hdr"
+    info  <- get_info.reared(fname)
+    expect_is(info, "reared")
+    expect_equal(info$spcs, "Sardinops-melanostictus")
+    expect_equal(info$date, "20160810")
+    expect_equal(info$key1, "temp14")
+    expect_true(is.na(info$key2))
+    expect_equal(info$sampleno, "01")
+  })
+
   test_that("detect_type() detects dattype correctly", {
     path_survey     <- "foo/survey/bar.hdr"
     path_commercial <- "foo/commercial/bar.hdr"
@@ -273,6 +284,17 @@ Imports:
   get_info.commercial <- function(fname) {
     out <- list()
     class(out)   <- "commercial"
+    out$spcs     <- xtract_var(fname, "spcsname")
+    out$date     <- xtract_var(fname, "date")
+    out$key1     <- xtract_var(fname, "key1")
+    out$key2     <- xtract_var(fname, "key2")
+    out$sampleno <- xtract_var(fname, "sampleno")
+    out
+  }
+
+  get_info.reared <- function(fname) {
+    out <- list()
+    class(out)   <- "reared"
     out$spcs     <- xtract_var(fname, "spcsname")
     out$date     <- xtract_var(fname, "date")
     out$key1     <- xtract_var(fname, "key1")
