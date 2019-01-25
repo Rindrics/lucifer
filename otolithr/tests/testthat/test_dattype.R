@@ -18,6 +18,16 @@ test_that("get_info.survey() makes sample metadata correctly", {
   expect_equal(info$sampleno, "10")
 })
 
+test_that("get_info.commercial() makes sample metadata correctly", {
+  fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+  info  <- get_info.commercial(fname_2keys)
+  expect_is(info, "commercial")
+  expect_equal(info$spcs, "Sardinops-melanostictus")
+  expect_equal(info$date, "20150827")
+  expect_equal(info$key1, "Toyama")
+  expect_equal(info$key2, "Nakase")
+  expect_equal(info$sampleno, "005")
+})
 
 test_that("detect_type() detects dattype correctly", {
   path_survey     <- "foo/survey/bar.hdr"
