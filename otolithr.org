@@ -248,20 +248,17 @@ Imports:
 
   xtract_var <- function(fname, var) {
     switch (var,
-            "spcsname" = regex <- "(^[A-Z][a-z]+-[a-z]+)_",
-            "cruise"   = regex <- "^[A-Z][a-z]+-[a-z]+_([A-Za-z0-9]+)_",
-            "stn"   =
-              regex <- "^[A-Z][a-z]+-[a-z]+_[A-Za-z0-9]+_([A-Za-z0-9]+)_",
-            "date"     = regex <- "_(2[0-9]{7})_",
-            "key1"     =
-              regex <- "_2[0-9]{7}_([A-Za-z]+)_(?:[A-Za-z]+_)?[a-zA-Z0-9]+\\.hdr$",
-            "key2"     =
-              regex <- "_2[0-9]{7}_(?:[A-Za-z]+)_([A-Za-z]+)_[a-zA-Z0-9]+\\.hdr$",
-            "sampleno" = regex <- "_([a-zA-Z0-9]+)\\.hdr$",
-            stop(paste0("Unexpected variable '",
-                        eval(bquote(var)),
-                        "' was given."))
-            )
+      "spcsname" = regex <- "(^[A-Z][a-z]+-[a-z]+)_",
+      "cruise"   = regex <- "^[A-Z][a-z]+-[a-z]+_([A-Za-z0-9]+)_",
+      "stn"      = regex <- "^[A-Z][a-z]+-[a-z]+_[A-Za-z0-9]+_([A-Za-z0-9]+)_",
+      "date"     = regex <- "_(2[0-9]{7})_",
+      "key1"     =
+        regex <- "_2[0-9]{7}_([A-Za-z0-9]+)_(?:[A-Za-z]+_)?[a-zA-Z0-9]+\\.hdr$",
+      "key2"     =
+        regex <- "_2[0-9]{7}_(?:[A-Za-z]+)_([A-Za-z0-9]+)_[a-zA-Z0-9]+\\.hdr$",
+      "sampleno" = regex <- "_([a-zA-Z0-9]+)\\.hdr$",
+      stop(paste0("Unexpected variable '", eval(bquote(var)), "' was given."))
+    )
     out <- stringr::str_match(fname, regex)[,2]
     out
   }
