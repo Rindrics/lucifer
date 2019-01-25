@@ -63,6 +63,7 @@ Imports:
 * 開発
 ** リロード & 自動テスト
 #+BEGIN_SRC R :results output
+  setwd("otolithr")
   system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
   devtools::load_all()
   devtools::test()
@@ -72,6 +73,7 @@ Imports:
 #+RESULTS[62d4820a9216b105c72787e032f80205ff1ada32]:
 : No man pages found in package  ‘otolithr’ 
 ** テスト
+*** テスト/ファイル名ハンドリング
 :PROPERTIES:
 :header-args: :results silent :exports code
 :END:
@@ -119,7 +121,32 @@ Imports:
     expect_equal(xtract_var(fname, "sampleno"), "005")
   })
 #+END_SRC
+*** テスト/ファイルパス
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fpath.R
+  library(tidyverse)
+  context("Manage path")
 
+  test_that("get_path() gives file dir correctly", {
+    expect_setequal(get_path("../testdir1"),
+                    c("../testdir1/FOO/data/foo.hdr",
+                      "../testdir1/bar/cannot_read/cannot.hdr",
+                      "../testdir1/bar/data/foo.hdr"))
+    expect_setequal(get_path("../Spcs-dir"),
+                    c("../Spcs-dir/othercruise/station/cannot_read/cannot.hdr",
+                      "../Spcs-dir/othercruise/station/data/foo.hdr",
+                      "../Spcs-dir/somecruise/mtfoo/cannot_read/cannot.hdr",
+                      "../Spcs-dir/somecruise/mtfoo/data/foo.hdr"))
+  })
+
+
+  test_that("get_dir2load() gives paths end with 'data/xxx.hdr'", {
+    paths <- get_path("../testdir1")
+    expect_setequal(get_dir2load(paths),
+                    c("../testdir1/FOO/data/foo.hdr",
+                      "../testdir1/bar/data/foo.hdr"))
+  })
+#+END_SRC
+*** テスト/データタイプ（調査|漁獲物|飼育）
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_dattype.R
   library(tidyverse)
   context("Controle behavior according to dattype")
@@ -162,31 +189,6 @@ Imports:
     expect_equal(detect_type(path_commercial),"commercial")
     expect_equal(detect_type(path_reared),"reared")
     expect_error(detect_type(path_error), msg, fix = TRUE)
-  })
-#+END_SRC
-
-#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fpath.R
-  library(tidyverse)
-  context("Manage path")
-
-  test_that("get_path() gives file dir correctly", {
-    expect_setequal(get_path("../testdir1"),
-                    c("../testdir1/FOO/data/foo.hdr",
-                      "../testdir1/bar/cannot_read/cannot.hdr",
-                      "../testdir1/bar/data/foo.hdr"))
-    expect_setequal(get_path("../Spcs-dir"),
-                    c("../Spcs-dir/othercruise/station/cannot_read/cannot.hdr",
-                      "../Spcs-dir/othercruise/station/data/foo.hdr",
-                      "../Spcs-dir/somecruise/mtfoo/cannot_read/cannot.hdr",
-                      "../Spcs-dir/somecruise/mtfoo/data/foo.hdr"))
-  })
-
-
-  test_that("get_dir2load() gives paths end with 'data/xxx.hdr'", {
-    paths <- get_path("../testdir1")
-    expect_setequal(get_dir2load(paths),
-                    c("../testdir1/FOO/data/foo.hdr",
-                      "../testdir1/bar/data/foo.hdr"))
   })
 #+END_SRC
 ** 関数
@@ -252,7 +254,6 @@ Imports:
   get_info <- function(fname) {
     UseMethod("get_info")
   }
-
 
   get_info.survey <- function(fname) {
     out <- list()
