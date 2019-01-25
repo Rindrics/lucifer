@@ -258,6 +258,7 @@ Imports:
       "key2"     =
         regex <- "_2[0-9]{7}_(?:[A-Za-z]+)_([A-Za-z0-9]+)_[a-zA-Z0-9]+\\.hdr$",
       "sampleno" = regex <- "_([a-zA-Z0-9]+)\\.hdr$",
+      "fname"    = regex <- "(^.+$)",
       stop(paste0("Unexpected variable '", eval(bquote(var)), "' was given."))
     )
     out <- stringr::str_match(fname, regex)[,2]
@@ -276,6 +277,7 @@ Imports:
     out$crs.name <- xtract_var(fname, "cruise")
     out$stn      <- xtract_var(fname, "stn")
     out$sampleno <- xtract_var(fname, "sampleno")
+    out$fname    <- xtract_var(fname, "fname")
     out
   }
 
