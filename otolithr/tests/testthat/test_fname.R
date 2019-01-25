@@ -1,4 +1,4 @@
-library(tidyverse)
+library(otolithr)
 context("Handle file name")
 
 test_that("split_fname() split fname correctly", {
@@ -19,7 +19,7 @@ test_that("rm_extension() removes file extension correctly", {
                "'extension' must begin with '.'")
 })
 
-test_that("detect_var() detects given variable in given vector", {
+test_that("xtract_var() detects given variable in given vector", {
   fname <- "Sardinops-melanostictus_YK1808_MT01_005.hdr"
   expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
   expect_equal(xtract_var(fname, "cruise")  , "YK1808")

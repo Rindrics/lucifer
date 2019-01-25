@@ -1,4 +1,4 @@
-library(tidyverse)
+library(otolithr)
 context("Manage path")
 
 test_that("get_path() gives file dir correctly", {
@@ -19,4 +19,9 @@ test_that("get_dir2load() gives paths end with 'data/xxx.hdr'", {
   expect_setequal(get_dir2load(paths),
                   c("../testdir1/FOO/data/foo.hdr",
                     "../testdir1/bar/data/foo.hdr"))
+})
+
+test_that("fullpath2fname() extracts only fname from full path", {
+  path <- get_path("../testdir1")[1]
+  expect_equal(fullpath2fname(path), "foo.hdr")
 })

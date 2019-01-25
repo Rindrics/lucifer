@@ -1,5 +1,5 @@
-library(tidyverse)
-context("Controle behavior according to dattype")
+library(otolithr)
+context("Control behavior according to dattype")
 
 test_that("set_type() gives type to fname correctly", {
   expect_is(set_type("foo.hdr", "survey"), "survey")
@@ -20,13 +20,24 @@ test_that("get_info.survey() makes sample metadata correctly", {
 
 test_that("get_info.commercial() makes sample metadata correctly", {
   fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
-  info  <- get_info.commercial(fname_2keys)
+  info  <- get_info.commercial(fname)
   expect_is(info, "commercial")
   expect_equal(info$spcs, "Sardinops-melanostictus")
   expect_equal(info$date, "20150827")
   expect_equal(info$key1, "Toyama")
   expect_equal(info$key2, "Nakase")
   expect_equal(info$sampleno, "005")
+})
+
+test_that("get_info.reared() makes sample metadata correctly", {
+  fname <- "Sardinops-melanostictus_20160810_temp14_01.hdr"
+  info  <- get_info.reared(fname)
+  expect_is(info, "reared")
+  expect_equal(info$spcs, "Sardinops-melanostictus")
+  expect_equal(info$date, "20160810")
+  expect_equal(info$key1, "temp14")
+  expect_true(is.na(info$key2))
+  expect_equal(info$sampleno, "01")
 })
 
 test_that("detect_type() detects dattype correctly", {
