@@ -206,6 +206,7 @@ Imports:
   }
 
   split_fname <- function(fname, sep = "_") {
+  # This function may be unnecessary.
     split <- strsplit(fname, sep) %>%
       unlist() %>%
       as.vector()
@@ -256,10 +257,13 @@ Imports:
   get_info.survey <- function(fname) {
     out <- list()
     class(out)   <- "survey"
-    out$spcs     <- split_fname(fname)[1]
-    out$crs.name <- split_fname(fname)[2]
-    out$stn      <- split_fname(fname)[3]
-    out$sampleno <- split_fname(fname)[4] %>% rm_extension(".hdr")
+    out$spcs     <- xtract_var(fname, "spcsname")
+    out$crs.name <- xtract_var(fname, "cruise")
+    out$stn      <- xtract_var(fname, "stn")
+    out$sampleno <- xtract_var(fname, "sampleno")
+    out
+  }
+
   get_info.commercial <- function(fname) {
     out <- list()
     class(out)   <- "commercial"
