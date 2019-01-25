@@ -141,6 +141,16 @@ Imports:
     expect_equal(info$sampleno, "10")
   })
 
+  test_that("get_info.commercial() makes sample metadata correctly", {
+    fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+    info  <- get_info.commercial(fname_2keys)
+    expect_is(info, "commercial")
+    expect_equal(info$spcs, "Sardinops-melanostictus")
+    expect_equal(info$date, "20150827")
+    expect_equal(info$key1, "Toyama")
+    expect_equal(info$key2, "Nakase")
+    expect_equal(info$sampleno, "005")
+  })
 
   test_that("detect_type() detects dattype correctly", {
     path_survey     <- "foo/survey/bar.hdr"
@@ -250,6 +260,14 @@ Imports:
     out$crs.name <- split_fname(fname)[2]
     out$stn      <- split_fname(fname)[3]
     out$sampleno <- split_fname(fname)[4] %>% rm_extension(".hdr")
+  get_info.commercial <- function(fname) {
+    out <- list()
+    class(out)   <- "commercial"
+    out$spcs     <- xtract_var(fname, "spcsname")
+    out$date     <- xtract_var(fname, "date")
+    out$key1     <- xtract_var(fname, "key1")
+    out$key2     <- xtract_var(fname, "key2")
+    out$sampleno <- xtract_var(fname, "sampleno")
     out
   }
 #+END_SRC
