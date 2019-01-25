@@ -149,7 +149,7 @@ Imports:
 *** テスト/データタイプ（調査|漁獲物|飼育）
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_dattype.R
   library(tidyverse)
-  context("Controle behavior according to dattype")
+  context("Control behavior according to dattype")
 
   test_that("set_type() gives type to fname correctly", {
     expect_is(set_type("foo.hdr", "survey"), "survey")
@@ -170,7 +170,7 @@ Imports:
 
   test_that("get_info.commercial() makes sample metadata correctly", {
     fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
-    info  <- get_info.commercial(fname_2keys)
+    info  <- get_info.commercial(fname)
     expect_is(info, "commercial")
     expect_equal(info$spcs, "Sardinops-melanostictus")
     expect_equal(info$date, "20150827")
