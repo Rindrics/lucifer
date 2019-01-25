@@ -78,7 +78,7 @@ Imports:
 :header-args: :results silent :exports code
 :END:
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fname.R
-  library(tidyverse)
+  library(otolithr)
   context("Handle file name")
 
   test_that("split_fname() split fname correctly", {
@@ -123,7 +123,7 @@ Imports:
 #+END_SRC
 *** テスト/ファイルパス
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fpath.R
-  library(tidyverse)
+  library(otolithr)
   context("Manage path")
 
   test_that("get_path() gives file dir correctly", {
@@ -148,7 +148,7 @@ Imports:
 #+END_SRC
 *** テスト/データタイプ（調査|漁獲物|飼育）
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_dattype.R
-  library(tidyverse)
+  library(otolithr)
   context("Control behavior according to dattype")
 
   test_that("set_type() gives type to fname correctly", {
