@@ -335,20 +335,130 @@ Imports:
     dir2load
   }
 #+END_SRC
-** 使ってみる
+** デモ
+:PROPERTIES:
+:header-args: :results output :exports both
+:END:
 #+BEGIN_SRC R
+  devtools::load_all("otolithr")
   path <- "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus"
-  dirlist.org <- get_path(path)
-  dirlist2load <- dirlist.org %>% get_dir2load()
-  fnames <- dirlist2load %>%
-    fullpath2fname()
-  types  <- purrr::map(dirlist2load, detect_type) %>% unlist()
-  fnames <- purrr::map2(fnames, types, set_type)
-  attributes(fnames[[1]])
 
-  info <- purrr::map(fnames, get_info)
-  info[[1]]
-  fnames[[1]]
-  fnames[1]
-  str(info)
+  print(".hdr ファイルがある全ディレクトリのリスト")
+  dirs_org  <- get_path(path)
+  head(dirs_org)
+  tail(dirs_org)
+
+  print("上記リストのうち，解析できなかった個体を除外したリスト")
+  dirs2load <- dirs_org %>% get_dir2load()
+  head(dirs2load)
+  tail(dirs2load)
+
+  print("フルパスをファイル名に変換")
+  fnames    <- dirs2load %>%
+    fullpath2fname()
+  head(fnames)
+  tail(fnames)
+
+  print("サンプリング方法（調査|漁獲|飼育）を取得")
+  types     <- purrr::map(dirs2load, detect_type) %>% unlist()
+  head(types)
+  tail(types)
+
+  print("ファイル名にサンプリング方法を属性として付与")
+  fnames_with_type <- purrr::map2(fnames, types, set_type)
+  head(fnames_with_type, 2)
+  tail(fnames_with_type, 2)
+
+  print("ファイル名と属性をリスト化")
+  info      <- purrr::map(fnames_with_type, get_info)
+  str(info[[1]])
+  str(info[[100]])
+  str(info[[200]])
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+[1] ".hdr ファイルがある全ディレクトリのリスト"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
+[1] "上記リストのうち，解析できなかった個体を除外したリスト"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
+[1] "フルパスをファイル名に変換"
+[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+[2] "Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+[3] "Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
+[4] "Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
+[5] "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+[6] "Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "C1_004.hdr" "C1_005.hdr" "C1_007.hdr" "C1_009.hdr" "C1_010.hdr"
+[6] "C1_011.hdr"
+[1] "サンプリング方法（調査|漁獲|飼育）を取得"
+[1] "commercial" "commercial" "commercial" "commercial" "commercial"
+[6] "commercial"
+[1] "survey" "survey" "survey" "survey" "survey" "survey"
+[1] "ファイル名にサンプリング方法を属性として付与"
+[[1]]
+[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+attr(,"class")
+[1] "commercial"
+
+[[2]]
+[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+attr(,"class")
+[1] "commercial"
+
+[[1]]
+[1] "C1_010.hdr"
+attr(,"class")
+[1] "survey"
+
+[[2]]
+[1] "C1_011.hdr"
+attr(,"class")
+[1] "survey"
+
+[1] "ファイル名と属性をリスト化"
+List of 6
+ $ fname   : chr "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+ $ spcs    : chr "Sardinops-melanostictus"
+ $ date    : chr "20150827"
+ $ key1    : chr "Toyama"
+ $ key2    : chr "Nakase"
+ $ sampleno: chr "001"
+ - attr(*, "class")= chr "commercial"
+List of 5
+ $ fname   : chr "Sardinops-melanostictus_YK1508_MT10_01.hdr"
+ $ spcs    : chr "Sardinops-melanostictus"
+ $ crs.name: chr "YK1508"
+ $ stn     : chr "MT10"
+ $ sampleno: chr "01"
+ - attr(*, "class")= chr "survey"
+List of 5
+ $ fname   : chr "C1_011.hdr"
+ $ spcs    : chr NA
+ $ crs.name: chr NA
+ $ stn     : chr NA
+ $ sampleno: chr "011"
+ - attr(*, "class")= chr "survey"
+#+end_example
