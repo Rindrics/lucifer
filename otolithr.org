@@ -145,6 +145,11 @@ Imports:
                     c("../testdir1/FOO/data/foo.hdr",
                       "../testdir1/bar/data/foo.hdr"))
   })
+
+  test_that("fullpath2fname() extracts only fname from full path", {
+    path <- get_path("../testdir1")[1]
+    expect_equal(fullpath2fname(path), "foo.hdr")
+  })
 #+END_SRC
 *** テスト/データタイプ（調査|漁獲物|飼育）
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_dattype.R
@@ -285,6 +290,17 @@ Imports:
     fullpaths <- list.files(dir.spcs, pattern = regex,
                             full.names = TRUE, recursive = TRUE)
     fullpaths
+  }
+
+  fullpath2fname <- function(full.path) {
+    regex <- "/([^/]+\\.hdr)$"
+    if (length(full.path) == 1) {
+      fname <- stringr::str_match(full.path, regex)[2]
+    } else {
+      match_res <- purrr::map2(full.path, regex, stringr::str_match) %>% unlist()
+      fname     <- match_res[!(1:length(match_res))%%2]
+    }
+    fname
   }
 
   get_dir2load <- function(paths) {
