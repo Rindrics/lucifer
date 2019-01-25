@@ -1,0 +1,252 @@
+#+TITLE: reformr 開発プロジェクトノート
+#+PROPERTY: header-args :cache yes :exports code :results scalar
+#+STARTUP: contents
+#+BEGIN_SRC R
+  setwd("otolithr")
+#+END_SRC
+
+#+RESULTS[8a4bc7aed74fdbd84bf3c88ba79c959332658351]:
+: /Users/ahayashi/Documents/GitHub/tidyNAS
+
+* パッケージのエコシステム
+継続的インテグレーションを可能にする
+** 耳石マシン
+*** 自動チェック
+データ更新がトリガー
+- 日齢-体長関係を描画（耳石マシンにも体長データを入れておく）
+- 日齢組成を描画
+*** 自動マージ
+** NAS
+*** 自動チェック
+**** データの品質
+*** 自動ビルド
+**** 目録の生成
+**** 逆算
+**** 描画
+* 開発準備
+#+BEGIN_SRC R :results silent
+  # usethis::create_package("otolithr")
+  usethis::use_testthat()
+#+END_SRC
+** 使用したパッケージ
+#+BEGIN_SRC R
+  usethis::use_package("magrittr", "Imports")
+  usethis::use_package("ggplot2", "Imports")
+#+END_SRC
+
+#+RESULTS[561fd1f754ba06670e281828859090e22fec2230]:
+
+#+BEGIN_SRC sh
+cat otolithr/DESCRIPTION
+#+END_SRC
+
+#+RESULTS[362fd202a9325dcbeafbf43e1712c3968b259db1]:
+#+begin_example
+Package: otolithr
+Title: What the Package Does (one line, title case)
+Version: 0.0.0.9000
+Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+Depends: R (>= 3.5.1)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat
+Imports: 
+    magrittr,
+    ggplot2
+#+end_example
+
+* 開発
+** リロード & 自動テスト
+#+BEGIN_SRC R :results output
+  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
+  devtools::load_all()
+  devtools::test()
+  devtools::document(roclets=c('rd', 'collate', 'namespace'))
+#+END_SRC
+
+#+RESULTS[62d4820a9216b105c72787e032f80205ff1ada32]:
+: No man pages found in package  ‘otolithr’ 
+** テスト
+:PROPERTIES:
+:header-args: :results silent :exports code
+:END:
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fname.R
+  library(tidyverse)
+  context("Handle file name")
+
+  test_that("split_fname() split fname correctly", {
+    fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
+    split <- split_fname(fname)
+    expect_equal(split[1], "Sardinops-melanostictus")
+    expect_equal(split[2], "YK1508")
+    expect_equal(split[3], "MT6")
+    expect_equal(split[4], "10.hdr")
+  })
+
+  test_that("rm_extension() removes file extension correctly", {
+    expect_equal(rm_extension("foo.hdr", ".hdr"), "foo")
+    expect_equal(rm_extension("bar.txt", ".txt"), "bar")
+    expect_equal(rm_extension("barhdr", ".hdr"), "barhdr")
+    expect_equal(rm_extension("foo.hdr"), "foo")
+    expect_error(rm_extension("foo.hdr", "hdr"),
+                 "'extension' must begin with '.'")
+  })
+
+  test_that("get_info.survey() makes sample metadata correctly", {
+    fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
+    info  <- get_info.survey(fname)
+    expect_is(info, "survey")
+    expect_equal(info$spcs, "Sardinops-melanostictus")
+    expect_equal(info$crs.name, "YK1508")
+    expect_equal(info$stn, "MT6")
+    expect_equal(info$sampleno, "10")
+  })
+#+END_SRC
+
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_dattype.R
+  library(tidyverse)
+  context("Controle behavior according to dattype")
+
+  test_that("set_type() gives type to fname correctly", {
+    expect_is(set_type("foo.hdr", "survey"), "survey")
+    expect_is(set_type("foo.hdr", "commercial"), "commercial")
+    expect_error(set_type("foo.hdr", "bar"),
+                 "'type' must be one of 'survey', 'commercial', or 'reared'.")
+  })
+
+  test_that("get_info.survey() makes sample metadata correctly", {
+    fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
+    info  <- get_info.survey(fname)
+    expect_is(info, "survey")
+    expect_equal(info$spcs, "Sardinops-melanostictus")
+    expect_equal(info$crs.name, "YK1508")
+    expect_equal(info$stn, "MT6")
+    expect_equal(info$sampleno, "10")
+  })
+
+
+  test_that("detect_type() detects dattype correctly", {
+    path_survey     <- "foo/survey/bar.hdr"
+    path_commercial <- "foo/commercial/bar.hdr"
+    path_reared     <- "foo/reared/bar.hdr"
+    path_error      <- "foo/bar.hdr"
+    msg <- "Dir structure error. Run 'help(detect_type)'."
+    expect_equal(detect_type(path_survey),"survey")
+    expect_equal(detect_type(path_commercial),"commercial")
+    expect_equal(detect_type(path_reared),"reared")
+    expect_error(detect_type(path_error), msg, fix = TRUE)
+  })
+#+END_SRC
+
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fpath.R
+  library(tidyverse)
+  context("Manage path")
+
+  test_that("get_path() gives file dir correctly", {
+    expect_setequal(get_path("../testdir1"),
+                    c("../testdir1/FOO/data/foo.hdr",
+                      "../testdir1/bar/cannot_read/cannot.hdr",
+                      "../testdir1/bar/data/foo.hdr"))
+    expect_setequal(get_path("../Spcs-dir"),
+                    c("../Spcs-dir/othercruise/station/cannot_read/cannot.hdr",
+                      "../Spcs-dir/othercruise/station/data/foo.hdr",
+                      "../Spcs-dir/somecruise/mtfoo/cannot_read/cannot.hdr",
+                      "../Spcs-dir/somecruise/mtfoo/data/foo.hdr"))
+  })
+
+
+  test_that("get_dir2load() gives paths end with 'data/xxx.hdr'", {
+    paths <- get_path("../testdir1")
+    expect_setequal(get_dir2load(paths),
+                    c("../testdir1/FOO/data/foo.hdr",
+                      "../testdir1/bar/data/foo.hdr"))
+  })
+#+END_SRC
+** 関数
+*** ヘルパー関数
+#+BEGIN_SRC R :tangle otolithr/R/util.R
+  #' @importFrom magrittr %>%
+  #' @export
+  magrittr::`%>%`
+
+
+
+  rm_extension <- function(x, extension = ".hdr") {
+    if (gregexpr("^[a-zA-Z]+", extension) > 0)
+      stop("'extension' must begin with '.'")
+    regex <- paste0("\\", extension)
+    out   <- sub(regex, "", x)
+  }
+
+  split_fname <- function(fname, sep = "_") {
+    split <- strsplit(fname, sep) %>%
+      unlist() %>%
+      as.vector()
+    split
+  }
+
+  detect_type <- function(fpath) {
+    regex <- "(survey|commercial|reared)"
+    type  <- stringr::str_match(fpath, regex)[,2]
+    if (is.na(type))
+      stop("Dir structure error. Run 'help(detect_type)'.")
+    type
+  }
+
+  set_type <- function(fname, type) {
+    if (!(type %in% c("survey", "commercial", "reared")))
+      stop("'type' must be one of 'survey', 'commercial', or 'reared'.")
+    class(fname) <- type
+    fname
+  }
+
+  get_info <- function(fname) {
+    UseMethod("get_info")
+  }
+
+
+  get_info.survey <- function(fname) {
+    out <- list()
+    class(out)   <- "survey"
+    out$spcs     <- split_fname(fname)[1]
+    out$crs.name <- split_fname(fname)[2]
+    out$stn      <- split_fname(fname)[3]
+    out$sampleno <- split_fname(fname)[4] %>% rm_extension(".hdr")
+    out
+  }
+#+END_SRC
+
+
+*** パス関連
+#+BEGIN_SRC R :tangle otolithr/R/fpath.R
+  get_path <- function(dir.spcs) {
+    regex <- ".+hdr$"
+    fullpaths <- list.files(dir.spcs, pattern = regex,
+                            full.names = TRUE, recursive = TRUE)
+    fullpaths
+  }
+
+  get_dir2load <- function(paths) {
+    regex         <- ".+\\/data\\/.+\\.hdr$"
+    (match_length <- purrr::map(regex, gregexpr, paths) %>% unlist())
+    match_pos     <- which(match_length > 0)
+    dir2load      <- paths[match_pos]
+    dir2load
+  }
+#+END_SRC
+** 使ってみる
+#+BEGIN_SRC R
+  path <- "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus"
+  dirlist.org <- get_path(path)
+  dirlist2load <- dirlist.org %>% get_dir2load()
+  length(dirlist.org)
+  length(dirlist2load)
+
+  types <- purrr::map(dirlist2load, detect_type) %>% unlist()
+  test <- purrr::map2(dirlist2load, types, set_type)
+  attributes(test[[1]])
+#+END_SRC
