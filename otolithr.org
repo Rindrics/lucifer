@@ -222,6 +222,10 @@ Imports:
     expect_setequal(data$V1[1:19], varnames)
     expect_equal(fullpath2fname(infile) %>% rm_extension(), data$V2[1])
   })
+
+  test_that("locate_1stinc() returns the position of first inc", {
+    expect_equal(locate_1stinc(data$V1), 20)
+  })
 #+END_SRC
 ** 関数
 *** ヘルパー関数
@@ -325,6 +329,10 @@ Imports:
   load_hdr <- function(fname){
     read.csv(fname, fileEncoding = "CP932",
              header = FALSE, stringsAsFactors = FALSE)
+  }
+
+  locate_1stinc <- function(x) {
+    which(x == "日輪幅") + 1 # Data of 1stinc is located just after "日輪幅".
   }
 #+END_SRC
 *** パス関連
