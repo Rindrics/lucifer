@@ -207,7 +207,22 @@ Imports:
     expect_error(detect_type(path_error), msg, fix = TRUE)
   })
 #+END_SRC
+****** テスト/hdr ファイル読み込み
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_load_hdr.R
+  context("Load .hdr file")
 
+  test_that("load_hdr() reads '.hdr' file correctly", {
+    infile   <- "../Sardinops-melanostictus_YK1508_MT6_02.hdr"
+    data     <- load_hdr(infile)
+    varnames <-  c("標本番号", "採集航海番号",  "採集ｽﾃｰｼｮﾝ番号", "採集日付",
+                   "緯度", "経度", "表面水温", "体長", "体重", "耳石径", "耳左右",
+                   "計測者番号", "日輪数", "lens", "calib", "unit",
+                   "samplesize", "filename", "日輪幅")
+    expect_is(data, "data.frame")
+    expect_setequal(data$V1[1:19], varnames)
+    expect_equal(fullpath2fname(infile) %>% rm_extension(), data$V2[1])
+  })
+#+END_SRC
 ** 関数
 *** ヘルパー関数
 #+BEGIN_SRC R :tangle otolithr/R/util.R
@@ -305,8 +320,13 @@ Imports:
     out
   }
 #+END_SRC
-
-
+*** hdr 読み込み
+#+BEGIN_SRC R :tangle otolithr/R/load_hdr.R
+  load_hdr <- function(fname){
+    read.csv(fname, fileEncoding = "CP932",
+             header = FALSE, stringsAsFactors = FALSE)
+  }
+#+END_SRC
 *** パス関連
 #+BEGIN_SRC R :tangle otolithr/R/fpath.R
   get_path <- function(dir.spcs) {
