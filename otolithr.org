@@ -1,6 +1,7 @@
-#+TITLE: reformr 開発プロジェクトノート
+#+TITLE: otolithr 開発プロジェクトノート
 #+PROPERTY: header-args :cache yes :exports code :results scalar
 #+STARTUP: contents
+
 #+BEGIN_SRC R
   setwd("otolithr")
 #+END_SRC
@@ -62,8 +63,9 @@ Imports:
 * 開発
 ** リロード & 自動テスト
 #+BEGIN_SRC R :results output
-  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
+  setwd("otolithr")
   devtools::load_all()
+  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
   devtools::test()
   devtools::document(roclets=c('rd', 'collate', 'namespace'))
 #+END_SRC
@@ -71,11 +73,12 @@ Imports:
 #+RESULTS[62d4820a9216b105c72787e032f80205ff1ada32]:
 : No man pages found in package  ‘otolithr’ 
 ** テスト
+*** テスト/ファイル名ハンドリング
 :PROPERTIES:
 :header-args: :results silent :exports code
 :END:
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fname.R
-  library(tidyverse)
+  library(otolithr)
   context("Handle file name")
 
   test_that("split_fname() split fname correctly", {
@@ -96,54 +99,31 @@ Imports:
                  "'extension' must begin with '.'")
   })
 
-  test_that("get_info.survey() makes sample metadata correctly", {
-    fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
-    info  <- get_info.survey(fname)
-    expect_is(info, "survey")
-    expect_equal(info$spcs, "Sardinops-melanostictus")
-    expect_equal(info$crs.name, "YK1508")
-    expect_equal(info$stn, "MT6")
-    expect_equal(info$sampleno, "10")
+  test_that("xtract_var() detects given variable in given vector", {
+    fname <- "Sardinops-melanostictus_YK1808_MT01_005.hdr"
+    expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
+    expect_equal(xtract_var(fname, "cruise")  , "YK1808")
+    expect_equal(xtract_var(fname, "stn")     , "MT01")
+    expect_equal(xtract_var(fname, "sampleno"), "005")
+
+    fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+    expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
+    expect_equal(xtract_var(fname, "date")    , "20150827")
+    expect_equal(xtract_var(fname, "key1")    , "Toyama")
+    expect_equal(xtract_var(fname, "key2")    , "Nakase")
+    expect_equal(xtract_var(fname, "sampleno"), "005")
+
+    fname <- "Sardinops-melanostictus_20150827_Toyama_005.hdr"
+    expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
+    expect_equal(xtract_var(fname, "date")    , "20150827")
+    expect_equal(xtract_var(fname, "key1")    , "Toyama")
+    expect_true(is.na(xtract_var(fname, "key2")))
+    expect_equal(xtract_var(fname, "sampleno"), "005")
   })
 #+END_SRC
-
-#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_dattype.R
-  library(tidyverse)
-  context("Controle behavior according to dattype")
-
-  test_that("set_type() gives type to fname correctly", {
-    expect_is(set_type("foo.hdr", "survey"), "survey")
-    expect_is(set_type("foo.hdr", "commercial"), "commercial")
-    expect_error(set_type("foo.hdr", "bar"),
-                 "'type' must be one of 'survey', 'commercial', or 'reared'.")
-  })
-
-  test_that("get_info.survey() makes sample metadata correctly", {
-    fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
-    info  <- get_info.survey(fname)
-    expect_is(info, "survey")
-    expect_equal(info$spcs, "Sardinops-melanostictus")
-    expect_equal(info$crs.name, "YK1508")
-    expect_equal(info$stn, "MT6")
-    expect_equal(info$sampleno, "10")
-  })
-
-
-  test_that("detect_type() detects dattype correctly", {
-    path_survey     <- "foo/survey/bar.hdr"
-    path_commercial <- "foo/commercial/bar.hdr"
-    path_reared     <- "foo/reared/bar.hdr"
-    path_error      <- "foo/bar.hdr"
-    msg <- "Dir structure error. Run 'help(detect_type)'."
-    expect_equal(detect_type(path_survey),"survey")
-    expect_equal(detect_type(path_commercial),"commercial")
-    expect_equal(detect_type(path_reared),"reared")
-    expect_error(detect_type(path_error), msg, fix = TRUE)
-  })
-#+END_SRC
-
+*** テスト/ファイルパス
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fpath.R
-  library(tidyverse)
+  library(otolithr)
   context("Manage path")
 
   test_that("get_path() gives file dir correctly", {
@@ -165,7 +145,69 @@ Imports:
                     c("../testdir1/FOO/data/foo.hdr",
                       "../testdir1/bar/data/foo.hdr"))
   })
+
+  test_that("fullpath2fname() extracts only fname from full path", {
+    path <- get_path("../testdir1")[1]
+    expect_equal(fullpath2fname(path), "foo.hdr")
+  })
 #+END_SRC
+*** テスト/データタイプ（調査|漁獲物|飼育）
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_dattype.R
+  library(otolithr)
+  context("Control behavior according to dattype")
+
+  test_that("set_type() gives type to fname correctly", {
+    expect_is(set_type("foo.hdr", "survey"), "survey")
+    expect_is(set_type("foo.hdr", "commercial"), "commercial")
+    expect_error(set_type("foo.hdr", "bar"),
+                 "'type' must be one of 'survey', 'commercial', or 'reared'.")
+  })
+
+  test_that("get_info.survey() makes sample metadata correctly", {
+    fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
+    info  <- get_info.survey(fname)
+    expect_is(info, "survey")
+    expect_equal(info$spcs, "Sardinops-melanostictus")
+    expect_equal(info$crs.name, "YK1508")
+    expect_equal(info$stn, "MT6")
+    expect_equal(info$sampleno, "10")
+  })
+
+  test_that("get_info.commercial() makes sample metadata correctly", {
+    fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+    info  <- get_info.commercial(fname)
+    expect_is(info, "commercial")
+    expect_equal(info$spcs, "Sardinops-melanostictus")
+    expect_equal(info$date, "20150827")
+    expect_equal(info$key1, "Toyama")
+    expect_equal(info$key2, "Nakase")
+    expect_equal(info$sampleno, "005")
+  })
+
+  test_that("get_info.reared() makes sample metadata correctly", {
+    fname <- "Sardinops-melanostictus_20160810_temp14_01.hdr"
+    info  <- get_info.reared(fname)
+    expect_is(info, "reared")
+    expect_equal(info$spcs, "Sardinops-melanostictus")
+    expect_equal(info$date, "20160810")
+    expect_equal(info$key1, "temp14")
+    expect_true(is.na(info$key2))
+    expect_equal(info$sampleno, "01")
+  })
+
+  test_that("detect_type() detects dattype correctly", {
+    path_survey     <- "foo/survey/bar.hdr"
+    path_commercial <- "foo/commercial/bar.hdr"
+    path_reared     <- "foo/reared/bar.hdr"
+    path_error      <- "foo/bar.hdr"
+    msg <- "Dir structure error. Run 'help(detect_type)'."
+    expect_equal(detect_type(path_survey),"survey")
+    expect_equal(detect_type(path_commercial),"commercial")
+    expect_equal(detect_type(path_reared),"reared")
+    expect_error(detect_type(path_error), msg, fix = TRUE)
+  })
+#+END_SRC
+
 ** 関数
 *** ヘルパー関数
 #+BEGIN_SRC R :tangle otolithr/R/util.R
@@ -183,6 +225,7 @@ Imports:
   }
 
   split_fname <- function(fname, sep = "_") {
+  # This function may be unnecessary.
     split <- strsplit(fname, sep) %>%
       unlist() %>%
       as.vector()
@@ -204,18 +247,61 @@ Imports:
     fname
   }
 
+  xtract_var <- function(fname, var) {
+    switch (var,
+      "spcsname" = regex <- "(^[A-Z][a-z]+-[a-z]+)_",
+      "cruise"   = regex <- "^[A-Z][a-z]+-[a-z]+_([A-Za-z0-9]+)_",
+      "stn"      = regex <- "^[A-Z][a-z]+-[a-z]+_[A-Za-z0-9]+_([A-Za-z0-9]+)_",
+      "date"     = regex <- "_(2[0-9]{7})_",
+      "key1"     =
+        regex <- "_2[0-9]{7}_([A-Za-z0-9]+)_(?:[A-Za-z]+_)?[a-zA-Z0-9]+\\.hdr$",
+      "key2"     =
+        regex <- "_2[0-9]{7}_(?:[A-Za-z]+)_([A-Za-z0-9]+)_[a-zA-Z0-9]+\\.hdr$",
+      "sampleno" = regex <- "_([a-zA-Z0-9]+)\\.hdr$",
+      "fname"    = regex <- "(^.+$)",
+      stop(paste0("Unexpected variable '", eval(bquote(var)), "' was given."))
+    )
+    out <- stringr::str_match(fname, regex)[,2]
+    out
+  }
+
+
   get_info <- function(fname) {
     UseMethod("get_info")
   }
 
-
   get_info.survey <- function(fname) {
     out <- list()
     class(out)   <- "survey"
-    out$spcs     <- split_fname(fname)[1]
-    out$crs.name <- split_fname(fname)[2]
-    out$stn      <- split_fname(fname)[3]
-    out$sampleno <- split_fname(fname)[4] %>% rm_extension(".hdr")
+    out$fname    <- xtract_var(fname, "fname")
+    out$spcs     <- xtract_var(fname, "spcsname")
+    out$crs.name <- xtract_var(fname, "cruise")
+    out$stn      <- xtract_var(fname, "stn")
+    out$sampleno <- xtract_var(fname, "sampleno")
+    out
+  }
+
+  get_info.commercial <- function(fname) {
+    out <- list()
+    class(out)   <- "commercial"
+    out$fname    <- xtract_var(fname, "fname")
+    out$spcs     <- xtract_var(fname, "spcsname")
+    out$date     <- xtract_var(fname, "date")
+    out$key1     <- xtract_var(fname, "key1")
+    out$key2     <- xtract_var(fname, "key2")
+    out$sampleno <- xtract_var(fname, "sampleno")
+    out
+  }
+
+  get_info.reared <- function(fname) {
+    out <- list()
+    class(out)   <- "reared"
+    out$fname    <- xtract_var(fname, "fname")
+    out$spcs     <- xtract_var(fname, "spcsname")
+    out$date     <- xtract_var(fname, "date")
+    out$key1     <- xtract_var(fname, "key1")
+    out$key2     <- xtract_var(fname, "key2")
+    out$sampleno <- xtract_var(fname, "sampleno")
     out
   }
 #+END_SRC
@@ -230,6 +316,17 @@ Imports:
     fullpaths
   }
 
+  fullpath2fname <- function(full.path) {
+    regex <- "/([^/]+\\.hdr)$"
+    if (length(full.path) == 1) {
+      fname <- stringr::str_match(full.path, regex)[2]
+    } else {
+      match_res <- purrr::map2(full.path, regex, stringr::str_match) %>% unlist()
+      fname     <- match_res[!(1:length(match_res))%%2]
+    }
+    fname
+  }
+
   get_dir2load <- function(paths) {
     regex         <- ".+\\/data\\/.+\\.hdr$"
     (match_length <- purrr::map(regex, gregexpr, paths) %>% unlist())
@@ -238,15 +335,130 @@ Imports:
     dir2load
   }
 #+END_SRC
-** 使ってみる
+** デモ
+:PROPERTIES:
+:header-args: :results output :exports both
+:END:
 #+BEGIN_SRC R
+  devtools::load_all("otolithr")
   path <- "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus"
-  dirlist.org <- get_path(path)
-  dirlist2load <- dirlist.org %>% get_dir2load()
-  length(dirlist.org)
-  length(dirlist2load)
 
-  types <- purrr::map(dirlist2load, detect_type) %>% unlist()
-  test <- purrr::map2(dirlist2load, types, set_type)
-  attributes(test[[1]])
+  print(".hdr ファイルがある全ディレクトリのリスト")
+  dirs_org  <- get_path(path)
+  head(dirs_org)
+  tail(dirs_org)
+
+  print("上記リストのうち，解析できなかった個体を除外したリスト")
+  dirs2load <- dirs_org %>% get_dir2load()
+  head(dirs2load)
+  tail(dirs2load)
+
+  print("フルパスをファイル名に変換")
+  fnames    <- dirs2load %>%
+    fullpath2fname()
+  head(fnames)
+  tail(fnames)
+
+  print("サンプリング方法（調査|漁獲|飼育）を取得")
+  types     <- purrr::map(dirs2load, detect_type) %>% unlist()
+  head(types)
+  tail(types)
+
+  print("ファイル名にサンプリング方法を属性として付与")
+  fnames_with_type <- purrr::map2(fnames, types, set_type)
+  head(fnames_with_type, 2)
+  tail(fnames_with_type, 2)
+
+  print("ファイル名と属性をリスト化")
+  info      <- purrr::map(fnames_with_type, get_info)
+  str(info[[1]])
+  str(info[[100]])
+  str(info[[200]])
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+[1] ".hdr ファイルがある全ディレクトリのリスト"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
+[1] "上記リストのうち，解析できなかった個体を除外したリスト"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
+[1] "フルパスをファイル名に変換"
+[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+[2] "Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+[3] "Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
+[4] "Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
+[5] "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
+[6] "Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "C1_004.hdr" "C1_005.hdr" "C1_007.hdr" "C1_009.hdr" "C1_010.hdr"
+[6] "C1_011.hdr"
+[1] "サンプリング方法（調査|漁獲|飼育）を取得"
+[1] "commercial" "commercial" "commercial" "commercial" "commercial"
+[6] "commercial"
+[1] "survey" "survey" "survey" "survey" "survey" "survey"
+[1] "ファイル名にサンプリング方法を属性として付与"
+[[1]]
+[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+attr(,"class")
+[1] "commercial"
+
+[[2]]
+[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+attr(,"class")
+[1] "commercial"
+
+[[1]]
+[1] "C1_010.hdr"
+attr(,"class")
+[1] "survey"
+
+[[2]]
+[1] "C1_011.hdr"
+attr(,"class")
+[1] "survey"
+
+[1] "ファイル名と属性をリスト化"
+List of 6
+ $ fname   : chr "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+ $ spcs    : chr "Sardinops-melanostictus"
+ $ date    : chr "20150827"
+ $ key1    : chr "Toyama"
+ $ key2    : chr "Nakase"
+ $ sampleno: chr "001"
+ - attr(*, "class")= chr "commercial"
+List of 5
+ $ fname   : chr "Sardinops-melanostictus_YK1508_MT10_01.hdr"
+ $ spcs    : chr "Sardinops-melanostictus"
+ $ crs.name: chr "YK1508"
+ $ stn     : chr "MT10"
+ $ sampleno: chr "01"
+ - attr(*, "class")= chr "survey"
+List of 5
+ $ fname   : chr "C1_011.hdr"
+ $ spcs    : chr NA
+ $ crs.name: chr NA
+ $ stn     : chr NA
+ $ sampleno: chr "011"
+ - attr(*, "class")= chr "survey"
+#+end_example

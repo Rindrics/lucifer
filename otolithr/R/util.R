@@ -3,17 +3,6 @@
 magrittr::`%>%`
 
 
-format <- function(x) {
-  UseMethod(format)
-}
-
-# format.otolith <- function(dir, spcs){
-
-# }
-
-# get_dir <- function(dir) {
-
-# }
 
 rm_extension <- function(x, extension = ".hdr") {
   if (gregexpr("^[a-zA-Z]+", extension) > 0)
@@ -23,6 +12,7 @@ rm_extension <- function(x, extension = ".hdr") {
 }
 
 split_fname <- function(fname, sep = "_") {
+# This function may be unnecessary.
   split <- strsplit(fname, sep) %>%
     unlist() %>%
     as.vector()
@@ -44,17 +34,60 @@ set_type <- function(fname, type) {
   fname
 }
 
+xtract_var <- function(fname, var) {
+  switch (var,
+    "spcsname" = regex <- "(^[A-Z][a-z]+-[a-z]+)_",
+    "cruise"   = regex <- "^[A-Z][a-z]+-[a-z]+_([A-Za-z0-9]+)_",
+    "stn"      = regex <- "^[A-Z][a-z]+-[a-z]+_[A-Za-z0-9]+_([A-Za-z0-9]+)_",
+    "date"     = regex <- "_(2[0-9]{7})_",
+    "key1"     =
+      regex <- "_2[0-9]{7}_([A-Za-z0-9]+)_(?:[A-Za-z]+_)?[a-zA-Z0-9]+\\.hdr$",
+    "key2"     =
+      regex <- "_2[0-9]{7}_(?:[A-Za-z]+)_([A-Za-z0-9]+)_[a-zA-Z0-9]+\\.hdr$",
+    "sampleno" = regex <- "_([a-zA-Z0-9]+)\\.hdr$",
+    "fname"    = regex <- "(^.+$)",
+    stop(paste0("Unexpected variable '", eval(bquote(var)), "' was given."))
+  )
+  out <- stringr::str_match(fname, regex)[,2]
+  out
+}
+
+
 get_info <- function(fname) {
   UseMethod("get_info")
 }
 
-
 get_info.survey <- function(fname) {
   out <- list()
   class(out)   <- "survey"
-  out$spcs     <- split_fname(fname)[1]
-  out$crs.name <- split_fname(fname)[2]
-  out$stn      <- split_fname(fname)[3]
-  out$sampleno <- split_fname(fname)[4] %>% rm_extension(".hdr")
+  out$fname    <- xtract_var(fname, "fname")
+  out$spcs     <- xtract_var(fname, "spcsname")
+  out$crs.name <- xtract_var(fname, "cruise")
+  out$stn      <- xtract_var(fname, "stn")
+  out$sampleno <- xtract_var(fname, "sampleno")
+  out
+}
+
+get_info.commercial <- function(fname) {
+  out <- list()
+  class(out)   <- "commercial"
+  out$fname    <- xtract_var(fname, "fname")
+  out$spcs     <- xtract_var(fname, "spcsname")
+  out$date     <- xtract_var(fname, "date")
+  out$key1     <- xtract_var(fname, "key1")
+  out$key2     <- xtract_var(fname, "key2")
+  out$sampleno <- xtract_var(fname, "sampleno")
+  out
+}
+
+get_info.reared <- function(fname) {
+  out <- list()
+  class(out)   <- "reared"
+  out$fname    <- xtract_var(fname, "fname")
+  out$spcs     <- xtract_var(fname, "spcsname")
+  out$date     <- xtract_var(fname, "date")
+  out$key1     <- xtract_var(fname, "key1")
+  out$key2     <- xtract_var(fname, "key2")
+  out$sampleno <- xtract_var(fname, "sampleno")
   out
 }
