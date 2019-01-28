@@ -35,7 +35,7 @@
   usethis::use_package("ggplot2", "Imports")
 #+END_SRC
 
-#+RESULTS[561fd1f754ba06670e281828859090e22fec2230]:
+#+RESULTS[74388f8cebf587e60c40ecf4173543e3668dc8ed]:
 
 #+BEGIN_SRC sh
 cat otolithr/DESCRIPTION
@@ -207,8 +207,8 @@ Imports:
     expect_error(detect_type(path_error), msg, fix = TRUE)
   })
 #+END_SRC
-****** テスト/hdr ファイル読み込み
-#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_load_hdr.R
+*** テスト/hdr ファイルハンドリング
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_handle_hdr.R
   context("Load .hdr file")
 
   test_that("load_hdr() reads '.hdr' file correctly", {
