@@ -211,13 +211,13 @@ Imports:
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_handle_hdr.R
   context("Load .hdr file")
 
+  infile   <- "../Sardinops-melanostictus_YK1508_MT6_02.hdr"
+  data     <- load_hdr(infile)
+  varnames <-  c("標本番号", "採集航海番号",  "採集ｽﾃｰｼｮﾝ番号", "採集日付",
+                 "緯度", "経度", "表面水温", "体長", "体重", "耳石径", "耳左右",
+                 "計測者番号", "日輪数", "lens", "calib", "unit",
+                 "samplesize", "filename", "日輪幅")
   test_that("load_hdr() reads '.hdr' file correctly", {
-    infile   <- "../Sardinops-melanostictus_YK1508_MT6_02.hdr"
-    data     <- load_hdr(infile)
-    varnames <-  c("標本番号", "採集航海番号",  "採集ｽﾃｰｼｮﾝ番号", "採集日付",
-                   "緯度", "経度", "表面水温", "体長", "体重", "耳石径", "耳左右",
-                   "計測者番号", "日輪数", "lens", "calib", "unit",
-                   "samplesize", "filename", "日輪幅")
     expect_is(data, "data.frame")
     expect_setequal(data$V1[1:19], varnames)
     expect_equal(fullpath2fname(infile) %>% rm_extension(), data$V2[1])
@@ -229,6 +229,18 @@ Imports:
 
   test_that("get_incdata() returns incdata", {
     expect_equal(get_incdata(append(varnames, 1:10)), 1:10)
+  })
+#+END_SRC
+*** 機能テスト
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_load_otolith.R
+  context("Functional test")
+
+  infile   <- "../Sardinops-melanostictus_YK1508_MT6_02.hdr"
+  data     <- load_hdr(infile)
+
+  test_that("load_otolith() loads otolith data", {
+    expect_is(load_otolith(infile), "list")
+    expect_is(load_otolith(infile)$age, "numeric")
   })
 #+END_SRC
 ** 関数
@@ -343,6 +355,18 @@ Imports:
     str <- x
     out <- as.numeric(str[locate_1stinc(x):length(str)])
     out
+  }
+#+END_SRC
+*** dir 以下全部のデータを読み込み
+#+BEGIN_SRC R :tangle otolithr/R/load_all_otolith.R
+  load_otolith <- function(dir) {
+    type            <- detect_type(dir)
+    fname_with_type <- fullpath2fname(dir) %>%
+      set_type(type)
+    info            <- get_info(fname_with_type)
+    out             <- load_otolith(dir)
+    out$spcs        <- info$spcs
+    # out$age
   }
 #+END_SRC
 *** パス関連
