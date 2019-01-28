@@ -329,7 +329,7 @@ Imports:
   }
 #+END_SRC
 *** hdr 読み込み
-#+BEGIN_SRC R :tangle otolithr/R/load_hdr.R
+#+BEGIN_SRC R :tangle otolithr/R/handle_hdr.R
   load_hdr <- function(fname){
     read.csv(fname, fileEncoding = "CP932",
              header = FALSE, stringsAsFactors = FALSE)
