@@ -412,6 +412,10 @@ Imports:
   str(info[[1]])
   str(info[[100]])
   str(info[[200]])
+
+  print("データを読み込み")
+  otldata <- purrr::map(dirs2load, load_otolith)
+  otldata[[1]]
 #+END_SRC
 
 #+RESULTS:
