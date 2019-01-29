@@ -57,11 +57,14 @@
   dirs_org  <- get_path(path)
   head(dirs_org)
   tail(dirs_org)
+  length(dirs_org)
+
 
   print("上記リストのうち，解析できなかった個体を除外したリスト")
   dirs2load <- dirs_org %>% get_dir2load()
   head(dirs2load)
   tail(dirs2load)
+  length(dirs2load)
 
   print("フルパスをファイル名に変換")
   fnames    <- dirs2load %>%
@@ -93,41 +96,40 @@
 
 #+END_SRC
 
-#+RESULTS:
+#+RESULTS[837845b052899211a5ed2721de04e7da7b31c1a1]:
 #+begin_example
 [1] ".hdr ファイルがある全ディレクトリのリスト"
-[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
-[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
-[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
-[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
-[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
-[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_001.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_002.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_003.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_004.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_005.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_006.hdr"
 [1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
 [2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
 [3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
 [4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
 [5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
 [6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
+[1] 209
 [1] "上記リストのうち，解析できなかった個体を除外したリスト"
-[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
-[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
-[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
-[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
-[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
-[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_001.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_002.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_003.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_004.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_005.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_006.hdr"
 [1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
 [2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
 [3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
 [4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
 [5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
 [6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
+[1] 200
 [1] "フルパスをファイル名に変換"
-[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
-[2] "Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
-[3] "Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
-[4] "Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
-[5] "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
-[6] "Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
+[1] "20150827_Toyama_Nakase_001.hdr" "20150827_Toyama_Nakase_002.hdr"
+[3] "20150827_Toyama_Nakase_003.hdr" "20150827_Toyama_Nakase_004.hdr"
+[5] "20150827_Toyama_Nakase_005.hdr" "20150827_Toyama_Nakase_006.hdr"
 [1] "C1_004.hdr" "C1_005.hdr" "C1_007.hdr" "C1_009.hdr" "C1_010.hdr"
 [6] "C1_011.hdr"
 [1] "サンプリング方法（調査|漁獲|飼育）を取得"
@@ -136,12 +138,12 @@
 [1] "survey" "survey" "survey" "survey" "survey" "survey"
 [1] "ファイル名にサンプリング方法を属性として付与"
 [[1]]
-[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
+[1] "20150827_Toyama_Nakase_001.hdr"
 attr(,"class")
 [1] "commercial"
 
 [[2]]
-[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
+[1] "20150827_Toyama_Nakase_002.hdr"
 attr(,"class")
 [1] "commercial"
 
@@ -156,29 +158,45 @@ attr(,"class")
 [1] "survey"
 
 [1] "ファイル名と属性をリスト化"
-List of 6
- $ fname   : chr "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
- $ spcs    : chr "Sardinops-melanostictus"
- $ date    : chr "20150827"
- $ key1    : chr "Toyama"
- $ key2    : chr "Nakase"
+List of 7
+ $ type    : chr "commercial"
+ $ fname   : chr "20150827_Toyama_Nakase_001.hdr"
+ $ spcs    : chr NA
+ $ date    : chr NA
+ $ key1    : chr NA
+ $ key2    : chr NA
  $ sampleno: chr "001"
- - attr(*, "class")= chr "commercial"
-List of 5
+List of 6
+ $ type    : chr "survey"
  $ fname   : chr "Sardinops-melanostictus_YK1508_MT10_01.hdr"
  $ spcs    : chr "Sardinops-melanostictus"
  $ crs.name: chr "YK1508"
  $ stn     : chr "MT10"
  $ sampleno: chr "01"
- - attr(*, "class")= chr "survey"
-List of 5
+List of 6
+ $ type    : chr "survey"
  $ fname   : chr "C1_011.hdr"
  $ spcs    : chr NA
  $ crs.name: chr NA
  $ stn     : chr NA
  $ sampleno: chr "011"
- - attr(*, "class")= chr "survey"
+[1] "データを読み込み"
+# A tibble: 29,722 x 12
+   type  fname spcs  date  key1  key2  sampleno   inc radius  ninc crs.name
+   <chr> <chr> <chr> <chr> <chr> <chr> <chr>    <dbl>  <dbl> <int> <chr>   
+ 1 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       7.61   7.61     0 <NA>    
+ 2 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       3.20  10.8      0 <NA>    
+ 3 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       2.10  12.9      0 <NA>    
+ 4 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       3.50  16.4      0 <NA>    
+ 5 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       2.30  18.7      0 <NA>    
+ 6 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       3.41  22.1      0 <NA>    
+ 7 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       3.50  25.6      0 <NA>    
+ 8 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       4.00  29.6      0 <NA>    
+ 9 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       5.00  34.6      0 <NA>    
+10 comm… 2015… <NA>  <NA>  <NA>  <NA>  001       4.60  39.2      0 <NA>    
+# … with 29,712 more rows, and 1 more variable: stn <chr>
 #+end_example
+
 * 開発環境の整備
 ** ディレクトリ作成
 #+BEGIN_SRC R :results silent
