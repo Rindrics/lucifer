@@ -2,26 +2,27 @@ library(otolithr)
 context("Manage path")
 
 test_that("get_path() gives file dir correctly", {
-  expect_setequal(get_path("../testdir1"),
-                  c("../testdir1/FOO/data/foo.hdr",
-                    "../testdir1/bar/cannot_read/cannot.hdr",
-                    "../testdir1/bar/data/foo.hdr"))
-  expect_setequal(get_path("../Spcs-dir"),
-                  c("../Spcs-dir/othercruise/station/cannot_read/cannot.hdr",
-                    "../Spcs-dir/othercruise/station/data/foo.hdr",
-                    "../Spcs-dir/somecruise/mtfoo/cannot_read/cannot.hdr",
-                    "../Spcs-dir/somecruise/mtfoo/data/foo.hdr"))
+  expect_setequal(get_path("../Genus-spcs"),
+                  c("../Genus-spcs/commercial/foo/cannot_read/cannot.hdr",
+                    "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+                    "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_10.hdr",
+                    "../Genus-spcs/reared/foo/cannot_read/cannot.hdr",
+                    "../Genus-spcs/reared/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+                    "../Genus-spcs/survey/mtfoo/cannot_read/cannot.hdr",
+                    "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"))
 })
 
 
 test_that("get_dir2load() gives paths end with 'data/xxx.hdr'", {
-  paths <- get_path("../testdir1")
+  paths <- get_path("../Genus-spcs")
   expect_setequal(get_dir2load(paths),
-                  c("../testdir1/FOO/data/foo.hdr",
-                    "../testdir1/bar/data/foo.hdr"))
+                  c("../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+                    "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_10.hdr",
+                    "../Genus-spcs/reared/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+                    "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"))
 })
 
 test_that("fullpath2fname() extracts only fname from full path", {
-  path <- get_path("../testdir1")[1]
-  expect_equal(fullpath2fname(path), "foo.hdr")
+  path <- get_path("../Genus-spcs")[1]
+  expect_equal(fullpath2fname(path), "cannot.hdr")
 })

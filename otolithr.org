@@ -35,7 +35,7 @@
   usethis::use_package("ggplot2", "Imports")
 #+END_SRC
 
-#+RESULTS[561fd1f754ba06670e281828859090e22fec2230]:
+#+RESULTS[74388f8cebf587e60c40ecf4173543e3668dc8ed]:
 
 #+BEGIN_SRC sh
 cat otolithr/DESCRIPTION
@@ -127,28 +127,31 @@ Imports:
   context("Manage path")
 
   test_that("get_path() gives file dir correctly", {
-    expect_setequal(get_path("../testdir1"),
-                    c("../testdir1/FOO/data/foo.hdr",
-                      "../testdir1/bar/cannot_read/cannot.hdr",
-                      "../testdir1/bar/data/foo.hdr"))
-    expect_setequal(get_path("../Spcs-dir"),
-                    c("../Spcs-dir/othercruise/station/cannot_read/cannot.hdr",
-                      "../Spcs-dir/othercruise/station/data/foo.hdr",
-                      "../Spcs-dir/somecruise/mtfoo/cannot_read/cannot.hdr",
-                      "../Spcs-dir/somecruise/mtfoo/data/foo.hdr"))
+    expect_setequal(
+      get_path("../Genus-spcs"),
+      c("../Genus-spcs/commercial/foo/cannot_read/cannot.hdr",
+        "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+        "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_10.hdr",
+        "../Genus-spcs/reared/foo/cannot_read/cannot.hdr",
+        "../Genus-spcs/reared/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+        "../Genus-spcs/survey/mtfoo/cannot_read/cannot.hdr",
+        "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"))
   })
 
 
   test_that("get_dir2load() gives paths end with 'data/xxx.hdr'", {
-    paths <- get_path("../testdir1")
-    expect_setequal(get_dir2load(paths),
-                    c("../testdir1/FOO/data/foo.hdr",
-                      "../testdir1/bar/data/foo.hdr"))
+    paths <- get_path("../Genus-spcs")
+    expect_setequal(
+      get_dir2load(paths),
+      c("../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+        "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_10.hdr",
+        "../Genus-spcs/reared/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+        "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"))
   })
 
   test_that("fullpath2fname() extracts only fname from full path", {
-    path <- get_path("../testdir1")[1]
-    expect_equal(fullpath2fname(path), "foo.hdr")
+    path <- get_path("../Genus-spcs")[1]
+    expect_equal(fullpath2fname(path), "cannot.hdr")
   })
 #+END_SRC
 *** テスト/データタイプ（調査|漁獲物|飼育）
@@ -207,7 +210,44 @@ Imports:
     expect_error(detect_type(path_error), msg, fix = TRUE)
   })
 #+END_SRC
+*** テスト/hdr ファイルハンドリング
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_handle_hdr.R
+  context("Load .hdr file")
 
+  infile   <-
+    "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"
+  data     <- load_hdr(infile)
+  varnames <-  c("標本番号", "採集航海番号",  "採集ｽﾃｰｼｮﾝ番号", "採集日付",
+                 "緯度", "経度", "表面水温", "体長", "体重", "耳石径", "耳左右",
+                 "計測者番号", "日輪数", "lens", "calib", "unit",
+                 "samplesize", "filename", "日輪幅")
+
+  test_that("load_hdr() reads '.hdr' file correctly", {
+    expect_is(data, "data.frame")
+    expect_setequal(data$V1[1:19], varnames)
+  })
+
+  test_that("locate_1stinc() returns the position of first inc", {
+    expect_equal(locate_1stinc(data$V1), 20)
+  })
+
+  test_that("get_incdata() returns incdata", {
+    expect_equal(get_incdata(append(varnames, 1:10)), 1:10)
+  })
+#+END_SRC
+*** 機能テスト
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_load_otolith.R
+  context("Functional test")
+
+  indir      <- "../Genus-spcs"
+  paths      <- get_path(indir)
+  paths2load <- get_dir2load(paths)[1]
+  data       <- load_otolith(paths2load)
+
+  test_that("load_otolith() loads otolith data", {
+    expect_is(data$ninc, "integer")
+  })
+#+END_SRC
 ** 関数
 *** ヘルパー関数
 #+BEGIN_SRC R :tangle otolithr/R/util.R
@@ -305,8 +345,43 @@ Imports:
     out
   }
 #+END_SRC
+*** hdr 読み込み
+#+BEGIN_SRC R :tangle otolithr/R/handle_hdr.R
+  load_hdr <- function(fname){
+    read.csv(fname, fileEncoding = "CP932",
+             header = FALSE, stringsAsFactors = FALSE)
+  }
+
+  locate_1stinc <- function(x) {
+    which(x == "日輪幅") + 1 # Data of 1stinc is located just after "日輪幅".
+  }
+
+  get_incdata <- function(x) {
+    str <- x
+    out <- as.numeric(str[locate_1stinc(x):length(str)])
+    out
+  }
+#+END_SRC
+*** dir 以下全部のデータを読み込み
+#+BEGIN_SRC R :tangle otolithr/R/load_all_otolith.R
+  make_data <- function(fname, fname_with_type) {
+    data     <- load_hdr(fname)
+    out      <- get_info(fname_with_type)
+    out$inc  <- get_incdata(data$V1)
+    out$radius   <- cumsum(out$inc)
+    out$ninc  <- length(out$iw)
+    out
+  }
 
 
+  load_otolith <- function(dir) {
+    type            <- detect_type(dir)
+    fname_with_type <- fullpath2fname(dir) %>%
+      set_type(type)
+    out <- make_data(dir, fname_with_type)
+    out
+  }
+#+END_SRC
 *** パス関連
 #+BEGIN_SRC R :tangle otolithr/R/fpath.R
   get_path <- function(dir.spcs) {
@@ -374,6 +449,10 @@ Imports:
   str(info[[1]])
   str(info[[100]])
   str(info[[200]])
+
+  print("データを読み込み")
+  otldata <- purrr::map(dirs2load, load_otolith)
+  otldata[[1]]
 #+END_SRC
 
 #+RESULTS:
