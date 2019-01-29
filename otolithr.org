@@ -69,13 +69,16 @@
 
 *** とりあえず使うには
 #+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
-  otldata <- purrr::map(dirs2load, load_otolith)
+  otldata <- path %>%
+    get_path() %>%
+    get_dir2load() %>%
+    purrr::map(load_otolith)
+
   df      <- purrr::map_dfr(otldata, as.data.frame)
   head(df)
   tail(df)
   print(paste("統合したファイルの数は", length(unique(df$fname)), "個"))
   # write.csv(df, "test.csv", row.names = FALSE)
-
 #+END_SRC
 
 #+RESULTS:
@@ -333,30 +336,17 @@ Imports:
 #+RESULTS[62d4820a9216b105c72787e032f80205ff1ada32]:
 #+begin_example
 ✔ | OK F W S | Context
-⠏ |  0       | Control behavior according to dattype⠋ |  1       | Control behavior according to dattype⠙ |  2       | Control behavior according to dattype⠹ |  3       | Control behavior according to dattype⠸ |  4       | Control behavior according to dattype⠼ |  5       | Control behavior according to dattype⠴ |  6       | Control behavior according to dattype⠦ |  7       | Control behavior according to dattype⠧ |  7 1     | Control behavior according to dattype⠇ |  8 1     | Control behavior according to dattype⠏ |  9 1     | Control behavior according to dattype⠋ | 10 1     | Control behavior according to dattype⠙ | 11 1     | Control behavior according to dattype⠹ | 12 1     | Control behavior according to dattype⠸ | 12 2     | Control behavior according to dattype⠼ | 13 2     | Control behavior according to dattype⠴ | 14 2     | Control behavior according to dattype⠦ | 15 2     | Control behavior according to dattype⠧ | 16 2     | Control behavior according to dattype⠇ | 17 2     | Control behavior according to dattype⠏ | 17 3     | Control behavior according to dattype⠋ | 18 3     | Control behavior according to dattype⠙ | 19 3     | Control behavior according to dattype⠹ | 20 3     | Control behavior according to dattype⠸ | 21 3     | Control behavior according to dattype✖ | 21 3     | Control behavior according to dattype
-────────────────────────────────────────────────────────────────────────────────
-test_dattype.R:18: failure: get_info.survey() makes sample metadata correctly
-info$sampleno not equal to "10".
-Types not compatible: integer is not character
-
-test_dattype.R:29: failure: get_info.commercial() makes sample metadata correctly
-info$sampleno not equal to "005".
-Types not compatible: integer is not character
-
-test_dattype.R:40: failure: get_info.reared() makes sample metadata correctly
-info$sampleno not equal to "01".
-Types not compatible: integer is not character
-────────────────────────────────────────────────────────────────────────────────
+⠏ |  0       | Control behavior according to dattype⠋ |  1       | Control behavior according to dattype⠙ |  2       | Control behavior according to dattype⠹ |  3       | Control behavior according to dattype⠸ |  4       | Control behavior according to dattype⠼ |  5       | Control behavior according to dattype⠴ |  6       | Control behavior according to dattype⠦ |  7       | Control behavior according to dattype⠧ |  8       | Control behavior according to dattype⠇ |  9       | Control behavior according to dattype⠏ | 10       | Control behavior according to dattype⠋ | 11       | Control behavior according to dattype⠙ | 12       | Control behavior according to dattype⠹ | 13       | Control behavior according to dattype⠸ | 14       | Control behavior according to dattype⠼ | 15       | Control behavior according to dattype⠴ | 16       | Control behavior according to dattype⠦ | 17       | Control behavior according to dattype⠧ | 18       | Control behavior according to dattype⠇ | 19       | Control behavior according to dattype⠏ | 20       | Control behavior according to dattype⠋ | 21       | Control behavior according to dattype⠙ | 22       | Control behavior according to dattype⠹ | 23       | Control behavior according to dattype⠸ | 24       | Control behavior according to dattype✔ | 24       | Control behavior according to dattype
 ⠏ |  0       | Handle file name⠋ |  1       | Handle file name⠙ |  2       | Handle file name⠹ |  3       | Handle file name⠸ |  4       | Handle file name⠼ |  5       | Handle file name⠴ |  6       | Handle file name⠦ |  7       | Handle file name⠧ |  8       | Handle file name⠇ |  9       | Handle file name⠏ | 10       | Handle file name⠋ | 11       | Handle file name⠙ | 12       | Handle file name⠹ | 13       | Handle file name⠸ | 14       | Handle file name⠼ | 15       | Handle file name⠴ | 16       | Handle file name⠦ | 17       | Handle file name⠧ | 18       | Handle file name⠇ | 19       | Handle file name⠏ | 20       | Handle file name⠋ | 21       | Handle file name⠙ | 22       | Handle file name⠹ | 23       | Handle file name✔ | 23       | Handle file name
 ⠏ |  0       | Manage path⠋ |  1       | Manage path⠙ |  2       | Manage path⠹ |  3       | Manage path✔ |  3       | Manage path
 ⠏ |  0       | Load .hdr file⠋ |  1       | Load .hdr file⠙ |  2       | Load .hdr file⠹ |  3       | Load .hdr file⠸ |  4       | Load .hdr file✔ |  4       | Load .hdr file
 ⠏ |  0       | Functional test⠋ |  1       | Functional test✔ |  1       | Functional test
 
 ══ Results ═════════════════════════════════════════════════════════════════════
-Duration: 0.2 s
+Duration: 0.1 s
 
-OK:       52
-Failed:   3
+OK:       55
+Failed:   0
 Warnings: 0
 Skipped:  0
 Writing NAMESPACE
