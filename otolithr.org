@@ -13,14 +13,12 @@
     - [[#グラフ描画][グラフ描画]]
 - [[#デモ][デモ]]
   - [[#読み込むディレクトリを指定][読み込むディレクトリを指定]]
-  - [[#hdr-ファイルがある全ディレクトリのリストを作成する][.hdr ファイルがある全ディレクトリのリストを作成する]]
-  - [[#上記リストのうち実際に解析に使う個体だけを抽出したリストを作成する][上記リストのうち，実際に解析に使う個体だけを抽出したリストを作成する]]
-  - [[#フルパスをファイル名に変換する][フルパスをファイル名に変換する]]
-  - [[#サンプリング方法調査漁獲飼育に応じた振る舞いの変化][サンプリング方法（調査|漁獲|飼育）に応じた振る舞いの変化]]
-    - [[#属性の取得][属性の取得]]
-    - [[#ファイル名に属性を付与][ファイル名に属性を付与]]
-    - [[#属性に応じてファイル名から情報を取得][属性に応じてファイル名から情報を取得]]
-    - [[#データを読み込み][データを読み込み]]
+  - [[#データを読み込み][データを読み込み]]
+  - [[#内部で使っている関数][内部で使っている関数]]
+    - [[#hdr-ファイルがある全ディレクトリのリストを作成する][.hdr ファイルがある全ディレクトリのリストを作成する]]
+    - [[#上記リストのうち実際に解析に使う個体だけを抽出したリストを作成する][上記リストのうち，実際に解析に使う個体だけを抽出したリストを作成する]]
+    - [[#フルパスをファイル名に変換する][フルパスをファイル名に変換する]]
+    - [[#サンプリング方法調査漁獲飼育に応じた振る舞いの変化][サンプリング方法（調査|漁獲|飼育）に応じた振る舞いの変化]]
 - [[#開発環境の整備][開発環境の整備]]
   - [[#ディレクトリ作成][ディレクトリ作成]]
   - [[#本バッケージ内部で使用するパッケージ][本バッケージ内部で使用するパッケージ]]
@@ -63,7 +61,26 @@
   devtools::load_all("otolithr")
   path <- "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus"
 #+END_SRC
-** .hdr ファイルがある全ディレクトリのリストを作成する
+
+** データを読み込み
+#+BEGIN_SRC R :results value :exports both :session *R:tidyNAS*
+  otldata <- purrr::map(dirs2load, load_otolith)
+  df      <- purrr::map_dfr(otldata, tibble::as.tibble)
+  head(df)
+  # write.csv(df, "test.csv", row.names = FALSE)
+
+#+END_SRC
+
+#+RESULTS:
+: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	7.606	7.606	0	nil	nil
+: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.202	10.808	0	nil	nil
+: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	2.102	12.91	0	nil	nil
+: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.501	16.411	0	nil	nil
+: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	2.302	18.713	0	nil	nil
+: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.406	22.119	0	nil	nil
+
+** 内部で使っている関数
+*** .hdr ファイルがある全ディレクトリのリストを作成する
 #+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
   dirs_org  <- get_path(path)
   head(dirs_org)
@@ -87,7 +104,7 @@
 [6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
 [1] 209
 #+end_example
-** 上記リストのうち，実際に解析に使う個体だけを抽出したリストを作成する
+*** 上記リストのうち，実際に解析に使う個体だけを抽出したリストを作成する
 本パッケージでは，data/ 以下に入っている.hdrファイル以外は無視する
 理由: 日輪が不明瞭だったりして解析できなかった個体は，統合データを汚染するため．
 解析に含めないデータは data/ 内に残しておかず，cannot/ などに格納するようにする．
@@ -114,7 +131,7 @@
 [6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
 [1] "データ統合から除外された個体は 9 個体．"
 #+end_example
-** フルパスをファイル名に変換する
+*** フルパスをファイル名に変換する
 #+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
   fnames    <- dirs2load %>%
     fullpath2fname()
@@ -128,7 +145,7 @@
 : [5] "20150827_Toyama_Nakase_005.hdr" "20150827_Toyama_Nakase_006.hdr"
 : [1] "C1_004.hdr" "C1_005.hdr" "C1_007.hdr" "C1_009.hdr" "C1_010.hdr"
 : [6] "C1_011.hdr"
-** サンプリング方法（調査|漁獲|飼育）に応じた振る舞いの変化
+*** サンプリング方法（調査|漁獲|飼育）に応じた振る舞いの変化
 ファイル名から標本情報を取得したいが，
 ファイルの命名規則は，標本のサンプリング方法によって変わってくる．
 そのため，全ての.hdr ファイルは
@@ -136,7 +153,7 @@
 - commercial
 - reared
 のいずれかに格納されるべきである．
-*** 属性の取得
+**** 属性の取得
 #+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
   types     <- purrr::map(dirs2load, detect_type) %>% unlist()
   head(types)
@@ -147,7 +164,7 @@
 : [1] "commercial" "commercial" "commercial" "commercial" "commercial"
 : [6] "commercial"
 : [1] "survey" "survey" "survey" "survey" "survey" "survey"
-*** ファイル名に属性を付与
+**** ファイル名に属性を付与
 #+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
   fnames_with_type <- purrr::map2(fnames, types, set_type)
   head(fnames_with_type, 2)
@@ -176,7 +193,7 @@ attr(,"class")
 [1] "survey"
 #+end_example
 
-*** 属性に応じてファイル名から情報を取得
+**** 属性に応じてファイル名から情報を取得
 #+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
   info      <- purrr::map(fnames_with_type, get_info)
   str(info[[1]])
@@ -209,23 +226,6 @@ List of 6
  $ stn     : chr NA
  $ sampleno: chr "011"
 #+end_example
-
-*** データを読み込み
-#+BEGIN_SRC R :results value :exports both :session *R:tidyNAS*
-  otldata <- purrr::map(dirs2load, load_otolith)
-  df      <- purrr::map_dfr(otldata, tibble::as.tibble)
-  head(df)
-  # write.csv(df, "test.csv", row.names = FALSE)
-
-#+END_SRC
-
-#+RESULTS:
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	7.606	7.606	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.202	10.808	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	2.102	12.91	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.501	16.411	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	2.302	18.713	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.406	22.119	0	nil	nil
 
 * 開発環境の整備
 ** ディレクトリ作成
