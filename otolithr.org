@@ -13,7 +13,9 @@
     - [[#グラフ描画][グラフ描画]]
 - [[#デモ][デモ]]
   - [[#読み込むディレクトリを指定][読み込むディレクトリを指定]]
-  - [[#データを読み込み][データを読み込み]]
+  - [[#hdr-ファイルを全て統合][.hdr ファイルを全て統合]]
+    - [[#とりあえず使うには][とりあえず使うには]]
+    - [[#ファイルは標本を一意に特定できるように命名せよ][ファイルは標本を一意に特定できるように命名せよ]]
   - [[#内部で使っている関数][内部で使っている関数]]
     - [[#hdr-ファイルがある全ディレクトリのリストを作成する][.hdr ファイルがある全ディレクトリのリストを作成する]]
     - [[#上記リストのうち実際に解析に使う個体だけを抽出したリストを作成する][上記リストのうち，実際に解析に使う個体だけを抽出したリストを作成する]]
@@ -62,9 +64,9 @@
   path <- "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus"
 #+END_SRC
 
-** データを読み込み
-指定したディレクトリ以下の.hdr ファイルが全て統合される．
+** .hdr ファイルを全て統合
 
+*** とりあえず使うには
 #+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
   otldata <- purrr::map(dirs2load, load_otolith)
   df      <- purrr::map_dfr(otldata, as.data.frame)
@@ -107,6 +109,29 @@ There were 50 or more warnings (use warnings() to see the first 50)
 29721     <NA> <NA>
 29722     <NA> <NA>
 [1] "統合したファイルの数は 200 個"
+#+end_example
+
+*** ファイルは標本を一意に特定できるように命名せよ
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+df %>% dplyr::filter(!is.na(spcs)) %>% head()
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+    type                                      fname                    spcs
+1 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+2 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+3 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+4 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+5 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+6 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+  date key1 key2 sampleno   inc radius ninc crs.name  stn
+1 <NA> <NA> <NA>       01 7.403  7.403    0   YK1508 MT10
+2 <NA> <NA> <NA>       01 1.900  9.303    0   YK1508 MT10
+3 <NA> <NA> <NA>       01 1.803 11.106    0   YK1508 MT10
+4 <NA> <NA> <NA>       01 1.800 12.906    0   YK1508 MT10
+5 <NA> <NA> <NA>       01 2.602 15.508    0   YK1508 MT10
+6 <NA> <NA> <NA>       01 2.802 18.310    0   YK1508 MT10
 #+end_example
 
 ** 内部で使っている関数
