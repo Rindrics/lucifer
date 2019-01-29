@@ -64,7 +64,8 @@ get_info.survey <- function(fname) {
   out$spcs     <- xtract_var(fname, "spcsname")
   out$crs.name <- xtract_var(fname, "cruise")
   out$stn      <- xtract_var(fname, "stn")
-  out$sampleno <- xtract_var(fname, "sampleno")
+  out$sampleno <- xtract_var(fname, "sampleno") %>%
+    as.integer()
   out
 }
 
@@ -76,7 +77,8 @@ get_info.commercial <- function(fname) {
   out$date     <- xtract_var(fname, "date")
   out$key1     <- xtract_var(fname, "key1")
   out$key2     <- xtract_var(fname, "key2")
-  out$sampleno <- xtract_var(fname, "sampleno")
+  out$sampleno <- xtract_var(fname, "sampleno") %>%
+    as.integer()
   out
 }
 
@@ -88,6 +90,7 @@ get_info.reared <- function(fname) {
   out$date     <- xtract_var(fname, "date")
   out$key1     <- xtract_var(fname, "key1")
   out$key2     <- xtract_var(fname, "key2")
-  out$sampleno <- xtract_var(fname, "sampleno")
+  out$sampleno <- xtract_var(fname, "sampleno") %>%
+    as.integer()
   out
 }
