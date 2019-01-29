@@ -11,7 +11,7 @@ test_that("set_type() gives type to fname correctly", {
 test_that("get_info.survey() makes sample metadata correctly", {
   fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
   info  <- get_info.survey(fname)
-  expect_is(info, "survey")
+  expect_equal(info$type, "survey")
   expect_equal(info$spcs, "Sardinops-melanostictus")
   expect_equal(info$crs.name, "YK1508")
   expect_equal(info$stn, "MT6")
@@ -21,7 +21,7 @@ test_that("get_info.survey() makes sample metadata correctly", {
 test_that("get_info.commercial() makes sample metadata correctly", {
   fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
   info  <- get_info.commercial(fname)
-  expect_is(info, "commercial")
+  expect_equal(info$type, "commercial")
   expect_equal(info$spcs, "Sardinops-melanostictus")
   expect_equal(info$date, "20150827")
   expect_equal(info$key1, "Toyama")
@@ -32,7 +32,7 @@ test_that("get_info.commercial() makes sample metadata correctly", {
 test_that("get_info.reared() makes sample metadata correctly", {
   fname <- "Sardinops-melanostictus_20160810_temp14_01.hdr"
   info  <- get_info.reared(fname)
-  expect_is(info, "reared")
+  expect_equal(info$type, "reared")
   expect_equal(info$spcs, "Sardinops-melanostictus")
   expect_equal(info$date, "20160810")
   expect_equal(info$key1, "temp14")
