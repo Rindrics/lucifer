@@ -363,7 +363,7 @@ Imports:
   }
 #+END_SRC
 *** dir 以下全部のデータを読み込み
-#+BEGIN_SRC R :tangle otolithr/R/load_all_otolith.R
+#+BEGIN_SRC R :tangle otolithr/R/load_otolith.R
   make_data <- function(fname, fname_with_type) {
     data     <- load_hdr(fname)
     out      <- get_info(fname_with_type)
