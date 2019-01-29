@@ -2,6 +2,13 @@
 #+PROPERTY: header-args :cache yes :exports code :results scalar
 #+STARTUP: contents
 
+#+BEGIN_SRC R
+  setwd("otolithr")
+#+END_SRC
+
+#+RESULTS[8a4bc7aed74fdbd84bf3c88ba79c959332658351]:
+: /Users/ahayashi/Documents/GitHub/tidyNAS
+
 * パッケージのエコシステム
 継続的インテグレーションを可能にする
 ** 耳石マシン
