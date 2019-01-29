@@ -49,10 +49,7 @@
 - 日齢-体長関係
 - 日齢組成を描画
 * デモ
-:PROPERTIES:
-:header-args: :results output :exports both
-:END:
-#+BEGIN_SRC R
+#+BEGIN_SRC R :results output :exports both
   devtools::load_all("otolithr")
   path <- "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus"
 
