@@ -21,6 +21,7 @@
     - [[#上記リストのうち実際に解析に使う個体だけを抽出したリストを作成する][上記リストのうち，実際に解析に使う個体だけを抽出したリストを作成する]]
     - [[#フルパスをファイル名に変換する][フルパスをファイル名に変換する]]
     - [[#サンプリング方法調査漁獲飼育に応じた振る舞いの変化][サンプリング方法（調査|漁獲|飼育）に応じた振る舞いの変化]]
+- [[#追加予定の機能][追加予定の機能]]
 - [[#開発環境の整備][開発環境の整備]]
   - [[#ディレクトリ作成][ディレクトリ作成]]
   - [[#本バッケージ内部で使用するパッケージ][本バッケージ内部で使用するパッケージ]]
@@ -81,12 +82,12 @@
 #+begin_example
 There were 50 or more warnings (use warnings() to see the first 50)
         type                          fname spcs date key1 key2 sampleno   inc
-1 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 7.606
-2 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 3.202
-3 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 2.102
-4 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 3.501
-5 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 2.302
-6 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 3.406
+1 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 7.606
+2 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 3.202
+3 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 2.102
+4 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 3.501
+5 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 2.302
+6 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 3.406
   radius ninc crs.name  stn
 1  7.606    0     <NA> <NA>
 2 10.808    0     <NA> <NA>
@@ -95,12 +96,12 @@ There were 50 or more warnings (use warnings() to see the first 50)
 5 18.713    0     <NA> <NA>
 6 22.119    0     <NA> <NA>
         type      fname spcs date key1 key2 sampleno    inc   radius ninc
-29717 survey C1_011.hdr <NA> <NA> <NA> <NA>      011  9.127 1314.698    0
-29718 survey C1_011.hdr <NA> <NA> <NA> <NA>      011 14.335 1329.033    0
-29719 survey C1_011.hdr <NA> <NA> <NA> <NA>      011  9.326 1338.359    0
-29720 survey C1_011.hdr <NA> <NA> <NA> <NA>      011  9.833 1348.192    0
-29721 survey C1_011.hdr <NA> <NA> <NA> <NA>      011 11.029 1359.221    0
-29722 survey C1_011.hdr <NA> <NA> <NA> <NA>      011  8.521 1367.742    0
+29717 survey C1_011.hdr <NA> <NA> <NA> <NA>       11  9.127 1314.698    0
+29718 survey C1_011.hdr <NA> <NA> <NA> <NA>       11 14.335 1329.033    0
+29719 survey C1_011.hdr <NA> <NA> <NA> <NA>       11  9.326 1338.359    0
+29720 survey C1_011.hdr <NA> <NA> <NA> <NA>       11  9.833 1348.192    0
+29721 survey C1_011.hdr <NA> <NA> <NA> <NA>       11 11.029 1359.221    0
+29722 survey C1_011.hdr <NA> <NA> <NA> <NA>       11  8.521 1367.742    0
       crs.name  stn
 29717     <NA> <NA>
 29718     <NA> <NA>
@@ -126,12 +127,12 @@ df %>% dplyr::filter(!is.na(spcs)) %>% head()
 5 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
 6 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
   date key1 key2 sampleno   inc radius ninc crs.name  stn
-1 <NA> <NA> <NA>       01 7.403  7.403    0   YK1508 MT10
-2 <NA> <NA> <NA>       01 1.900  9.303    0   YK1508 MT10
-3 <NA> <NA> <NA>       01 1.803 11.106    0   YK1508 MT10
-4 <NA> <NA> <NA>       01 1.800 12.906    0   YK1508 MT10
-5 <NA> <NA> <NA>       01 2.602 15.508    0   YK1508 MT10
-6 <NA> <NA> <NA>       01 2.802 18.310    0   YK1508 MT10
+1 <NA> <NA> <NA>        1 7.403  7.403    0   YK1508 MT10
+2 <NA> <NA> <NA>        1 1.900  9.303    0   YK1508 MT10
+3 <NA> <NA> <NA>        1 1.803 11.106    0   YK1508 MT10
+4 <NA> <NA> <NA>        1 1.800 12.906    0   YK1508 MT10
+5 <NA> <NA> <NA>        1 2.602 15.508    0   YK1508 MT10
+6 <NA> <NA> <NA>        1 2.802 18.310    0   YK1508 MT10
 #+end_example
 
 ** 内部で使っている関数
@@ -265,23 +266,24 @@ List of 7
  $ date    : chr NA
  $ key1    : chr NA
  $ key2    : chr NA
- $ sampleno: chr "001"
+ $ sampleno: int 1
 List of 6
  $ type    : chr "survey"
  $ fname   : chr "Sardinops-melanostictus_YK1508_MT10_01.hdr"
  $ spcs    : chr "Sardinops-melanostictus"
  $ crs.name: chr "YK1508"
  $ stn     : chr "MT10"
- $ sampleno: chr "01"
+ $ sampleno: int 1
 List of 6
  $ type    : chr "survey"
  $ fname   : chr "C1_011.hdr"
  $ spcs    : chr NA
  $ crs.name: chr NA
  $ stn     : chr NA
- $ sampleno: chr "011"
+ $ sampleno: int 11
 #+end_example
-
+* 追加予定の機能
+[[https://github.com/smxshxishxad/tidyNAS/issues][Issues]] にて随時募集中
 * 開発環境の整備
 ** ディレクトリ作成
 #+BEGIN_SRC R :results silent
@@ -315,8 +317,7 @@ Suggests:
     testthat
 Imports: 
     magrittr,
-    ggplot2,
-    tibble
+    ggplot2
 #+end_example
 
 * 開発
@@ -330,7 +331,37 @@ Imports:
 #+END_SRC
 
 #+RESULTS[62d4820a9216b105c72787e032f80205ff1ada32]:
-: No man pages found in package  ‘otolithr’ 
+#+begin_example
+✔ | OK F W S | Context
+⠏ |  0       | Control behavior according to dattype⠋ |  1       | Control behavior according to dattype⠙ |  2       | Control behavior according to dattype⠹ |  3       | Control behavior according to dattype⠸ |  4       | Control behavior according to dattype⠼ |  5       | Control behavior according to dattype⠴ |  6       | Control behavior according to dattype⠦ |  7       | Control behavior according to dattype⠧ |  7 1     | Control behavior according to dattype⠇ |  8 1     | Control behavior according to dattype⠏ |  9 1     | Control behavior according to dattype⠋ | 10 1     | Control behavior according to dattype⠙ | 11 1     | Control behavior according to dattype⠹ | 12 1     | Control behavior according to dattype⠸ | 12 2     | Control behavior according to dattype⠼ | 13 2     | Control behavior according to dattype⠴ | 14 2     | Control behavior according to dattype⠦ | 15 2     | Control behavior according to dattype⠧ | 16 2     | Control behavior according to dattype⠇ | 17 2     | Control behavior according to dattype⠏ | 17 3     | Control behavior according to dattype⠋ | 18 3     | Control behavior according to dattype⠙ | 19 3     | Control behavior according to dattype⠹ | 20 3     | Control behavior according to dattype⠸ | 21 3     | Control behavior according to dattype✖ | 21 3     | Control behavior according to dattype
+────────────────────────────────────────────────────────────────────────────────
+test_dattype.R:18: failure: get_info.survey() makes sample metadata correctly
+info$sampleno not equal to "10".
+Types not compatible: integer is not character
+
+test_dattype.R:29: failure: get_info.commercial() makes sample metadata correctly
+info$sampleno not equal to "005".
+Types not compatible: integer is not character
+
+test_dattype.R:40: failure: get_info.reared() makes sample metadata correctly
+info$sampleno not equal to "01".
+Types not compatible: integer is not character
+────────────────────────────────────────────────────────────────────────────────
+⠏ |  0       | Handle file name⠋ |  1       | Handle file name⠙ |  2       | Handle file name⠹ |  3       | Handle file name⠸ |  4       | Handle file name⠼ |  5       | Handle file name⠴ |  6       | Handle file name⠦ |  7       | Handle file name⠧ |  8       | Handle file name⠇ |  9       | Handle file name⠏ | 10       | Handle file name⠋ | 11       | Handle file name⠙ | 12       | Handle file name⠹ | 13       | Handle file name⠸ | 14       | Handle file name⠼ | 15       | Handle file name⠴ | 16       | Handle file name⠦ | 17       | Handle file name⠧ | 18       | Handle file name⠇ | 19       | Handle file name⠏ | 20       | Handle file name⠋ | 21       | Handle file name⠙ | 22       | Handle file name⠹ | 23       | Handle file name✔ | 23       | Handle file name
+⠏ |  0       | Manage path⠋ |  1       | Manage path⠙ |  2       | Manage path⠹ |  3       | Manage path✔ |  3       | Manage path
+⠏ |  0       | Load .hdr file⠋ |  1       | Load .hdr file⠙ |  2       | Load .hdr file⠹ |  3       | Load .hdr file⠸ |  4       | Load .hdr file✔ |  4       | Load .hdr file
+⠏ |  0       | Functional test⠋ |  1       | Functional test✔ |  1       | Functional test
+
+══ Results ═════════════════════════════════════════════════════════════════════
+Duration: 0.2 s
+
+OK:       52
+Failed:   3
+Warnings: 0
+Skipped:  0
+Writing NAMESPACE
+Writing NAMESPACE
+#+end_example
 ** テストコード
 :PROPERTIES:
 :header-args: :results silent :exports code
@@ -363,21 +394,21 @@ Imports:
     expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
     expect_equal(xtract_var(fname, "cruise")  , "YK1808")
     expect_equal(xtract_var(fname, "stn")     , "MT01")
-    expect_equal(xtract_var(fname, "sampleno"), "005")
+    expect_equal(xtract_var(fname, "sampleno"), 5)
 
     fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
     expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
     expect_equal(xtract_var(fname, "date")    , "20150827")
     expect_equal(xtract_var(fname, "key1")    , "Toyama")
     expect_equal(xtract_var(fname, "key2")    , "Nakase")
-    expect_equal(xtract_var(fname, "sampleno"), "005")
+    expect_equal(xtract_var(fname, "sampleno"), 5)
 
     fname <- "Sardinops-melanostictus_20150827_Toyama_005.hdr"
     expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
     expect_equal(xtract_var(fname, "date")    , "20150827")
     expect_equal(xtract_var(fname, "key1")    , "Toyama")
     expect_true(is.na(xtract_var(fname, "key2")))
-    expect_equal(xtract_var(fname, "sampleno"), "005")
+    expect_equal(xtract_var(fname, "sampleno"), 5)
   })
 #+END_SRC
 *** テスト/ファイルパス
@@ -509,7 +540,7 @@ Imports:
 #+END_SRC
 ** 関数
 *** ヘルパー関数
-#+BEGIN_SRC R :tangle otolithr/R/util.R
+#+BEGIN_SRC R :tangle otolithr/R/util.R :results silent
   #' @importFrom magrittr %>%
   #' @export
   magrittr::`%>%`
@@ -636,8 +667,11 @@ Imports:
     dir2load
   }
 #+END_SRC
+
+#+RESULTS:
+
 *** hdr 読み込み
-#+BEGIN_SRC R :tangle otolithr/R/handle_hdr.R
+#+BEGIN_SRC R :tangle otolithr/R/handle_hdr.R :results silent
   load_hdr <- function(fname){
     read.csv(fname, fileEncoding = "CP932",
              header = FALSE, stringsAsFactors = FALSE)
@@ -653,8 +687,9 @@ Imports:
     out
   }
 #+END_SRC
+
 *** 統合関数
-#+BEGIN_SRC R :tangle otolithr/R/load_otolith.R
+#+BEGIN_SRC R :tangle otolithr/R/load_otolith.R :results silent
   make_data <- function(fname, fname_with_type) {
     data     <- load_hdr(fname)
     out      <- get_info(fname_with_type)
