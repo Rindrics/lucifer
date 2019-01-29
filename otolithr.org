@@ -2,46 +2,70 @@
 #+PROPERTY: header-args :cache yes :exports code :results scalar
 #+STARTUP: contents
 
-#+BEGIN_SRC R
-  setwd("otolithr")
-#+END_SRC
+* 目次                                                                :TOC_3:
+- [[#パッケージの機能][パッケージの機能]]
+  - [[#自動テスト機能][自動テスト機能]]
+    - [[#データの格納方法][データの格納方法]]
+    - [[#ファイル命名規則][ファイル命名規則]]
+  - [[#自動ビルド機能][自動ビルド機能]]
+    - [[#データ目録の生成][データ目録の生成]]
+    - [[#体長体重逆算][体長・体重逆算]]
+    - [[#グラフ描画][グラフ描画]]
+- [[#開発環境の整備][開発環境の整備]]
+  - [[#ディレクトリ作成][ディレクトリ作成]]
+  - [[#本バッケージ内部で使用するパッケージ][本バッケージ内部で使用するパッケージ]]
+- [[#開発][開発]]
+  - [[#リロード--自動テスト][リロード & 自動テスト]]
+  - [[#テストコード][テストコード]]
+    - [[#テストファイル名][テスト/ファイル名]]
+    - [[#テストファイルパス][テスト/ファイルパス]]
+    - [[#テストデータタイプ調査漁獲物飼育][テスト/データタイプ（調査|漁獲物|飼育）]]
+    - [[#テストhdr-ファイルハンドリング][テスト/hdr ファイルハンドリング]]
+    - [[#機能テスト][機能テスト]]
+  - [[#関数][関数]]
+    - [[#ヘルパー関数][ヘルパー関数]]
+    - [[#ファイルパス][ファイルパス]]
+    - [[#hdr-読み込み][hdr 読み込み]]
+    - [[#統合関数][統合関数]]
+  - [[#デモ][デモ]]
 
-#+RESULTS[8a4bc7aed74fdbd84bf3c88ba79c959332658351]:
-: /Users/ahayashi/Documents/GitHub/tidyNAS
-
-* パッケージのエコシステム
-継続的インテグレーションを可能にする
-** 耳石マシン
-*** 自動チェック
-データ更新がトリガー
-- 日齢-体長関係を描画（耳石マシンにも体長データを入れておく）
+* パッケージの機能
+耳石日輪解析データにおいて継続的デプロイを実現する．
+データ更新をトリガーとして動作する
+** 自動テスト機能
+*** データの格納方法
+データが
+- 調査
+- 漁業
+- 飼育
+いずれかに入っていることを保証
+*** ファイル命名規則
+ファイルが種名_識別キー1_識別キー2_標本番号.hdr という形式で命名されていることを保証
+** 自動ビルド機能
+全てのhdr ファイルが上記テストに通った場合，以下が実行される．
+*** データ目録の生成
+*** 体長・体重逆算
+*** グラフ描画
+- 日齢-体長関係
 - 日齢組成を描画
-*** 自動マージ
-** NAS
-*** 自動チェック
-**** データの品質
-*** 自動ビルド
-**** 目録の生成
-**** 逆算
-**** 描画
-* 開発準備
+* 開発環境の整備
+** ディレクトリ作成
 #+BEGIN_SRC R :results silent
   # usethis::create_package("otolithr")
-  usethis::use_testthat()
-#+END_SRC
-** 使用したパッケージ
-#+BEGIN_SRC R
+  #+END_SRC
+** 本バッケージ内部で使用するパッケージ
+#+BEGIN_SRC R :results silent
   usethis::use_package("magrittr", "Imports")
   usethis::use_package("ggplot2", "Imports")
+  usethis::use_package("tibble", "Imports")
+  usethis::use_testthat()
 #+END_SRC
 
-#+RESULTS[74388f8cebf587e60c40ecf4173543e3668dc8ed]:
-
-#+BEGIN_SRC sh
-cat otolithr/DESCRIPTION
+#+BEGIN_SRC sh :exports results
+  cat otolithr/DESCRIPTION
 #+END_SRC
 
-#+RESULTS[362fd202a9325dcbeafbf43e1712c3968b259db1]:
+#+RESULTS[26e6d91ffe9c3ff5d95f888fb0006e9154a02abb]:
 #+begin_example
 Package: otolithr
 Title: What the Package Does (one line, title case)
@@ -57,7 +81,8 @@ Suggests:
     testthat
 Imports: 
     magrittr,
-    ggplot2
+    ggplot2,
+    tibble
 #+end_example
 
 * 開発
@@ -72,11 +97,11 @@ Imports:
 
 #+RESULTS[62d4820a9216b105c72787e032f80205ff1ada32]:
 : No man pages found in package  ‘otolithr’ 
-** テスト
-*** テスト/ファイル名ハンドリング
+** テストコード
 :PROPERTIES:
 :header-args: :results silent :exports code
 :END:
+*** テスト/ファイル名
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fname.R
   library(otolithr)
   context("Handle file name")
@@ -345,44 +370,7 @@ Imports:
     out
   }
 #+END_SRC
-*** hdr 読み込み
-#+BEGIN_SRC R :tangle otolithr/R/handle_hdr.R
-  load_hdr <- function(fname){
-    read.csv(fname, fileEncoding = "CP932",
-             header = FALSE, stringsAsFactors = FALSE)
-  }
-
-  locate_1stinc <- function(x) {
-    which(x == "日輪幅") + 1 # Data of 1stinc is located just after "日輪幅".
-  }
-
-  get_incdata <- function(x) {
-    str <- x
-    out <- as.numeric(str[locate_1stinc(x):length(str)])
-    out
-  }
-#+END_SRC
-*** dir 以下全部のデータを読み込み
-#+BEGIN_SRC R :tangle otolithr/R/load_otolith.R
-  make_data <- function(fname, fname_with_type) {
-    data     <- load_hdr(fname)
-    out      <- get_info(fname_with_type)
-    out$inc  <- get_incdata(data$V1)
-    out$radius   <- cumsum(out$inc)
-    out$ninc  <- length(out$iw)
-    out
-  }
-
-
-  load_otolith <- function(dir) {
-    type            <- detect_type(dir)
-    fname_with_type <- fullpath2fname(dir) %>%
-      set_type(type)
-    out <- make_data(dir, fname_with_type)
-    out
-  }
-#+END_SRC
-*** パス関連
+*** ファイルパス
 #+BEGIN_SRC R :tangle otolithr/R/fpath.R
   get_path <- function(dir.spcs) {
     regex <- ".+hdr$"
@@ -408,6 +396,43 @@ Imports:
     match_pos     <- which(match_length > 0)
     dir2load      <- paths[match_pos]
     dir2load
+  }
+#+END_SRC
+*** hdr 読み込み
+#+BEGIN_SRC R :tangle otolithr/R/handle_hdr.R
+  load_hdr <- function(fname){
+    read.csv(fname, fileEncoding = "CP932",
+             header = FALSE, stringsAsFactors = FALSE)
+  }
+
+  locate_1stinc <- function(x) {
+    which(x == "日輪幅") + 1 # Data of 1stinc is located just after "日輪幅".
+  }
+
+  get_incdata <- function(x) {
+    str <- x
+    out <- as.numeric(str[locate_1stinc(x):length(str)])
+    out
+  }
+#+END_SRC
+*** 統合関数
+#+BEGIN_SRC R :tangle otolithr/R/load_otolith.R
+  make_data <- function(fname, fname_with_type) {
+    data     <- load_hdr(fname)
+    out      <- get_info(fname_with_type)
+    out$inc  <- get_incdata(data$V1)
+    out$radius   <- cumsum(out$inc)
+    out$ninc  <- length(out$iw)
+    out
+  }
+
+
+  load_otolith <- function(dir) {
+    type            <- detect_type(dir)
+    fname_with_type <- fullpath2fname(dir) %>%
+      set_type(type)
+    out <- make_data(dir, fname_with_type)
+    out
   }
 #+END_SRC
 ** デモ
@@ -452,7 +477,10 @@ Imports:
 
   print("データを読み込み")
   otldata <- purrr::map(dirs2load, load_otolith)
-  otldata[[1]]
+  df      <- purrr::map_dfr(otldata, tibble::as.tibble)
+  df
+  # write.csv(df, "test.csv", row.names = FALSE)
+
 #+END_SRC
 
 #+RESULTS:
