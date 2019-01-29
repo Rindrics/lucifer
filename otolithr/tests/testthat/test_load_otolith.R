@@ -1,9 +1,10 @@
 context("Functional test")
 
-infile   <- "../Sardinops-melanostictus_YK1508_MT6_02.hdr"
-data     <- load_hdr(infile)
+indir      <- "../Genus-spcs"
+paths      <- get_path(indir)
+paths2load <- get_dir2load(paths)[1]
+data       <- load_otolith(paths2load)
 
 test_that("load_otolith() loads otolith data", {
-  expect_is(load_otolith(infile), "list")
-  expect_is(load_otolith(infile)$age, "numeric")
+  expect_is(data$ninc, "integer")
 })
