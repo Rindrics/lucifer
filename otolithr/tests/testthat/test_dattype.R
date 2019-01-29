@@ -15,7 +15,7 @@ test_that("get_info.survey() makes sample metadata correctly", {
   expect_equal(info$spcs, "Sardinops-melanostictus")
   expect_equal(info$crs.name, "YK1508")
   expect_equal(info$stn, "MT6")
-  expect_equal(info$sampleno, "10")
+  expect_equal(info$sampleno, 10)
 })
 
 test_that("get_info.commercial() makes sample metadata correctly", {
@@ -26,7 +26,7 @@ test_that("get_info.commercial() makes sample metadata correctly", {
   expect_equal(info$date, "20150827")
   expect_equal(info$key1, "Toyama")
   expect_equal(info$key2, "Nakase")
-  expect_equal(info$sampleno, "005")
+  expect_equal(info$sampleno, 5)
 })
 
 test_that("get_info.reared() makes sample metadata correctly", {
@@ -37,7 +37,7 @@ test_that("get_info.reared() makes sample metadata correctly", {
   expect_equal(info$date, "20160810")
   expect_equal(info$key1, "temp14")
   expect_true(is.na(info$key2))
-  expect_equal(info$sampleno, "01")
+  expect_equal(info$sampleno, 1)
 })
 
 test_that("detect_type() detects dattype correctly", {

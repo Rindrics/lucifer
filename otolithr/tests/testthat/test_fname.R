@@ -24,19 +24,19 @@ test_that("xtract_var() detects given variable in given vector", {
   expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
   expect_equal(xtract_var(fname, "cruise")  , "YK1808")
   expect_equal(xtract_var(fname, "stn")     , "MT01")
-  expect_equal(xtract_var(fname, "sampleno"), "005")
+  expect_equal(xtract_var(fname, "sampleno"), 5)
 
   fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
   expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
   expect_equal(xtract_var(fname, "date")    , "20150827")
   expect_equal(xtract_var(fname, "key1")    , "Toyama")
   expect_equal(xtract_var(fname, "key2")    , "Nakase")
-  expect_equal(xtract_var(fname, "sampleno"), "005")
+  expect_equal(xtract_var(fname, "sampleno"), 5)
 
   fname <- "Sardinops-melanostictus_20150827_Toyama_005.hdr"
   expect_equal(xtract_var(fname, "spcsname"), "Sardinops-melanostictus")
   expect_equal(xtract_var(fname, "date")    , "20150827")
   expect_equal(xtract_var(fname, "key1")    , "Toyama")
   expect_true(is.na(xtract_var(fname, "key2")))
-  expect_equal(xtract_var(fname, "sampleno"), "005")
+  expect_equal(xtract_var(fname, "sampleno"), 5)
 })
