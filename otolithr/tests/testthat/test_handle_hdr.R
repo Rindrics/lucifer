@@ -1,6 +1,7 @@
 context("Load .hdr file")
 
-infile   <- "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"
+infile   <-
+  "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"
 data     <- load_hdr(infile)
 varnames <-  c("標本番号", "採集航海番号",  "採集ｽﾃｰｼｮﾝ番号", "採集日付",
                "緯度", "経度", "表面水温", "体長", "体重", "耳石径", "耳左右",
