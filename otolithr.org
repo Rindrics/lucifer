@@ -63,21 +63,51 @@
 #+END_SRC
 
 ** データを読み込み
-#+BEGIN_SRC R :results value :exports both :session *R:tidyNAS*
+指定したディレクトリ以下の.hdr ファイルが全て統合される．
+
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
   otldata <- purrr::map(dirs2load, load_otolith)
-  df      <- purrr::map_dfr(otldata, tibble::as.tibble)
+  df      <- purrr::map_dfr(otldata, as.data.frame)
   head(df)
+  tail(df)
+  print(paste("統合したファイルの数は", length(unique(df$fname)), "個"))
   # write.csv(df, "test.csv", row.names = FALSE)
 
 #+END_SRC
 
 #+RESULTS:
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	7.606	7.606	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.202	10.808	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	2.102	12.91	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.501	16.411	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	2.302	18.713	0	nil	nil
-: commercial	20150827_Toyama_Nakase_001.hdr	nil	nil	nil	nil	001	3.406	22.119	0	nil	nil
+#+begin_example
+There were 50 or more warnings (use warnings() to see the first 50)
+        type                          fname spcs date key1 key2 sampleno   inc
+1 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 7.606
+2 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 3.202
+3 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 2.102
+4 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 3.501
+5 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 2.302
+6 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>      001 3.406
+  radius ninc crs.name  stn
+1  7.606    0     <NA> <NA>
+2 10.808    0     <NA> <NA>
+3 12.910    0     <NA> <NA>
+4 16.411    0     <NA> <NA>
+5 18.713    0     <NA> <NA>
+6 22.119    0     <NA> <NA>
+        type      fname spcs date key1 key2 sampleno    inc   radius ninc
+29717 survey C1_011.hdr <NA> <NA> <NA> <NA>      011  9.127 1314.698    0
+29718 survey C1_011.hdr <NA> <NA> <NA> <NA>      011 14.335 1329.033    0
+29719 survey C1_011.hdr <NA> <NA> <NA> <NA>      011  9.326 1338.359    0
+29720 survey C1_011.hdr <NA> <NA> <NA> <NA>      011  9.833 1348.192    0
+29721 survey C1_011.hdr <NA> <NA> <NA> <NA>      011 11.029 1359.221    0
+29722 survey C1_011.hdr <NA> <NA> <NA> <NA>      011  8.521 1367.742    0
+      crs.name  stn
+29717     <NA> <NA>
+29718     <NA> <NA>
+29719     <NA> <NA>
+29720     <NA> <NA>
+29721     <NA> <NA>
+29722     <NA> <NA>
+[1] "統合したファイルの数は 200 個"
+#+end_example
 
 ** 内部で使っている関数
 *** .hdr ファイルがある全ディレクトリのリストを作成する
