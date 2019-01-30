@@ -164,6 +164,9 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
     expect_match(get_sheet2read(infile06), "0207", all = FALSE)
     expect_equal(length(get_sheet2read(infile06)), 10)
     expect_equal(length(get_sheet2read(infile17)), 0)
+    expect_match(parse_year("aaaa99"), "20")
+    expect_match(parse_year("____99"), "20")
+    expect_match(parse_year("123499"), "20")
   })
 
   test_that("get_date() parses dates correctly", {
