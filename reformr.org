@@ -212,6 +212,22 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
     expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$sex), "integer")
     expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$gw_g), "double")
     expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$gsi), "double")
+  test_that("get_spcsname() gets spcs name", {
+    expect_equal(get_spcsname("カタクチイワシ.xls"), "カタクチイワシ")
+    expect_equal(get_spcsname("カタクチ.xls"), "カタクチイワシ")
+    expect_equal(get_spcsname("カタクチ.xls"), "カタクチイワシ")
+    goodnames <- c("カタクチイワシ", "マイワシ", "マアジ", "ウルメイワシ")
+    variants  <- c("カタクチイワシ", "カタクチ", "マイワシ", "マアジ",
+                   "ウルメイワシ", "ウルメ")
+    misc      <- c("測定", "鳥取", "XX丸", "")
+    xtn       <- c(".xls", ".xlsx")
+    fnames    <- expand.grid(variants, misc, xtn) %>%
+      transmute(fname = paste0(Var1, Var2, Var3)) %>%
+      pull(fname)
+    expect_setequal(purrr::map(variants, get_spcsname) %>%
+                      unlist() %>%
+                      unique(),
+                    goodnames)
   })
   test_that("format() cleanses otolith and scale columns correctly", {
     expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$otolith.taken), "integer")
@@ -253,10 +269,22 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
     out
   }
 
+  get_spcsname <- function(x) {
+    regex <- "(カタクチ|マ(?!アジ)|ウルメ|マアジ)"
+    match <- return_match(x, regex)
+    if (match == "マアジ") {
+      out <- match
+    } else {
+      out <- paste0(match, "イワシ")
+    }
+    out
+  }
+
   parse_str <- function(x, type) {
     switch(type,
            "sheet" = out <- filter_sheet(x),
            "year"  = out <- parse_year(x),
+           "fish"  = out <- parse_spcsname(x),
            stop("unknown case"))
     out
   }
