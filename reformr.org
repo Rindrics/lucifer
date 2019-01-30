@@ -246,6 +246,14 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
 * 関数群を開発する
 ** reform(indir, type)
 *** 有効シート名取得
+** 関数定義
+*** ユーティリティ
+#+BEGIN_SRC R :tangle reformr/R/util.R
+  #' @importFrom magrittr %>%
+  #' @export
+  magrittr::`%>%`
+#+END_SRC
+*** 文字列パース
 #+BEGIN_SRC R :results silent :exports code :tangle reformr/R/parse_str.R
   return_match <- function(x, regex) {
     match <- x %>%
