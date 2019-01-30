@@ -242,16 +242,20 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
 #+BEGIN_SRC R :results silent :exports code :tangle reformr/tests/testthat/test_get_sheet2load.R
   context("Get sheet name which contains measurement data")
 
-  test_that("get_sheet2load() gets sheets with good name format", {
-    expect_equal(get_sheet2load("0201"), "0201")
-    expect_equal(get_sheet2load("0201(1)"), "0201(1)")
-    expect_equal(length(get_sheet2load("体長")), 0)
-    expect_equal(length(get_sheet2load("Sheet1")), 0)
+
+  test_that("filter_sheet() gets sheets with good name format", {
+    expect_equal(filter_sheet("0201"), "0201")
+    expect_equal(filter_sheet("0201(1)"), "0201(1)")
+    expect_equal(filter_sheet("0201大"), "0201大")
+    expect_equal(length(filter_sheet("体長")), 0)
+    expect_equal(length(filter_sheet("Sheet1")), 0)
     sheets <- c("体長", "0125", "0204", "0207(1)", "0217", "0325", "0407",
                 "0428", "0510", "0524", "0929", "Sheet2", "Sheet3")
     expect <- c("0125", "0204", "0207(1)", "0217", "0325", "0407",
                 "0428", "0510", "0524", "0929")
-    expect_setequal(get_sheet2load(sheets), expect)
+    expect_setequal(filter_sheet(sheets), expect)
+  })
+
   })
 #+END_SRC
 
@@ -277,7 +281,7 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
 
   filter_sheet <- function(x) {
     re_omit  <- "^(?!.*0000)(?!体長)(?!Sheet)"
-    re_match <- "((?:0[1-9][0-9]{2}|1[0-2][0-9]{2})(?:\\([0-9]+\\))?)"
+    re_match <- "((?:0[1-9][0-9]{2}|1[0-2][0-9]{2}).*)"
     regex <- paste0(re_omit, re_match)
     out   <- return_match(x, regex)
     out
