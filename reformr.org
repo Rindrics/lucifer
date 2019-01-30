@@ -121,18 +121,13 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
 })
 #+END_SRC
 
-** 文字列パース
-#+BEGIN_SRC R :tangle reformr/tests/testthat/test_filestring.R
+*** テスト/文字列パース
+#+BEGIN_SRC R :tangle reformr/tests/testthat/test_parse_str.R
   context("Parse strings")
 
   test_that("parse_year() puts year list correctly", {
     expect_match(parse_year("鮮魚測定11"), "2011")
     expect_match(parse_year("鮮魚測定99"), "2099")
-    expect_match(parse_year("aaaa99"), "2099")
-    expect_match(parse_year("____99"), "2099")
-    expect_match(parse_year("123499"), "2099")
-  })
-
   test_that("get_filelist() puts species file list correctly", {
     expect_match(get_filelist(indir, "カタクチイワシ"), "カタクチイワシ.xls", all = FALSE)
     expect_match(get_filelist(indir, "マイワシ"), "マイワシ.xls", all = FALSE)
@@ -211,16 +206,35 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
 * 関数群を開発する
 ** reform(indir, type)
 *** 有効シート名取得
-#+BEGIN_SRC R :results silent :exports code :tangle reformr/R/get_sheet2load.R
-  get_sheet2load <- function(x) {
-    re_omit  <- "^(?!.*0000)(?!体長)(?!Sheet)"
-    re_match <- "(0[1-9][0-9]{2}|1[0-2][0-9]{2})(\\([0-9]+\\))?"
-    regex <- paste0(re_omit, re_match)
+#+BEGIN_SRC R :results silent :exports code :tangle reformr/R/parse_str.R
+  return_match <- function(x, regex) {
     match <- x %>%
       stringr::str_match(regex)
-    out <- match[,1] %>%         # '1' points column which contains full match
-      na.omit()
-    as.vector(out)
+    out <- match[,2] %>%         # '2' points $1 regex capture
+      na.omit() %>% as.vector()
+    out
+  }
+
+  filter_sheet <- function(x) {
+    re_omit  <- "^(?!.*0000)(?!体長)(?!Sheet)"
+    re_match <- "((?:0[1-9][0-9]{2}|1[0-2][0-9]{2})(?:\\([0-9]+\\))?)"
+    regex <- paste0(re_omit, re_match)
+    out   <- return_match(x, regex)
+    out
+  }
+
+  parse_year <- function(x) {
+    regex <- "^鮮魚測定([0-9]{2})$"
+    out   <- paste0(20, return_match(x, regex))
+    out
+  }
+
+  parse_str <- function(x, type) {
+    switch(type,
+           "sheet" = out <- filter_sheet(x),
+           "year"  = out <- parse_year(x),
+           stop("unknown case"))
+    out
   }
 #+END_SRC
 #+BEGIN_SRC R :tangle reformr/R/reform.R
