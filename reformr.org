@@ -95,6 +95,13 @@ ls reformr
 #+NAME: load_data
 #+BEGIN_SRC R :session *R:tidyNAS* :var indir = "./data/鮮魚関係"
   list.files(indir, pattern = ".+[カタクチイワシ|マイワシ|マアジ]\\.xls", recursive = TRUE)
+* 開発
+** 再ロード & 自動テスト
+#+BEGIN_SRC R :exports both :results silent
+  devtools::load_all()
+  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
+  devtools::test()
+  devtools::document(roclets=c('rd', 'collate', 'namespace'))
 #+END_SRC
 
 #+RESULTS: load_data
