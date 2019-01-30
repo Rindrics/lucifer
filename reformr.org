@@ -240,6 +240,11 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
     expect_equal(get_sheet2load("0201(1)"), "0201(1)")
     expect_equal(length(get_sheet2load("体長")), 0)
     expect_equal(length(get_sheet2load("Sheet1")), 0)
+    sheets <- c("体長", "0125", "0204", "0207(1)", "0217", "0325", "0407",
+                "0428", "0510", "0524", "0929", "Sheet2", "Sheet3")
+    expect <- c("0125", "0204", "0207(1)", "0217", "0325", "0407",
+                "0428", "0510", "0524", "0929")
+    expect_setequal(get_sheet2load(sheets), expect)
   })
 #+END_SRC
 
