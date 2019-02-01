@@ -7,6 +7,8 @@
   - [[#整理対象ディレクトリの指定][整理対象ディレクトリの指定]]
   - [[#データを読み込んで-csv-として書き出す][データを読み込んで csv として書き出す]]
   - [[#未整形csvファイルを読み込んで統合][未整形csvファイルを読み込んで統合]]
+    - [[#データ統合][データ統合]]
+    - [[#データの精査][データの精査]]
 - [[#パッケージ開発の準備][パッケージ開発の準備]]
   - [[#r-パッケージの開発環境を整える][R パッケージの開発環境を整える]]
   - [[#使用したパッケージ][使用したパッケージ]]
@@ -107,6 +109,7 @@ Removing タクチイワシ_0929.csv
 ** 未整形csvファイルを読み込んで統合
 ファイル名から採集日などの情報を取得し，merged.csvに統合する
 merged.csv に，元データに起因する不具合が見つかったら，xls を修正，もしくはコードを修正．
+*** データ統合
 #+BEGIN_SRC R
   dir_unformatted <- "../output.git/conv_from_xls"
   csvs_all <- list.files(dir_unformatted, full.names = TRUE)
@@ -117,9 +120,12 @@ merged.csv に，元データに起因する不具合が見つかったら，xls
       mutate(original.file = fpath)
     data
   }
-
   anchovy <- purrr::map(csv_anchovy, my_readcsv) %>%
     bind_rows()
+
+#+END_SRC
+*** データの精査
+#+BEGIN_SRC R :results output :exports both
   colnames(anchovy)
 
   anchovy %>%
@@ -135,6 +141,35 @@ merged.csv に，元データに起因する不具合が見つかったら，xls
     unique()
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+ [1] "番号"          "BL"            "BW"            "Sex"          
+ [5] "GW"            "GSI(male)"     "GSI(Female)"   "original.file"
+ [9] "No"            "ホルマリン"    "耳石"          "鱗"           
+[13] "..11"          "備考"          "筋肉冷凍"      "FL"           
+[17] "内臓除去重量"  "アニサキス"    "SL"            "Gu"           
+[21] "尾鰭"
+[90m# A tibble: 100 x 1[39m
+   original.file                                              
+   [3m[90m<chr>[39m[23m                                                      
+[90m 1[39m ../output.git/conv_from_xls/2006_カタクチイワシ_0325.csv   
+[90m 2[39m ../output.git/conv_from_xls/2006_カタクチイワシ_0407.csv   
+[90m 3[39m ../output.git/conv_from_xls/2006_カタクチイワシ_0428.csv   
+[90m 4[39m ../output.git/conv_from_xls/2006_カタクチイワシ_0510.csv   
+[90m 5[39m ../output.git/conv_from_xls/2006_カタクチイワシ_0524.csv   
+[90m 6[39m ../output.git/conv_from_xls/2006_カタクチイワシ_0929.csv   
+[90m 7[39m ../output.git/conv_from_xls/2007_カタクチイワシ_0110.csv   
+[90m 8[39m ../output.git/conv_from_xls/2007_カタクチイワシ_0427(2).csv
+[90m 9[39m ../output.git/conv_from_xls/2007_カタクチイワシ_0427.csv   
+[90m10[39m ../output.git/conv_from_xls/2007_カタクチイワシ_0619.csv   
+[90m# … with 90 more rows[39m
+[90m# A tibble: 3 x 1[39m
+  original.file                                             
+  [3m[90m<chr>[39m[23m                                                     
+[90m1[39m ../output.git/conv_from_xls/2007_カタクチイワシ_0619.csv  
+[90m2[39m ../output.git/conv_from_xls/2007_カタクチイワシ_0619大.csv
+[90m3[39m ../output.git/conv_from_xls/2007_カタクチイワシ_0619小.csv
+#+end_example
 
 * パッケージ開発の準備
 ** R パッケージの開発環境を整える
