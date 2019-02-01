@@ -95,6 +95,24 @@ devtools::use_testthat("reformr")
 *** dir 確認
 #+BEGIN_SRC bash :session nil :results output
 ls reformr
+* パッケージ開発の準備
+** R パッケージの開発環境を整える
+#+BEGIN_SRC R :results silent :exports code
+# usethis::create_package("reformr")
+# usethis::use_testthat()
+setwd("reformr")
+#+END_SRC
+** 使用したパッケージ
+#+BEGIN_SRC R :results silent :exports code
+usethis::use_package("magrittr", type = "Imports")
+usethis::use_package("dplyr", type = "Imports")
+usethis::use_package("lubridate", type = "Imports")
+usethis::use_package("readxl", type = "Imports")
+usethis::use_package("stringr", type = "Imports")
+#+END_SRC
+
+#+BEGIN_SRC sh :session nil :results output :exports results
+cat reformr/DESCRIPTION
 #+END_SRC
 
 #+RESULTS:
