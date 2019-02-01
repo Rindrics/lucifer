@@ -264,8 +264,8 @@ cat reformr/DESCRIPTION
     misc      <- c("測定", "鳥取", "XX丸", "")
     xtn       <- c(".xls", ".xlsx")
     fnames    <- expand.grid(variants, misc, xtn) %>%
-      transmute(fname = paste0(Var1, Var2, Var3)) %>%
-      pull(fname)
+      dplyr::transmute(fname = paste0(Var1, Var2, Var3)) %>%
+      dplyr::pull(fname)
     expect_setequal(purrr::map(variants, get_spcsname) %>%
                       unlist() %>%
                       unique(),
