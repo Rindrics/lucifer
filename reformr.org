@@ -1,14 +1,15 @@
-#+TITLE: reformr 開発プロジェクトノート
+#+TITLE: reformr プロジェクトノート
 #+PROPERTY: header-args :session *R:tidyNAS*
 * 目次                                                                :TOC_3:
 - [[#これは何か][これは何か？]]
 - [[#パッケージ読み込み][パッケージ読み込み]]
+- [[#使い方][使い方]]
+  - [[#整理対象ディレクトリの指定][整理対象ディレクトリの指定]]
+  - [[#データを読み込んで-csv-として書き出す][データを読み込んで csv として書き出す]]
+  - [[#未整形csvファイルを読み込んで統合][未整形csvファイルを読み込んで統合]]
 - [[#パッケージ開発の準備][パッケージ開発の準備]]
   - [[#r-パッケージの開発環境を整える][R パッケージの開発環境を整える]]
   - [[#使用したパッケージ][使用したパッケージ]]
-- [[#チュートリアル][チュートリアル]]
-  - [[#鮮魚データを整理する][鮮魚データを整理する]]
-  - [[#データを読み込んで-csv-として書き出し][データを読み込んで csv として書き出し]]
 - [[#開発][開発]]
   - [[#再ロード--自動テスト][再ロード & 自動テスト]]
   - [[#テストコード][テストコード]]
@@ -19,6 +20,7 @@
   - [[#関数定義][関数定義]]
     - [[#ユーティリティ][ユーティリティ]]
     - [[#文字列パース][文字列パース]]
+    - [[#統合関数][統合関数]]
     - [[#reformindir-type][reform(indir, type)]]
     - [[#conv2entsheet][conv2entsheet()]]
     - [[#export_inputsheet][export_inputSheet()]]
@@ -36,9 +38,6 @@
 * パッケージ読み込み
 #+name: load-packages
 #+BEGIN_SRC R :results silent
-  library(tidyverse)
-  library(lubridate)
-  library(readxl)
 library(tidyverse)
 library(lubridate)
 library(readxl)
