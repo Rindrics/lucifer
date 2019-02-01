@@ -420,7 +420,7 @@ cat reformr/DESCRIPTION
     switch(type,
            "sheet" = out <- filter_sheet(x),
            "year"  = out <- parse_year(x),
-           "fish"  = out <- parse_spcsname(x),
+           "fish"  = out <- get_spcsname(x),
            stop("unknown case"))
     out
   }
