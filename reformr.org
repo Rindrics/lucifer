@@ -1,217 +1,422 @@
-#+TITLE: reformr 開発プロジェクトノート
+#+TITLE: reformr プロジェクトノート
 #+PROPERTY: header-args :session *R:tidyNAS*
+* 目次                                                                :TOC_3:
+- [[#これは何か][これは何か？]]
+- [[#パッケージ読み込み][パッケージ読み込み]]
+- [[#使い方][使い方]]
+  - [[#整理対象ディレクトリの指定][整理対象ディレクトリの指定]]
+  - [[#データを読み込んで-csv-として書き出す][データを読み込んで csv として書き出す]]
+  - [[#未整形csvファイルを読み込んで統合][未整形csvファイルを読み込んで統合]]
+- [[#パッケージ開発の準備][パッケージ開発の準備]]
+  - [[#r-パッケージの開発環境を整える][R パッケージの開発環境を整える]]
+  - [[#使用したパッケージ][使用したパッケージ]]
+- [[#開発][開発]]
+  - [[#再ロード--自動テスト][再ロード & 自動テスト]]
+  - [[#テストコード][テストコード]]
+    - [[#テストパラメータ作成関数][テスト/パラメータ作成関数]]
+    - [[#テスト文字列パース][テスト/文字列パース]]
+    - [[#テスト統合テスト][テスト/統合テスト]]
+    - [[#テストデータ整形関数][テスト/データ整形関数]]
+  - [[#関数定義][関数定義]]
+    - [[#ユーティリティ][ユーティリティ]]
+    - [[#文字列パース][文字列パース]]
+    - [[#統合関数][統合関数]]
+    - [[#reformindir-type][reform(indir, type)]]
+    - [[#conv2entsheet][conv2entsheet()]]
+    - [[#export_inputsheet][export_inputSheet()]]
+- [[#データ整備状況][データ整備状況]]
+  - [[#nas][NAS]]
 
-#+call: load-packages()
-#+call: constants()
-
-* このパッケージでやらないこと
-外部機関から送付されたデータの整形
-- マアジ高精度化の島根，鳥取 -> jm
-- 漁海況各県データ -> gyokaikyo
-
-** なぜか？
-reformr で扱うデータは，当研究室で生み出されたデータなので，原本をきれいに保つ意義がある．
+* これは何か？
+浮魚資源グループで生成されたデータを整形するバッケージ．
+「原本をきれいに保つ」ことに主眼を置いている．
+一方，外部機関から送付されるデータ（例えば以下）は，原本をきれいにすることはできないため，
+このパッケージでは扱わない．
+- マアジ高精度化の島根 & 鳥取データ: -> jmdatar で扱う
+- 漁海況各県データ: -> gyokaikyo で扱う
 
 * パッケージ読み込み
 #+name: load-packages
 #+BEGIN_SRC R :results silent
-  library(tidyverse)
-  library(lubridate)
-  library(readxl)
+library(tidyverse)
+library(lubridate)
+library(readxl)
+#+END_SRC
+* 使い方
+** 整理対象ディレクトリの指定
+#+BEGIN_SRC R :results output
+  indir    <- "../data.git/鮮魚関係/"
+  outdir   <- "../output.git/"
+  dirs_all <- list.files(indir, recursive = TRUE, full.names = TRUE) %>%
+    utf8::utf8_normalize()
+    dirs <- dirs_all[gregexpr(".+[カタクチイワシ|マイワシ|マアジ]\\.xls", dirs_all) > 0]
+  head(dirs)
+  tail(dirs)
 #+END_SRC
 
-* 定数宣言
-#+name: constants
-#+BEGIN_SRC R :results silent
-  datdir_jm_org <- "/Volumes/評価研/個人的データ置き場/hayashi/kouseido_maaji/original_data/"
-  datdir_jm     <- "/Users/ahayashi/Documents/GitHub/jm/data/"
+#+RESULTS:
+#+begin_example
+[1] "../data.git/鮮魚関係//鮮魚測定06/カタクチイワシ.xls"
+[2] "../data.git/鮮魚関係//鮮魚測定06/マアジ.xls"        
+[3] "../data.git/鮮魚関係//鮮魚測定06/マイワシ.xls"      
+[4] "../data.git/鮮魚関係//鮮魚測定07/カタクチイワシ.xls"
+[5] "../data.git/鮮魚関係//鮮魚測定07/マアジ.xls"        
+[6] "../data.git/鮮魚関係//鮮魚測定07/マイワシ.xls"
+[1] "../data.git/鮮魚関係//鮮魚測定18/カタクチイワシ.xls"
+[2] "../data.git/鮮魚関係//鮮魚測定18/マアジ.xls"        
+[3] "../data.git/鮮魚関係//鮮魚測定18/マイワシ.xls"      
+[4] "../data.git/鮮魚関係//鮮魚測定19/カタクチイワシ.xls"
+[5] "../data.git/鮮魚関係//鮮魚測定19/マアジ.xls"        
+[6] "../data.git/鮮魚関係//鮮魚測定19/マイワシ.xls"
+#+end_example
+** データを読み込んで csv として書き出す
+この段階ではまだ整形はしない．
+#+BEGIN_SRC R :results silent :exports code
+  for (i in dirs) {
+    infile <- i
+    (sheetlist  <- readxl::excel_sheets(infile))
+    (sheet2load <- filter_sheet(sheetlist))
+    if(length(sheet2load) > 0) {
+      data        <- purrr::map2(infile, sheet2load, readxl::read_excel)
+      outfpath    <- paste0(outdir, "conv_from_xls/", make_outfname(infile))
+      purrr::walk2(data, outfpath, readr::write_csv)
+    }
+  }
 #+END_SRC
+
+
+#+BEGIN_SRC sh :session nil :results output
+cd output.git
+git clean -f
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+bash: cd: output.git: No such file or directory
+Removing タクチイワシ_0125.csv
+Removing タクチイワシ_0204.csv
+Removing タクチイワシ_0207(1).csv
+Removing タクチイワシ_0217.csv
+Removing タクチイワシ_0325.csv
+Removing タクチイワシ_0407.csv
+Removing タクチイワシ_0428.csv
+Removing タクチイワシ_0510.csv
+Removing タクチイワシ_0524.csv
+Removing タクチイワシ_0929.csv
+#+end_example
+** 未整形csvファイルを読み込んで統合
+ファイル名から採集日などの情報を取得し，merged.csvに統合する
+merged.csv に，元データに起因する不具合が見つかったら，xls を修正，もしくはコードを修正．
+#+BEGIN_SRC R
+  dir_unformatted <- "../output.git/conv_from_xls"
+  csvs_all <- list.files(dir_unformatted, full.names = TRUE)
+  csv_anchovy  <- csvs_all[gregexpr("カタクチイワシ", csvs_all) > 0]
+
+  my_readcsv <- function(fpath) {
+    data <- read_csv(fpath) %>%
+      mutate(original.file = fpath)
+    data
+  }
+
+  anchovy <- purrr::map(csv_anchovy, my_readcsv) %>%
+    bind_rows()
+  colnames(anchovy)
+
+  anchovy %>%
+    filter(!is.na(No)) %>%
+    select(original.file) %>%
+    unique()
+
+
+  anchovy %>%
+    rename(foo = "..11") %>%
+    filter(!is.na(foo)) %>%
+    select(original.file) %>%
+    unique()
+#+END_SRC
+
 
 * パッケージ開発の準備
-:LOGBOOK:
-CLOCK: [2018-12-16 Sun 12:45]--[2018-12-16 Sun 13:13] =>  0:28
-:END:
-** DONE このファイルをagenda に追加する
 ** R パッケージの開発環境を整える
-*** DONE パッケージ dir を作る
-:LOGBOOK:
-CLOCK: [2018-12-26 Wed 11:49]--[2018-12-26 Wed 12:18] =>  0:29
-:END:
-#+BEGIN_SRC R
-  setwd("/Users/ahayashi/Documents/GitHub/tidyNAS/")
-  list.files()
-#  devtools::create("reformr")
+#+BEGIN_SRC R :results silent :exports code
+# usethis::create_package("reformr")
+# usethis::use_testthat()
+setwd("reformr")
+#+END_SRC
+** 使用したパッケージ
+#+BEGIN_SRC R :results silent :exports code
+usethis::use_package("magrittr", type = "Imports")
+usethis::use_package("dplyr", type = "Imports")
+usethis::use_package("lubridate", type = "Imports")
+usethis::use_package("readxl", type = "Imports")
+usethis::use_package("stringr", type = "Imports")
+#+END_SRC
+
+#+BEGIN_SRC sh :session nil :results output :exports results
+cat reformr/DESCRIPTION
 #+END_SRC
 
 #+RESULTS:
-
-
-*** DONE テスト dir を作る
-#+BEGIN_SRC R
-devtools::use_testthat("reformr")
+#+begin_example
+Package: reformr
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+person(given = "First",
+        family = "Last",
+        role = c("aut", "cre"),
+        email = "first.last@example.com")
+Description: What the package does (one paragraph).
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+testthat
+Imports: 
+magrittr,
+dplyr,
+lubridate,
+readxl
+#+end_example
+* 開発
+** 再ロード & 自動テスト
+#+BEGIN_SRC R :exports both :results silent
+  devtools::load_all()
+  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
+  devtools::test()
+  devtools::document(roclets=c('rd', 'collate', 'namespace'))
 #+END_SRC
 
-#+RESULTS:
-: TRUE
-
-*** 依存パッケージを宣言する
-#+BEGIN_SRC R
-  devtools::use_package("tidyverse", type = "Imports", pkg = "reformr")
-  devtools::use_package("lubridate", type = "Imports", pkg = "reformr")
-  devtools::use_package("readxl", type = "Imports", pkg = "reformr")
+** テストコード
+*** テスト/パラメータ作成関数
+#+begin_src r :tangle reformr/tests/testthat/test_param.R
+  # library(tidyverse)
+  #   context("Handle param object")
+  #   test_that("make_params accept only 'sengyo' or 'cruise'", {
+  #     expect_error(make_params(indir = "./", "a")
+  #                , "Tell me the correct type of data. is it 'sengyo', or 'cruise?'", fixed = TRUE)
+  #     expect_error(make_params(indir = "./", 1),
+  #                  "Tell me the correct type of data. is it 'sengyo', or 'cruise?'", fixed = TRUE)
+  #   })
+  #   test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or 'マアジ' ", {
+  #     expect_error(make_params(indir = "./", "sengyo", 1), "Tell me the correct japanese species name.", fixed = TRUE)
+  #     expect_error(make_params(indir = "./", "sengyo", "anchovy"),  "Tell me the correct japanese species name.", fixed = TRUE)
+  #   })
 #+END_SRC
 
-#+RESULTS:
-
-*** dir 確認
-#+BEGIN_SRC bash :session nil :results output
-ls reformr
-#+END_SRC
-
-#+RESULTS:
-: DESCRIPTION	NAMESPACE	R		reformr.Rproj	tests
-* データのリストを作ってみる
-#+NAME: load_data
-#+BEGIN_SRC R :session *R:tidyNAS* :var indir = "./data/鮮魚関係"
-  list.files(indir, pattern = ".+[カタクチイワシ|マイワシ|マアジ]\\.xls", recursive = TRUE)
-#+END_SRC
-
-#+RESULTS: load_data
-| 鮮魚測定06/カタクチイワシ.xls |
-| 鮮魚測定06/マイワシ.xls       |
-| 鮮魚測定07/カタクチイワシ.xls |
-| 鮮魚測定07/マイワシ.xls       |
-| 鮮魚測定08/カタクチイワシ.xls |
-| 鮮魚測定08/マイワシ.xls       |
-| 鮮魚測定09/カタクチイワシ.xls |
-| 鮮魚測定09/マイワシ.xls       |
-| 鮮魚測定10/カタクチイワシ.xls |
-| 鮮魚測定10/マイワシ.xls       |
-| 鮮魚測定11/カタクチイワシ.xls |
-| 鮮魚測定11/マイワシ.xls       |
-| 鮮魚測定12/カタクチイワシ.xls |
-| 鮮魚測定12/マイワシ.xls       |
-| 鮮魚測定13/カタクチイワシ.xls |
-| 鮮魚測定13/マイワシ.xls       |
-| 鮮魚測定14/カタクチイワシ.xls |
-| 鮮魚測定14/マイワシ.xls       |
-| 鮮魚測定15/カタクチイワシ.xls |
-| 鮮魚測定15/マイワシ.xls       |
-| 鮮魚測定16/カタクチイワシ.xls |
-| 鮮魚測定16/マイワシ.xls       |
-| 鮮魚測定17/カタクチイワシ.xls |
-| 鮮魚測定17/マイワシ.xls       |
-| 鮮魚測定18/カタクチイワシ.xls |
-| 鮮魚測定18/マイワシ.xls       |
-| 鮮魚測定19/カタクチイワシ.xls |
-| 鮮魚測定19/マイワシ.xls       |
-
-* テストを書く
-** パラメータ作成関数
-#+BEGIN_SRC R :tangle reformr/tests/testthat/test_param.R
-library(tidyverse)
-context("Handle param object")
-test_that("make_params accept only 'sengyo' or 'cruise'", {
-  expect_error(make_params(indir = "./", "a"), "Tell me the correct type of data. Is it 'sengyo', or 'cruise?'", fixed = TRUE)
-  expect_error(make_params(indir = "./", 1), "Tell me the correct type of data. Is it 'sengyo', or 'cruise?'", fixed = TRUE)
-})
-test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or 'マアジ' ", {
-  expect_error(make_params(indir = "./", "sengyo", 1), "Tell me the correct Japanese species name.", fixed = TRUE)
-  expect_error(make_params(indir = "./", "sengyo", "Anchovy"),  "Tell me the correct Japanese species name.", fixed = TRUE)
-})
-#+END_SRC
-
-** 文字列パース
-#+BEGIN_SRC R :tangle reformr/tests/testthat/test_filestring.R
-  library(tidyverse)
-  context("Parse file and sheet names")
-  indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係"
-  type  <- "sengyo"
-  test_that("make_datlist make data list correctly", {
-    expect_match(make_datlist(indir, type), "鮮魚測定06", all = FALSE)
-    expect_match(make_datlist(indir, type), "鮮魚測定07", all = FALSE)
-  })
-
-  datlist <- make_datlist(indir, type)
+*** テスト/文字列パース
+#+BEGIN_SRC R :tangle reformr/tests/testthat/test_parse_str.R
+  context("Parse strings")
 
   test_that("parse_year() puts year list correctly", {
-    expect_match(parse_year(datlist), "2008", all = FALSE)
-    expect_match(parse_year(datlist), "2009", all = FALSE)
     expect_match(parse_year("鮮魚測定11"), "2011")
     expect_match(parse_year("鮮魚測定99"), "2099")
-    expect_match(parse_year("aaaa99"), "2099")
-    expect_match(parse_year("____99"), "2099")
-    expect_match(parse_year("123499"), "2099")
+    expect_equal(parse_year("aaaa99"), NA)
+    expect_equal(parse_year("____99"), NA)
+    expect_equal(parse_year("123499"), NA)
   })
 
-  test_that("get_filelist() puts species file list correctly", {
-    expect_match(get_filelist(indir, "カタクチイワシ"), "カタクチイワシ.xls", all = FALSE)
-    expect_match(get_filelist(indir, "マイワシ"), "マイワシ.xls", all = FALSE)
-    expect_error(get_filelist(indir), "argument \"spcs\" is missing, with no default", fixed = TRUE)
-    expect_error(get_filelist(indir, NA), "Give me Japanese species name", fixed = TRUE)
+  # test_that("get_date() parses dates correctly", {
+  #   expect_equal(get_date(2012, "0201"), as.Date("2012-02-01"))
+  #   expect_equal(get_date(2012, "0201(1)"), as.Date("2012-02-01"))
+  #   expect_equal(get_date(2017, "170201(1)"), as.Date("2017-02-01"))
+  #   expect_equal(get_date(2017, "170201(11)"), as.Date("2017-02-01"))
+  # })
+
+  test_that("get_spcsname() gets spcs name", {
+    expect_equal(get_spcsname("カタクチイワシ.xls"), "カタクチイワシ")
+    expect_equal(get_spcsname("カタクチ.xls"), "カタクチイワシ")
+    expect_equal(get_spcsname("カタクチ.xls"), "カタクチイワシ")
+    goodnames <- c("カタクチイワシ", "マイワシ", "マアジ", "ウルメイワシ")
+    variants  <- c("カタクチイワシ", "カタクチ", "マイワシ", "マアジ",
+                   "ウルメイワシ", "ウルメ")
+    misc      <- c("測定", "鳥取", "XX丸", "")
+    xtn       <- c(".xls", ".xlsx")
+    fnames    <- expand.grid(variants, misc, xtn) %>%
+      dplyr::transmute(fname = paste0(Var1, Var2, Var3)) %>%
+      dplyr::pull(fname)
+    expect_setequal(purrr::map(variants, get_spcsname) %>%
+                      unlist() %>%
+                      unique(),
+                    goodnames)
   })
 
-  infile06 <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/鮮魚測定06/カタクチイワシ.xls"
-  infile17 <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/鮮魚測定17/カタクチイワシ.xls"
-
-  test_that("get_sheet2read() puts sheets to read", {
-    expect_match(get_sheet2read(infile06), "0125", all = FALSE)
-    expect_match(get_sheet2read(infile06), "0207", all = FALSE)
-    expect_equal(length(get_sheet2read(infile06)), 10)
-    expect_equal(length(get_sheet2read(infile17)), 0)
+  test_that("filter_sheet() gets sheets with good name format", {
+    expect_equal(filter_sheet("0201"), "0201")
+    expect_equal(filter_sheet("0201(1)"), "0201(1)")
+    expect_equal(filter_sheet("0201大"), "0201大")
+    expect_equal(length(filter_sheet("体長")), 0)
+    expect_equal(length(filter_sheet("Sheet1")), 0)
+    sheets <- c("体長", "0125", "0204", "0207(1)", "0217", "0325", "0407",
+                "0428", "0510", "0524", "0929", "Sheet2", "Sheet3")
+    expect <- c("0125", "0204", "0207(1)", "0217", "0325", "0407",
+                "0428", "0510", "0524", "0929")
+    expect_setequal(filter_sheet(sheets), expect)
   })
 
-  test_that("get_date() parses dates correctly", {
-    expect_equal(get_date(2012, "0201"), as.Date("2012-02-01"))
-    expect_equal(get_date(2012, "0201(1)"), as.Date("2012-02-01"))
-    expect_equal(get_date(2017, "170201(1)"), as.Date("2017-02-01"))
-    expect_equal(get_date(2017, "170201(11)"), as.Date("2017-02-01"))
+  test_that("parse_date() makes date from sheetname vector", {
+    expect_equal(parse_date(2012, "0125"), "2012-01-25")
+    expect_equal(parse_date(2016, "0204"), "2016-02-04")
   })
-
 #+END_SRC
+*** テスト/統合テスト 
+#+BEGIN_SRC R :results silent :exports code :tangle reformr/tests/testthat/test_integrated.R
+  context("Integrated test")
 
-** データ整形関数
+  test_that("make_outfname() creates out fname", {
+    path   <- "../../../data.git/鮮魚関係/鮮魚測定06/カタクチイワシ.xls"
+    sheets <- c("0125", "0204", "0207(1)", "0217", "0325", "0407", "0428",
+                "0510", "0524", "0929")
+    mmdd   <- purrr::map(sheets, filter_sheet) %>% unlist()
+    year   <- 2006
+    spcs   <- "カタクチイワシ"
+    xtn    <- ".csv"
+    expect <- paste0(year, "_", spcs, "_", mmdd, xtn)
+    expect_equal(make_outfname(path), expect)
+  })
+
+  # test_that("get_sheet2read() puts sheets to read", {
+  #   expect_match(get_sheet2read(infile06), "0125", all = FALSE)
+  #   expect_match(get_sheet2read(infile06), "0207", all = FALSE)
+  #   expect_equal(length(get_sheet2read(infile06)), 10)
+  #   expect_equal(length(get_sheet2read(infile17)), 0)
+  # })
+
+  # test_that("make_datlist make data list correctly", {
+  #   expect_match(make_datlist(indir, type), "鮮魚測定06", all = FALSE)
+  #   expect_match(make_datlist(indir, type), "鮮魚測定07", all = FALSE)
+  # })
+
+  # test_that("get_filelist() puts species file list correctly", {
+  #   expect_match(get_filelist(indir, "カタクチイワシ"), "カタクチイワシ.xls", all = FALSE)
+  #   expect_match(get_filelist(indir, "マイワシ"), "マイワシ.xls", all = FALSE)
+  #   expect_error(get_filelist(indir), "argument \"spcs\" is missing, with no default", fixed = TRUE)
+  #   expect_error(get_filelist(indir, NA), "Give me Japanese species name", fixed = TRUE)
+  # })
+#+END_SRC
+*** テスト/データ整形関数
 #+BEGIN_SRC R :tangle reformr/tests/testthat/test_format.R :results silent
-  library(tidyverse)
-  context("Formatting loaded data")
-  param <- list()
-  indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/"
-  type  <- "sengyo"
-  spcs  <- "カタクチイワシ"
-  # get_filelist(param)
-  col_names <- c("sample.no", "bl_mm", "bw_g", "sex", "gw_g", "gsi", "otolith.taken", "original.fname", "original.sheetname")
-  # get_sheet2read(infile)
-  test_that("format() make datcols correctly", {
-    expect_equal(length(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125"))), length(col_names))
-    expect_equal(length(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325"))), length(col_names))
-    expect_equal(length(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0116"))), length(col_names))
-    expect_equal(length(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0117"))), length(col_names))
-    expect_equal(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")), col_names, ignore.case = FALSE)
-    expect_equal(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0116")), col_names, ignore.case = FALSE)
-    expect_equal(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0117")), col_names, ignore.case = FALSE)
-  })
+  # library(tidyverse)
+  # context("Formatting loaded data")
+  # param <- list()
+  # indir <- "/Users/ahayashi/Documents/GitHub/tidyNAS/data/鮮魚関係/"
+  # type  <- "sengyo"
+  # spcs  <- "カタクチイワシ"
+  # # get_filelist(param)
+  # col_names <- c("sample.no", "bl_mm", "bw_g", "sex", "gw_g", "gsi", "otolith.taken", "original.fname", "original.sheetname")
+  # # get_sheet2read(infile)
+  # test_that("format() make datcols correctly", {
+  #   expect_equal(length(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125"))), length(col_names))
+  #   expect_equal(length(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325"))), length(col_names))
+  #   expect_equal(length(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0116"))), length(col_names))
+  #   expect_equal(length(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0117"))), length(col_names))
+  #   expect_equal(colnames(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")), col_names, ignore.case = FALSE)
+  #   expect_equal(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0116")), col_names, ignore.case = FALSE)
+  #   expect_equal(colnames(format(paste0(indir, "鮮魚測定08/マイワシ.xls"), "0117")), col_names, ignore.case = FALSE)
+  # })
 
-  test_that("format() cleanses length and weight columns correctly", {
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$sample.no), "integer")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$bl_mm), "double")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$bw_g), "double")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$sex), "integer")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$gw_g), "double")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$gsi), "double")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$sample.no), "integer")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$bl_mm), "double")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$bw_g), "double")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$sex), "integer")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$gw_g), "double")
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$gsi), "double")
-  })
-  test_that("format() cleanses otolith and scale columns correctly", {
-    expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$otolith.taken), "integer")
-  })
+  # test_that("format() cleanses length and weight columns correctly", {
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$sample.no), "integer")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$bl_mm), "double")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$bw_g), "double")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$sex), "integer")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$gw_g), "double")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$gsi), "double")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$sample.no), "integer")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$bl_mm), "double")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$bw_g), "double")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$sex), "integer")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$gw_g), "double")
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0325")$gsi), "double")
+  # })
+  # test_that("format() cleanses otolith and scale columns correctly", {
+  #   expect_match(typeof(format(paste0(indir, "鮮魚測定06/カタクチイワシ.xls"), "0125")$otolith.taken), "integer")
+  # })
 #+END_SRC
 
-* 関数群を開発する
-** reform(indir, type)
+** 関数定義
+*** ユーティリティ
+#+BEGIN_SRC R :tangle reformr/R/util.R
+  #' @importFrom magrittr %>%
+  #' @export
+  magrittr::`%>%`
+#+END_SRC
+*** 文字列パース
+#+BEGIN_SRC R :results silent :exports code :tangle reformr/R/parse_str.R
+  return_match <- function(x, regex) {
+    match <- x %>%
+      stringr::str_match(regex)
+    out <- match[,2] %>%         # '2' points $1 regex capture
+      na.omit() %>% as.vector()
+    out
+  }
+
+  filter_sheet <- function(x) {
+    re_omit  <- "^(?!.*0000)(?!体長)(?!Sheet)"
+    re_match <- "((?:0[1-9][0-9]{2}|1[0-2][0-9]{2}).*)"
+    regex <- paste0(re_omit, re_match)
+    out   <- return_match(x, regex)
+    out
+  }
+
+  parse_year <- function(x) {
+    regex <- "^鮮魚測定([0-9]{2})$"
+    match <- return_match(x, regex)
+    if (length(match) == 0) {
+      out <- NA
+    } else {
+      out <- paste0(20, match)
+    }
+    out
+  }
+
+  parse_date <- function(year, mmdd) {
+    mm  <- substr(mmdd, 1, 2)
+    dd  <- substr(mmdd, 3, 4)
+    out <- paste(year, mm, dd, sep = "-")
+    out
+  }
+
+  get_spcsname <- function(x) {
+    regex <- "(カタクチ|マ(?!アジ)|ウルメ|マアジ)"
+    match <- return_match(x, regex)
+    if (length(match) == 0) {
+      out <- NA
+    } else {
+      switch(match,
+             "マアジ" = out <- match,
+             out <- paste0(match, "イワシ"))
+    }
+    out
+  }
+
+  parse_str <- function(x, type) {
+    switch(type,
+           "sheet" = out <- filter_sheet(x),
+           "year"  = out <- parse_year(x),
+           "fish"  = out <- get_spcsname(x),
+           stop("unknown case"))
+    out
+  }
+
+#+END_SRC
+*** 統合関数
+#+BEGIN_SRC R :results silent :exports code :tangle reformr/R/integrated.R
+  make_outfname <- function(fpath) {
+    dirvec <- stringr::str_split(fpath, "/") %>%
+      unlist()
+    year     <- purrr::map2(dirvec, "year", parse_str) %>%
+      unlist() %>% na.omit()
+    spcsname <- purrr::map2(dirvec, "fish", parse_str) %>%
+      unlist() %>% na.omit()
+    sheetname <- readxl::excel_sheets(fpath) %>%
+      filter_sheet()
+    mmdd      <- filter_sheet(sheetname)
+    out   <- paste0(year, "_", spcsname, "_", mmdd, ".csv")
+    out
+  }
+#+END_SRC
+*** reform(indir, type)
 #+BEGIN_SRC R :tangle reformr/R/reform.R
   # This script is tangled from reformr.org.
   # Do not edit by hand!!!
@@ -238,12 +443,6 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
     datlist
   }
 
-  parse_year <- function(datlist){
-    yearlist <- datlist %>%
-      str_sub(5, 6) %>%
-      paste0(20, .)
-    yearlist
-  }
 
   get_filelist <- function(indir, spcs) {
     if (is.na(spcs)) {
@@ -260,13 +459,13 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
     sheets2read <- as.vector(na.omit(stringr::str_match(all_sheets, "^(?!.*0000)(?!体長)(?!Sheet).+")))
     sheets2read
   }
-  get_date <- function(year, sheetname) {
-    date_char <- dplyr::if_else(str_length(sheetname) >= 9,
-                         paste0(20, str_sub(sheetname, 1, 6)),
-                         paste0(year, str_sub(sheetname, 1, 4)))
-    date      <- lubridate::ymd(date_char)
-    date
-  }
+  # get_date <- function(year, sheetname) {
+  #   date_char <- dplyr::if_else(str_length(sheetname) >= 9,
+  #                        paste0(20, str_sub(sheetname, 1, 6)),
+  #                        paste0(year, str_sub(sheetname, 1, 4)))
+  #   date      <- lubridate::ymd(date_char)
+  #   date
+  # }
 
   format <- function(infile, sheet) {
     data_org <- readxl::read_xls(infile, sheet = sheet)
@@ -291,34 +490,17 @@ test_that("make_params accept only 'カタクチイワシ', 'マイワシ' or '�
 
 #+RESULTS:
 
-*** コードを書く
-*** get_station()
-*** format(param)
-*** merge_old(param)
-** conv2entsheet()
-*** load_tidied(data)
-*** conv2inputSheet(tidied)
-** export_inputSheet()
-*** load_inputSheet(entsheet)
-*** split_year(inputSheet)
-*** export_entsheet(entsheet, outdir)
-* 再ロードしてテストする
-#+BEGIN_SRC R :results table
-  devtools::load_all("reformr")
-  devtools::test("reformr")
-#+END_SRC
-
-#+RESULTS:
-| test_filestring.R | Parse file and sheet names | make_datlist make data list correctly                            |  2 | 0 | FALSE | FALSE | 0 |  0.00199999999999889 |                   0 | 0.00199999999949796 |
-| test_filestring.R | Parse file and sheet names | parse_year() puts year list correctly                            |  7 | 0 | FALSE | FALSE | 0 |  0.00600000000000023 | 0.00099999999999989 | 0.00700000000051659 |
-| test_filestring.R | Parse file and sheet names | get_filelist() puts species file list correctly                  |  4 | 0 | FALSE | FALSE | 0 |  0.00499999999999901 | 0.00100000000000011 | 0.00599999999940337 |
-| test_filestring.R | Parse file and sheet names | get_sheet2read() puts sheets to read                             |  4 | 0 | FALSE | FALSE | 0 |  0.00400000000000134 | 0.00099999999999989 | 0.00700000000051659 |
-| test_filestring.R | Parse file and sheet names | get_date() parses dates correctly                                |  4 | 0 | FALSE | FALSE | 0 |  0.00900000000000034 |                   0 | 0.00900000000001455 |
-| test_format.R     | Formatting loaded data     | format() make datcols correctly                                  |  7 | 0 | FALSE | FALSE | 0 |   0.0399999999999991 | 0.00099999999999989 |  0.0420000000003711 |
-| test_format.R     | Formatting loaded data     | format() cleanses length and weight columns correctly            | 12 | 0 | FALSE | FALSE | 0 |    0.116000000000003 | 0.00299999999999989 |   0.118999999999687 |
-| test_format.R     | Formatting loaded data     | format() cleanses otolith and scale columns correctly            |  1 | 0 | FALSE | FALSE | 0 |  0.00999999999999801 | 0.00100000000000011 |   0.011000000000422 |
-| test_param.R      | Handle param object        | make_params accept only 'sengyo' or 'cruise'                     |  2 | 0 | FALSE | FALSE | 0 |  0.00200000000000244 |                   0 | 0.00200000000040745 |
-| test_param.R      | Handle param object        | make_params accept only 'カタクチイワシ', 'マイワシ' or 'マアジ' |  2 | 0 | FALSE | FALSE | 0 | 0.000999999999997669 |                   0 | 0.00199999999949796 |
+**** コードを書く
+**** get_station()
+**** format(param)
+**** merge_old(param)
+*** conv2entsheet()
+**** load_tidied(data)
+**** conv2inputSheet(tidied)
+*** export_inputSheet()
+**** load_inputSheet(entsheet)
+**** split_year(inputSheet)
+**** export_entsheet(entsheet, outdir)
 
 * データ整備状況
 ** NAS
