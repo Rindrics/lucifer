@@ -59,35 +59,38 @@ get_info <- function(fname) {
 
 get_info.survey <- function(fname) {
   out <- list()
-  class(out)   <- "survey"
+  out$type     <- "survey"
   out$fname    <- xtract_var(fname, "fname")
   out$spcs     <- xtract_var(fname, "spcsname")
   out$crs.name <- xtract_var(fname, "cruise")
   out$stn      <- xtract_var(fname, "stn")
-  out$sampleno <- xtract_var(fname, "sampleno")
+  out$sampleno <- xtract_var(fname, "sampleno") %>%
+    as.integer()
   out
 }
 
 get_info.commercial <- function(fname) {
   out <- list()
-  class(out)   <- "commercial"
+  out$type     <- "commercial"
   out$fname    <- xtract_var(fname, "fname")
   out$spcs     <- xtract_var(fname, "spcsname")
   out$date     <- xtract_var(fname, "date")
   out$key1     <- xtract_var(fname, "key1")
   out$key2     <- xtract_var(fname, "key2")
-  out$sampleno <- xtract_var(fname, "sampleno")
+  out$sampleno <- xtract_var(fname, "sampleno") %>%
+    as.integer()
   out
 }
 
 get_info.reared <- function(fname) {
   out <- list()
-  class(out)   <- "reared"
+  out$type     <- "reared"
   out$fname    <- xtract_var(fname, "fname")
   out$spcs     <- xtract_var(fname, "spcsname")
   out$date     <- xtract_var(fname, "date")
   out$key1     <- xtract_var(fname, "key1")
   out$key2     <- xtract_var(fname, "key2")
-  out$sampleno <- xtract_var(fname, "sampleno")
+  out$sampleno <- xtract_var(fname, "sampleno") %>%
+    as.integer()
   out
 }

@@ -12,6 +12,3 @@ get_incdata <- function(x) {
   out <- as.numeric(str[locate_1stinc(x):length(str)])
   out
 }
-
-
-}
