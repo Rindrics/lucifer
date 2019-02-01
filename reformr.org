@@ -54,11 +54,6 @@ library(readxl)
   tail(dirs)
 #+END_SRC
 
-* 定数宣言
-#+name: constants
-#+BEGIN_SRC R :results silent
-  datdir_jm_org <- "/Volumes/評価研/個人的データ置き場/hayashi/kouseido_maaji/original_data/"
-  datdir_jm     <- "/Users/ahayashi/Documents/GitHub/jm/data/"
 #+END_SRC
 
 * パッケージ開発の準備
