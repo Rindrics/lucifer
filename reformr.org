@@ -291,6 +291,9 @@ cat reformr/DESCRIPTION
     expect_setequal(filter_sheet(sheets), expect)
   })
 
+  test_that("parse_date() makes date from sheetname vector", {
+    expect_equal(parse_date(2012, "0125"), "2012-01-25")
+    expect_equal(parse_date(2016, "0204"), "2016-02-04")
   })
 #+END_SRC
 *** テスト/統合テスト 
