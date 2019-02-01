@@ -39,6 +39,20 @@
   library(tidyverse)
   library(lubridate)
   library(readxl)
+library(tidyverse)
+library(lubridate)
+library(readxl)
+#+END_SRC
+* 使い方
+** 整理対象ディレクトリの指定
+#+BEGIN_SRC R :results output
+  indir    <- "../data.git/鮮魚関係/"
+  outdir   <- "../output.git/"
+  dirs_all <- list.files(indir, recursive = TRUE, full.names = TRUE) %>%
+    utf8::utf8_normalize()
+    dirs <- dirs_all[gregexpr(".+[カタクチイワシ|マイワシ|マアジ]\\.xls", dirs_all) > 0]
+  head(dirs)
+  tail(dirs)
 #+END_SRC
 
 * 定数宣言
