@@ -125,7 +125,7 @@ merged.csv に，元データに起因する不具合が見つかったら，xls
 
 #+END_SRC
 *** データの精査
-#+BEGIN_SRC R :results output
+#+BEGIN_SRC R :results output :exports both
   colnames(anchovy)
 
   anchovy %>%
