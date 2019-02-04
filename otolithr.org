@@ -1,47 +1,310 @@
 #+TITLE: otolithr 開発プロジェクトノート
-#+PROPERTY: header-args :cache yes :exports code :results scalar
+#+PROPERTY: header-args :exports code :results scalar
 #+STARTUP: contents
 
-#+BEGIN_SRC R
-  setwd("otolithr")
+* 目次                                                                :TOC_3:
+- [[#パッケージの機能][パッケージの機能]]
+  - [[#自動テスト機能][自動テスト機能]]
+    - [[#データの格納方法][データの格納方法]]
+    - [[#ファイル命名規則][ファイル命名規則]]
+  - [[#自動ビルド機能][自動ビルド機能]]
+    - [[#データ目録の生成][データ目録の生成]]
+    - [[#体長体重逆算][体長・体重逆算]]
+    - [[#グラフ描画][グラフ描画]]
+- [[#デモ][デモ]]
+  - [[#読み込むディレクトリを指定][読み込むディレクトリを指定]]
+  - [[#hdr-ファイルを全て統合][.hdr ファイルを全て統合]]
+    - [[#とりあえず使うには][とりあえず使うには]]
+    - [[#ファイルは標本を一意に特定できるように命名せよ][ファイルは標本を一意に特定できるように命名せよ]]
+  - [[#内部で使っている関数][内部で使っている関数]]
+    - [[#hdr-ファイルがある全ディレクトリのリストを作成する][.hdr ファイルがある全ディレクトリのリストを作成する]]
+    - [[#上記リストのうち実際に解析に使う個体だけを抽出したリストを作成する][上記リストのうち，実際に解析に使う個体だけを抽出したリストを作成する]]
+    - [[#フルパスをファイル名に変換する][フルパスをファイル名に変換する]]
+    - [[#サンプリング方法調査漁獲飼育に応じた振る舞いの変化][サンプリング方法（調査|漁獲|飼育）に応じた振る舞いの変化]]
+- [[#追加予定の機能][追加予定の機能]]
+- [[#開発環境の整備][開発環境の整備]]
+  - [[#ディレクトリ作成][ディレクトリ作成]]
+  - [[#本バッケージ内部で使用するパッケージ][本バッケージ内部で使用するパッケージ]]
+- [[#開発][開発]]
+  - [[#リロード--自動テスト][リロード & 自動テスト]]
+  - [[#テストコード][テストコード]]
+    - [[#テストファイル名][テスト/ファイル名]]
+    - [[#テストファイルパス][テスト/ファイルパス]]
+    - [[#テストデータタイプ調査漁獲物飼育][テスト/データタイプ（調査|漁獲物|飼育）]]
+    - [[#テストhdr-ファイルハンドリング][テスト/hdr ファイルハンドリング]]
+    - [[#機能テスト][機能テスト]]
+  - [[#関数][関数]]
+    - [[#ヘルパー関数][ヘルパー関数]]
+    - [[#ファイルパス][ファイルパス]]
+    - [[#hdr-読み込み][hdr 読み込み]]
+    - [[#統合関数][統合関数]]
+
+* パッケージの機能
+耳石日輪解析データにおいて継続的デプロイを実現する．
+データ更新をトリガーとして動作する
+** 自動テスト機能
+*** データの格納方法
+データが
+- 調査
+- 漁業
+- 飼育
+いずれかに入っていることを保証
+*** ファイル命名規則
+ファイルが種名_識別キー1_識別キー2_標本番号.hdr という形式で命名されていることを保証
+** 自動ビルド機能
+全てのhdr ファイルが上記テストに通った場合，以下が実行される．
+*** データ目録の生成
+*** 体長・体重逆算
+*** グラフ描画
+- 日齢-体長関係
+- 日齢組成を描画
+* デモ
+** 読み込むディレクトリを指定
+#+BEGIN_SRC R :results silent :exports code :session *R:tidyNAS*
+  devtools::load_all("otolithr")
+  path <- "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus"
 #+END_SRC
 
-#+RESULTS[8a4bc7aed74fdbd84bf3c88ba79c959332658351]:
-: /Users/ahayashi/Documents/GitHub/tidyNAS
+** .hdr ファイルを全て統合
 
-* パッケージのエコシステム
-継続的インテグレーションを可能にする
-** 耳石マシン
-*** 自動チェック
-データ更新がトリガー
-- 日齢-体長関係を描画（耳石マシンにも体長データを入れておく）
-- 日齢組成を描画
-*** 自動マージ
-** NAS
-*** 自動チェック
-**** データの品質
-*** 自動ビルド
-**** 目録の生成
-**** 逆算
-**** 描画
-* 開発準備
+*** とりあえず使うには
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+  otldata <- path %>%
+    get_path() %>%
+    get_dir2load() %>%
+    purrr::map(load_otolith)
+
+  df      <- purrr::map_dfr(otldata, as.data.frame)
+  head(df)
+  tail(df)
+  print(paste("統合したファイルの数は", length(unique(df$fname)), "個"))
+  # write.csv(df, "test.csv", row.names = FALSE)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+There were 50 or more warnings (use warnings() to see the first 50)
+        type                          fname spcs date key1 key2 sampleno   inc
+1 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 7.606
+2 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 3.202
+3 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 2.102
+4 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 3.501
+5 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 2.302
+6 commercial 20150827_Toyama_Nakase_001.hdr <NA> <NA> <NA> <NA>        1 3.406
+  radius ninc crs.name  stn
+1  7.606    0     <NA> <NA>
+2 10.808    0     <NA> <NA>
+3 12.910    0     <NA> <NA>
+4 16.411    0     <NA> <NA>
+5 18.713    0     <NA> <NA>
+6 22.119    0     <NA> <NA>
+        type      fname spcs date key1 key2 sampleno    inc   radius ninc
+29717 survey C1_011.hdr <NA> <NA> <NA> <NA>       11  9.127 1314.698    0
+29718 survey C1_011.hdr <NA> <NA> <NA> <NA>       11 14.335 1329.033    0
+29719 survey C1_011.hdr <NA> <NA> <NA> <NA>       11  9.326 1338.359    0
+29720 survey C1_011.hdr <NA> <NA> <NA> <NA>       11  9.833 1348.192    0
+29721 survey C1_011.hdr <NA> <NA> <NA> <NA>       11 11.029 1359.221    0
+29722 survey C1_011.hdr <NA> <NA> <NA> <NA>       11  8.521 1367.742    0
+      crs.name  stn
+29717     <NA> <NA>
+29718     <NA> <NA>
+29719     <NA> <NA>
+29720     <NA> <NA>
+29721     <NA> <NA>
+29722     <NA> <NA>
+[1] "統合したファイルの数は 200 個"
+#+end_example
+
+*** ファイルは標本を一意に特定できるように命名せよ
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+df %>% dplyr::filter(!is.na(spcs)) %>% head()
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+    type                                      fname                    spcs
+1 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+2 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+3 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+4 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+5 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+6 survey Sardinops-melanostictus_YK1508_MT10_01.hdr Sardinops-melanostictus
+  date key1 key2 sampleno   inc radius ninc crs.name  stn
+1 <NA> <NA> <NA>        1 7.403  7.403    0   YK1508 MT10
+2 <NA> <NA> <NA>        1 1.900  9.303    0   YK1508 MT10
+3 <NA> <NA> <NA>        1 1.803 11.106    0   YK1508 MT10
+4 <NA> <NA> <NA>        1 1.800 12.906    0   YK1508 MT10
+5 <NA> <NA> <NA>        1 2.602 15.508    0   YK1508 MT10
+6 <NA> <NA> <NA>        1 2.802 18.310    0   YK1508 MT10
+#+end_example
+
+** 内部で使っている関数
+*** .hdr ファイルがある全ディレクトリのリストを作成する
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+  dirs_org  <- get_path(path)
+  head(dirs_org)
+  tail(dirs_org)
+  length(dirs_org)
+#+END_SRC
+
+#+RESULTS[caea1325df86bc364fb11547bcc08ea5a1f4c877]:
+#+begin_example
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_001.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_002.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_003.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_004.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_005.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_006.hdr"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
+[1] 209
+#+end_example
+*** 上記リストのうち，実際に解析に使う個体だけを抽出したリストを作成する
+本パッケージでは，data/ 以下に入っている.hdrファイル以外は無視する
+理由: 日輪が不明瞭だったりして解析できなかった個体は，統合データを汚染するため．
+解析に含めないデータは data/ 内に残しておかず，cannot/ などに格納するようにする．
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+  dirs2load <- dirs_org %>% get_dir2load()
+  head(dirs2load)
+  tail(dirs2load)
+  print(paste("データ統合から除外された個体は", length(dirs_org) - length(dirs2load), "個体．"))
+#+END_SRC
+
+#+RESULTS[fb279dd039435937cf9a2fd733231c60575912ab]:
+#+begin_example
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_001.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_002.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_003.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_004.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_005.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/20150827_Toyama_Nakase_006.hdr"
+[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
+[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
+[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
+[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
+[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
+[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
+[1] "データ統合から除外された個体は 9 個体．"
+#+end_example
+*** フルパスをファイル名に変換する
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+  fnames    <- dirs2load %>%
+    fullpath2fname()
+  head(fnames)
+  tail(fnames)
+#+END_SRC
+
+#+RESULTS[fe5422fe888fa3db6b9f764e6d16804f5299e3ab]:
+: [1] "20150827_Toyama_Nakase_001.hdr" "20150827_Toyama_Nakase_002.hdr"
+: [3] "20150827_Toyama_Nakase_003.hdr" "20150827_Toyama_Nakase_004.hdr"
+: [5] "20150827_Toyama_Nakase_005.hdr" "20150827_Toyama_Nakase_006.hdr"
+: [1] "C1_004.hdr" "C1_005.hdr" "C1_007.hdr" "C1_009.hdr" "C1_010.hdr"
+: [6] "C1_011.hdr"
+*** サンプリング方法（調査|漁獲|飼育）に応じた振る舞いの変化
+ファイル名から標本情報を取得したいが，
+ファイルの命名規則は，標本のサンプリング方法によって変わってくる．
+そのため，全ての.hdr ファイルは
+- survey
+- commercial
+- reared
+のいずれかに格納されるべきである．
+**** 属性の取得
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+  types     <- purrr::map(dirs2load, detect_type) %>% unlist()
+  head(types)
+  tail(types)
+#+END_SRC
+
+#+RESULTS[ac12538cc55d321689a741274eafc4d9c7939618]:
+: [1] "commercial" "commercial" "commercial" "commercial" "commercial"
+: [6] "commercial"
+: [1] "survey" "survey" "survey" "survey" "survey" "survey"
+**** ファイル名に属性を付与
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+  fnames_with_type <- purrr::map2(fnames, types, set_type)
+  head(fnames_with_type, 2)
+  tail(fnames_with_type, 2)
+#+END_SRC
+
+#+RESULTS[8b541d5a40959b9fb57eaacc72ae1189c746c5f3]:
+#+begin_example
+[[1]]
+[1] "20150827_Toyama_Nakase_001.hdr"
+attr(,"class")
+[1] "commercial"
+
+[[2]]
+[1] "20150827_Toyama_Nakase_002.hdr"
+attr(,"class")
+[1] "commercial"
+[[1]]
+[1] "C1_010.hdr"
+attr(,"class")
+[1] "survey"
+
+[[2]]
+[1] "C1_011.hdr"
+attr(,"class")
+[1] "survey"
+#+end_example
+
+**** 属性に応じてファイル名から情報を取得
+#+BEGIN_SRC R :results output :exports both :session *R:tidyNAS*
+  info      <- purrr::map(fnames_with_type, get_info)
+  str(info[[1]])
+  str(info[[100]])
+  str(info[[200]])
+#+END_SRC
+
+#+RESULTS[df719b506d94a96544097afef7f57cb76cac066c]:
+#+begin_example
+List of 7
+ $ type    : chr "commercial"
+ $ fname   : chr "20150827_Toyama_Nakase_001.hdr"
+ $ spcs    : chr NA
+ $ date    : chr NA
+ $ key1    : chr NA
+ $ key2    : chr NA
+ $ sampleno: int 1
+List of 6
+ $ type    : chr "survey"
+ $ fname   : chr "Sardinops-melanostictus_YK1508_MT10_01.hdr"
+ $ spcs    : chr "Sardinops-melanostictus"
+ $ crs.name: chr "YK1508"
+ $ stn     : chr "MT10"
+ $ sampleno: int 1
+List of 6
+ $ type    : chr "survey"
+ $ fname   : chr "C1_011.hdr"
+ $ spcs    : chr NA
+ $ crs.name: chr NA
+ $ stn     : chr NA
+ $ sampleno: int 11
+#+end_example
+* 追加予定の機能
+[[https://github.com/smxshxishxad/tidyNAS/issues][Issues]] にて随時募集中
+* 開発環境の整備
+** ディレクトリ作成
 #+BEGIN_SRC R :results silent
   # usethis::create_package("otolithr")
-  usethis::use_testthat()
-#+END_SRC
-** 使用したパッケージ
-#+BEGIN_SRC R
+  #+END_SRC
+** 本バッケージ内部で使用するパッケージ
+#+BEGIN_SRC R :results silent
   usethis::use_package("magrittr", "Imports")
   usethis::use_package("ggplot2", "Imports")
+  usethis::use_package("tibble", "Imports")
+  usethis::use_testthat()
 #+END_SRC
 
-#+RESULTS[561fd1f754ba06670e281828859090e22fec2230]:
-
-#+BEGIN_SRC sh
-cat otolithr/DESCRIPTION
+#+BEGIN_SRC sh :exports results
+  cat otolithr/DESCRIPTION
 #+END_SRC
 
-#+RESULTS[362fd202a9325dcbeafbf43e1712c3968b259db1]:
+#+RESULTS[26e6d91ffe9c3ff5d95f888fb0006e9154a02abb]:
 #+begin_example
 Package: otolithr
 Title: What the Package Does (one line, title case)
@@ -71,12 +334,29 @@ Imports:
 #+END_SRC
 
 #+RESULTS[62d4820a9216b105c72787e032f80205ff1ada32]:
-: No man pages found in package  ‘otolithr’ 
-** テスト
-*** テスト/ファイル名ハンドリング
+#+begin_example
+✔ | OK F W S | Context
+⠏ |  0       | Control behavior according to dattype⠋ |  1       | Control behavior according to dattype⠙ |  2       | Control behavior according to dattype⠹ |  3       | Control behavior according to dattype⠸ |  4       | Control behavior according to dattype⠼ |  5       | Control behavior according to dattype⠴ |  6       | Control behavior according to dattype⠦ |  7       | Control behavior according to dattype⠧ |  8       | Control behavior according to dattype⠇ |  9       | Control behavior according to dattype⠏ | 10       | Control behavior according to dattype⠋ | 11       | Control behavior according to dattype⠙ | 12       | Control behavior according to dattype⠹ | 13       | Control behavior according to dattype⠸ | 14       | Control behavior according to dattype⠼ | 15       | Control behavior according to dattype⠴ | 16       | Control behavior according to dattype⠦ | 17       | Control behavior according to dattype⠧ | 18       | Control behavior according to dattype⠇ | 19       | Control behavior according to dattype⠏ | 20       | Control behavior according to dattype⠋ | 21       | Control behavior according to dattype⠙ | 22       | Control behavior according to dattype⠹ | 23       | Control behavior according to dattype⠸ | 24       | Control behavior according to dattype✔ | 24       | Control behavior according to dattype
+⠏ |  0       | Handle file name⠋ |  1       | Handle file name⠙ |  2       | Handle file name⠹ |  3       | Handle file name⠸ |  4       | Handle file name⠼ |  5       | Handle file name⠴ |  6       | Handle file name⠦ |  7       | Handle file name⠧ |  8       | Handle file name⠇ |  9       | Handle file name⠏ | 10       | Handle file name⠋ | 11       | Handle file name⠙ | 12       | Handle file name⠹ | 13       | Handle file name⠸ | 14       | Handle file name⠼ | 15       | Handle file name⠴ | 16       | Handle file name⠦ | 17       | Handle file name⠧ | 18       | Handle file name⠇ | 19       | Handle file name⠏ | 20       | Handle file name⠋ | 21       | Handle file name⠙ | 22       | Handle file name⠹ | 23       | Handle file name✔ | 23       | Handle file name
+⠏ |  0       | Manage path⠋ |  1       | Manage path⠙ |  2       | Manage path⠹ |  3       | Manage path✔ |  3       | Manage path
+⠏ |  0       | Load .hdr file⠋ |  1       | Load .hdr file⠙ |  2       | Load .hdr file⠹ |  3       | Load .hdr file⠸ |  4       | Load .hdr file✔ |  4       | Load .hdr file
+⠏ |  0       | Functional test⠋ |  1       | Functional test✔ |  1       | Functional test
+
+══ Results ═════════════════════════════════════════════════════════════════════
+Duration: 0.1 s
+
+OK:       55
+Failed:   0
+Warnings: 0
+Skipped:  0
+Writing NAMESPACE
+Writing NAMESPACE
+#+end_example
+** テストコード
 :PROPERTIES:
 :header-args: :results silent :exports code
 :END:
+*** テスト/ファイル名
 #+BEGIN_SRC R :tangle otolithr/tests/testthat/test_fname.R
   library(otolithr)
   context("Handle file name")
@@ -127,28 +407,31 @@ Imports:
   context("Manage path")
 
   test_that("get_path() gives file dir correctly", {
-    expect_setequal(get_path("../testdir1"),
-                    c("../testdir1/FOO/data/foo.hdr",
-                      "../testdir1/bar/cannot_read/cannot.hdr",
-                      "../testdir1/bar/data/foo.hdr"))
-    expect_setequal(get_path("../Spcs-dir"),
-                    c("../Spcs-dir/othercruise/station/cannot_read/cannot.hdr",
-                      "../Spcs-dir/othercruise/station/data/foo.hdr",
-                      "../Spcs-dir/somecruise/mtfoo/cannot_read/cannot.hdr",
-                      "../Spcs-dir/somecruise/mtfoo/data/foo.hdr"))
+    expect_setequal(
+      get_path("../Genus-spcs"),
+      c("../Genus-spcs/commercial/foo/cannot_read/cannot.hdr",
+        "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+        "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_10.hdr",
+        "../Genus-spcs/reared/foo/cannot_read/cannot.hdr",
+        "../Genus-spcs/reared/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+        "../Genus-spcs/survey/mtfoo/cannot_read/cannot.hdr",
+        "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"))
   })
 
 
   test_that("get_dir2load() gives paths end with 'data/xxx.hdr'", {
-    paths <- get_path("../testdir1")
-    expect_setequal(get_dir2load(paths),
-                    c("../testdir1/FOO/data/foo.hdr",
-                      "../testdir1/bar/data/foo.hdr"))
+    paths <- get_path("../Genus-spcs")
+    expect_setequal(
+      get_dir2load(paths),
+      c("../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+        "../Genus-spcs/commercial/foo/data/Sardinops-melanostictus_foo_bar_10.hdr",
+        "../Genus-spcs/reared/foo/data/Sardinops-melanostictus_foo_bar_01.hdr",
+        "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"))
   })
 
   test_that("fullpath2fname() extracts only fname from full path", {
-    path <- get_path("../testdir1")[1]
-    expect_equal(fullpath2fname(path), "foo.hdr")
+    path <- get_path("../Genus-spcs")[1]
+    expect_equal(fullpath2fname(path), "cannot.hdr")
   })
 #+END_SRC
 *** テスト/データタイプ（調査|漁獲物|飼育）
@@ -166,33 +449,33 @@ Imports:
   test_that("get_info.survey() makes sample metadata correctly", {
     fname <- "Sardinops-melanostictus_YK1508_MT6_10.hdr"
     info  <- get_info.survey(fname)
-    expect_is(info, "survey")
+    expect_equal(info$type, "survey")
     expect_equal(info$spcs, "Sardinops-melanostictus")
     expect_equal(info$crs.name, "YK1508")
     expect_equal(info$stn, "MT6")
-    expect_equal(info$sampleno, "10")
+    expect_equal(info$sampleno, 10)
   })
 
   test_that("get_info.commercial() makes sample metadata correctly", {
     fname <- "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
     info  <- get_info.commercial(fname)
-    expect_is(info, "commercial")
+    expect_equal(info$type, "commercial")
     expect_equal(info$spcs, "Sardinops-melanostictus")
     expect_equal(info$date, "20150827")
     expect_equal(info$key1, "Toyama")
     expect_equal(info$key2, "Nakase")
-    expect_equal(info$sampleno, "005")
+    expect_equal(info$sampleno, 5)
   })
 
   test_that("get_info.reared() makes sample metadata correctly", {
     fname <- "Sardinops-melanostictus_20160810_temp14_01.hdr"
     info  <- get_info.reared(fname)
-    expect_is(info, "reared")
+    expect_equal(info$type, "reared")
     expect_equal(info$spcs, "Sardinops-melanostictus")
     expect_equal(info$date, "20160810")
     expect_equal(info$key1, "temp14")
     expect_true(is.na(info$key2))
-    expect_equal(info$sampleno, "01")
+    expect_equal(info$sampleno, 1)
   })
 
   test_that("detect_type() detects dattype correctly", {
@@ -207,10 +490,47 @@ Imports:
     expect_error(detect_type(path_error), msg, fix = TRUE)
   })
 #+END_SRC
+*** テスト/hdr ファイルハンドリング
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_handle_hdr.R
+  context("Load .hdr file")
 
+  infile   <-
+    "../Genus-spcs/survey/mtfoo/data/Sardinops-melanostictus_foo_MT01_01.hdr"
+  data     <- load_hdr(infile)
+  varnames <-  c("標本番号", "採集航海番号",  "採集ｽﾃｰｼｮﾝ番号", "採集日付",
+                 "緯度", "経度", "表面水温", "体長", "体重", "耳石径", "耳左右",
+                 "計測者番号", "日輪数", "lens", "calib", "unit",
+                 "samplesize", "filename", "日輪幅")
+
+  test_that("load_hdr() reads '.hdr' file correctly", {
+    expect_is(data, "data.frame")
+    expect_setequal(data$V1[1:19], varnames)
+  })
+
+  test_that("locate_1stinc() returns the position of first inc", {
+    expect_equal(locate_1stinc(data$V1), 20)
+  })
+
+  test_that("get_incdata() returns incdata", {
+    expect_equal(get_incdata(append(varnames, 1:10)), 1:10)
+  })
+#+END_SRC
+*** 機能テスト
+#+BEGIN_SRC R :tangle otolithr/tests/testthat/test_load_otolith.R
+  context("Functional test")
+
+  indir      <- "../Genus-spcs"
+  paths      <- get_path(indir)
+  paths2load <- get_dir2load(paths)[1]
+  data       <- load_otolith(paths2load)
+
+  test_that("load_otolith() loads otolith data", {
+    expect_is(data$ninc, "integer")
+  })
+#+END_SRC
 ** 関数
 *** ヘルパー関数
-#+BEGIN_SRC R :tangle otolithr/R/util.R
+#+BEGIN_SRC R :tangle otolithr/R/util.R :results silent
   #' @importFrom magrittr %>%
   #' @export
   magrittr::`%>%`
@@ -272,42 +592,44 @@ Imports:
 
   get_info.survey <- function(fname) {
     out <- list()
-    class(out)   <- "survey"
+    out$type     <- "survey"
     out$fname    <- xtract_var(fname, "fname")
     out$spcs     <- xtract_var(fname, "spcsname")
     out$crs.name <- xtract_var(fname, "cruise")
     out$stn      <- xtract_var(fname, "stn")
-    out$sampleno <- xtract_var(fname, "sampleno")
+    out$sampleno <- xtract_var(fname, "sampleno") %>%
+      as.integer()
     out
   }
 
   get_info.commercial <- function(fname) {
     out <- list()
-    class(out)   <- "commercial"
+    out$type     <- "commercial"
     out$fname    <- xtract_var(fname, "fname")
     out$spcs     <- xtract_var(fname, "spcsname")
     out$date     <- xtract_var(fname, "date")
     out$key1     <- xtract_var(fname, "key1")
     out$key2     <- xtract_var(fname, "key2")
-    out$sampleno <- xtract_var(fname, "sampleno")
+    out$sampleno <- xtract_var(fname, "sampleno") %>%
+      as.integer()
     out
   }
 
   get_info.reared <- function(fname) {
     out <- list()
-    class(out)   <- "reared"
+    out$type     <- "reared"
     out$fname    <- xtract_var(fname, "fname")
     out$spcs     <- xtract_var(fname, "spcsname")
     out$date     <- xtract_var(fname, "date")
     out$key1     <- xtract_var(fname, "key1")
     out$key2     <- xtract_var(fname, "key2")
-    out$sampleno <- xtract_var(fname, "sampleno")
+    out$sampleno <- xtract_var(fname, "sampleno") %>%
+      as.integer()
     out
   }
 #+END_SRC
 
-
-*** パス関連
+*** ファイルパス
 #+BEGIN_SRC R :tangle otolithr/R/fpath.R
   get_path <- function(dir.spcs) {
     regex <- ".+hdr$"
@@ -335,130 +657,44 @@ Imports:
     dir2load
   }
 #+END_SRC
-** デモ
-:PROPERTIES:
-:header-args: :results output :exports both
-:END:
-#+BEGIN_SRC R
-  devtools::load_all("otolithr")
-  path <- "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus"
-
-  print(".hdr ファイルがある全ディレクトリのリスト")
-  dirs_org  <- get_path(path)
-  head(dirs_org)
-  tail(dirs_org)
-
-  print("上記リストのうち，解析できなかった個体を除外したリスト")
-  dirs2load <- dirs_org %>% get_dir2load()
-  head(dirs2load)
-  tail(dirs2load)
-
-  print("フルパスをファイル名に変換")
-  fnames    <- dirs2load %>%
-    fullpath2fname()
-  head(fnames)
-  tail(fnames)
-
-  print("サンプリング方法（調査|漁獲|飼育）を取得")
-  types     <- purrr::map(dirs2load, detect_type) %>% unlist()
-  head(types)
-  tail(types)
-
-  print("ファイル名にサンプリング方法を属性として付与")
-  fnames_with_type <- purrr::map2(fnames, types, set_type)
-  head(fnames_with_type, 2)
-  tail(fnames_with_type, 2)
-
-  print("ファイル名と属性をリスト化")
-  info      <- purrr::map(fnames_with_type, get_info)
-  str(info[[1]])
-  str(info[[100]])
-  str(info[[200]])
-#+END_SRC
 
 #+RESULTS:
-#+begin_example
-[1] ".hdr ファイルがある全ディレクトリのリスト"
-[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
-[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
-[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
-[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
-[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
-[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
-[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
-[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
-[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
-[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
-[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
-[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
-[1] "上記リストのうち，解析できなかった個体を除外したリスト"
-[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
-[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
-[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
-[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
-[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
-[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/commercial/data/Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
-[1] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_004.hdr"
-[2] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_005.hdr"
-[3] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_007.hdr"
-[4] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_009.hdr"
-[5] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_010.hdr"
-[6] "/Users/ahayashi/Documents/GitHub/otolith/ratocB/Sardinops_melanostictus/survey/YK1611/data/C1_011.hdr"
-[1] "フルパスをファイル名に変換"
-[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
-[2] "Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
-[3] "Sardinops-melanostictus_20150827_Toyama_Nakase_003.hdr"
-[4] "Sardinops-melanostictus_20150827_Toyama_Nakase_004.hdr"
-[5] "Sardinops-melanostictus_20150827_Toyama_Nakase_005.hdr"
-[6] "Sardinops-melanostictus_20150827_Toyama_Nakase_006.hdr"
-[1] "C1_004.hdr" "C1_005.hdr" "C1_007.hdr" "C1_009.hdr" "C1_010.hdr"
-[6] "C1_011.hdr"
-[1] "サンプリング方法（調査|漁獲|飼育）を取得"
-[1] "commercial" "commercial" "commercial" "commercial" "commercial"
-[6] "commercial"
-[1] "survey" "survey" "survey" "survey" "survey" "survey"
-[1] "ファイル名にサンプリング方法を属性として付与"
-[[1]]
-[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
-attr(,"class")
-[1] "commercial"
 
-[[2]]
-[1] "Sardinops-melanostictus_20150827_Toyama_Nakase_002.hdr"
-attr(,"class")
-[1] "commercial"
+*** hdr 読み込み
+#+BEGIN_SRC R :tangle otolithr/R/handle_hdr.R :results silent
+  load_hdr <- function(fname){
+    read.csv(fname, fileEncoding = "CP932",
+             header = FALSE, stringsAsFactors = FALSE)
+  }
 
-[[1]]
-[1] "C1_010.hdr"
-attr(,"class")
-[1] "survey"
+  locate_1stinc <- function(x) {
+    which(x == "日輪幅") + 1 # Data of 1stinc is located just after "日輪幅".
+  }
 
-[[2]]
-[1] "C1_011.hdr"
-attr(,"class")
-[1] "survey"
+  get_incdata <- function(x) {
+    str <- x
+    out <- as.numeric(str[locate_1stinc(x):length(str)])
+    out
+  }
+#+END_SRC
 
-[1] "ファイル名と属性をリスト化"
-List of 6
- $ fname   : chr "Sardinops-melanostictus_20150827_Toyama_Nakase_001.hdr"
- $ spcs    : chr "Sardinops-melanostictus"
- $ date    : chr "20150827"
- $ key1    : chr "Toyama"
- $ key2    : chr "Nakase"
- $ sampleno: chr "001"
- - attr(*, "class")= chr "commercial"
-List of 5
- $ fname   : chr "Sardinops-melanostictus_YK1508_MT10_01.hdr"
- $ spcs    : chr "Sardinops-melanostictus"
- $ crs.name: chr "YK1508"
- $ stn     : chr "MT10"
- $ sampleno: chr "01"
- - attr(*, "class")= chr "survey"
-List of 5
- $ fname   : chr "C1_011.hdr"
- $ spcs    : chr NA
- $ crs.name: chr NA
- $ stn     : chr NA
- $ sampleno: chr "011"
- - attr(*, "class")= chr "survey"
-#+end_example
+*** 統合関数
+#+BEGIN_SRC R :tangle otolithr/R/load_otolith.R :results silent
+  make_data <- function(fname, fname_with_type) {
+    data     <- load_hdr(fname)
+    out      <- get_info(fname_with_type)
+    out$inc  <- get_incdata(data$V1)
+    out$radius   <- cumsum(out$inc)
+    out$ninc  <- length(out$iw)
+    out
+  }
+
+
+  load_otolith <- function(dir) {
+    type            <- detect_type(dir)
+    fname_with_type <- fullpath2fname(dir) %>%
+      set_type(type)
+    out <- make_data(dir, fname_with_type)
+    out
+  }
+#+END_SRC

@@ -23,12 +23,6 @@ make_datlist <- function(indir, type){
   datlist
 }
 
-parse_year <- function(datlist){
-  yearlist <- datlist %>%
-    str_sub(5, 6) %>%
-    paste0(20, .)
-  yearlist
-}
 
 get_filelist <- function(indir, spcs) {
   if (is.na(spcs)) {
@@ -45,13 +39,13 @@ get_sheet2read <- function(infile) {
   sheets2read <- as.vector(na.omit(stringr::str_match(all_sheets, "^(?!.*0000)(?!体長)(?!Sheet).+")))
   sheets2read
 }
-get_date <- function(year, sheetname) {
-  date_char <- dplyr::if_else(str_length(sheetname) >= 9,
-                       paste0(20, str_sub(sheetname, 1, 6)),
-                       paste0(year, str_sub(sheetname, 1, 4)))
-  date      <- lubridate::ymd(date_char)
-  date
-}
+# get_date <- function(year, sheetname) {
+#   date_char <- dplyr::if_else(str_length(sheetname) >= 9,
+#                        paste0(20, str_sub(sheetname, 1, 6)),
+#                        paste0(year, str_sub(sheetname, 1, 4)))
+#   date      <- lubridate::ymd(date_char)
+#   date
+# }
 
 format <- function(infile, sheet) {
   data_org <- readxl::read_xls(infile, sheet = sheet)
