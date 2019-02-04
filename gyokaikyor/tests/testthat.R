@@ -1,4 +1,4 @@
 library(testthat)
-library(gyokaikyo)
+library(gyokaikyor)
 
-test_check("gyokaikyo")
+test_check("gyokaikyor")

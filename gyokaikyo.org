@@ -1,4 +1,4 @@
-#+TITLE: gyokaikyo プロジェクトノート
+#+TITLE: gyokaikyor プロジェクトノート
 #+PROPERTY: header-args :exports code :results scalar :session *R:tidyNAS*
 #+STARTUP: contents
 
@@ -74,11 +74,11 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 * 開発環境の整備
 ** ディレクトリ作成
 #+BEGIN_SRC R :results silent
-# usethis::create_package("gyokaikyo")
+# usethis::create_package("gyokaikyor")
 #+END_SRC
 ** セットアップ
 #+BEGIN_SRC R
-setwd("gyokaikyo")
+setwd("gyokaikyor")
 #+END_SRC
 
 #+RESULTS:
@@ -92,12 +92,12 @@ setwd("gyokaikyo")
 #+END_SRC
 
 #+BEGIN_SRC sh :exports results :session nil
-cat gyokaikyo/DESCRIPTION
+cat gyokaikyor/DESCRIPTION
 #+END_SRC
 
 #+RESULTS[26e6d91ffe9c3ff5d95f888fb0006e9154a02abb]:
 #+begin_example
-Package: gyokaikyo
+Package: gyokaikyor
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
@@ -118,7 +118,7 @@ Suggests:
 * 開発
 ** リロード & 自動テスト
 #+BEGIN_SRC R :results output
-  setwd("gyokaikyo")
+  setwd("gyokaikyor")
   devtools::load_all()
   system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
   devtools::test()
