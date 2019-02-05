@@ -17,6 +17,7 @@
   - [[#グラフ描画][グラフ描画]]
   - [[#予報文案テンプレートの生成][予報文案テンプレートの生成]]
 - [[#デモ][デモ]]
+  - [[#ファイル情報を整備する][ファイル情報を整備する]]
 - [[#開発環境の整備][開発環境の整備]]
   - [[#ディレクトリ作成][ディレクトリ作成]]
   - [[#セットアップ][セットアップ]]
@@ -86,10 +87,15 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 できるだけタグが短いもの．
 マークダウンが有力か？
 * デモ
+** ファイル情報を整備する
+#+BEGIN_SRC R
+  fname <- tribble()
+#+END_SRC
 * 開発環境の整備
 ** ディレクトリ作成
 #+BEGIN_SRC R :results silent
-# usethis::create_package("gyokaikyor")
+  # getwd()
+  # usethis::create_package("gyokaikyor")
 #+END_SRC
 ** セットアップ
 #+BEGIN_SRC R :results silent
@@ -100,6 +106,7 @@ setwd("gyokaikyor")
 #+BEGIN_SRC R :results silent
   usethis::use_package("magrittr", "Imports")
   usethis::use_package("hash")
+  usethis::use_package("tibble")
   # usethis::use_package("ggplot2", "Imports")
   # usethis::use_package("tibble", "Imports")
   usethis::use_testthat()
@@ -111,7 +118,6 @@ cat gyokaikyor/DESCRIPTION
 
 #+RESULTS[26e6d91ffe9c3ff5d95f888fb0006e9154a02abb]:
 #+begin_example
-
 Package: gyokaikyor
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
@@ -126,10 +132,10 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     magrittr,
-    hash
+    hash,
+    tibble
 Suggests: 
     testthat
-RoxygenNote: 6.1.1
 #+end_example
 
 * 開発
