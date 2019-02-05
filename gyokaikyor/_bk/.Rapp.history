@@ -1,0 +1,13 @@
+setwd("~/Documents/GitHub/gyokaikyo/ByHayashi//")
+INDIR  <- "../../../OneDrive\\ -\\ 国立研究開発法人\\ 水産研究・教育機構/"
+INDIR  <- "../../../OneDrive - 国立研究開発法人 水産研究・教育機構/"
+INDIR  <- "../../../OneDrive - 国立研究開発法人 水産研究・教育機構/業務/2017_H29"
+list.files(INDIR)
+source("_param.R")
+FISCAL_YEAR_START   <- 2017#
+SPCS_LIST           <- c("Sardine", "Anchovy", "RoundHerring", "Mackerels", "JackMackerel")#
+SPCS_LIST_DETAILED  <- c("Sardine", "Anchovy", "RoundHerring", "ChubMackerel", "SouthernMackerel", "JackMackerel")#
+FISCAL_YEARS        <- paste(FISCAL_YEAR_START, FISCAL_YEAR_START+1, sep="_")#
+FISCAL_YEARS_LAST   <- paste(FISCAL_YEAR_START-1, FISCAL_YEAR_START, sep="_")
+source("Nagasaki.R")
+q()
