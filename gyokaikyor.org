@@ -272,7 +272,27 @@ print(out_all)
 :PROPERTIES:
 :header-args: :results silent :exports code
 :END:
+*** テスト/ ファイル名操作
+#+BEGIN_SRC R :tangle gyokaikyor/tests/testthat/test_handle_fname.R
+  context("Handle file name")
+  fname     <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
+  tbl_fname <- hash::hash(c("04 漁獲努力量（1704~1803）（熊本県）.xls"), "熊本")
+  tbl_fmt   <- hash::hash(c("熊本"), c("seimitsu"))
+  test_that("give_class() gives fname its file format as class", {
+    expect_is(give_class(fname, tbl_fname, tbl_fmt), "seimitsu")
+  })
+#+END_SRC
 ** 関数
 :PROPERTIES:
 :header-args: :results silent :exports code
 :END:
+*** ファイル名操作
+#+BEGIN_SRC R :tangle gyokaikyor/R/handle_fname.R
+  give_class <- function(fname, tbl.fname, tbl.fmt) {
+    out   <- fname
+    prefec <- tbl.fname[[fname]]
+    format <- tbl.fmt[[prefec]]
+    class(out) <- format
+    out
+  }
+#+END_SRC
