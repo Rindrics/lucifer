@@ -221,10 +221,10 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 :END:
 *** ファイル名操作
 #+BEGIN_SRC R :tangle gyokaikyor/R/handle_fname.R
-  give_class <- function(fname, tbl.fname, tbl.fmt) {
-    out   <- fname
-    prefec <- tbl.fname[[fname]]
-    format <- tbl.fmt[[prefec]]
+  give_class   <- function(fname, tbl.fname, tbl.fmt) {
+    out        <- fname
+    prefec     <- tbl.fname[[fname]]
+    format     <- tbl.fmt[[prefec]]
     class(out) <- format
     out
   }
