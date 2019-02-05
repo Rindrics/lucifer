@@ -26,8 +26,13 @@
   - [[#各県ファイルの処理概要][各県ファイルの処理概要]]
     - [[#体長][体長]]
     - [[#漁獲量][漁獲量]]
+  - [[#どう問題を解くか][どう問題を解くか]]
+    - [[#get_topleftkey--flmm][get_topleft(key = "FL(mm)")]]
   - [[#テストコード][テストコード]]
+    - [[#テスト-ファイル名操作][テスト/ ファイル名操作]]
   - [[#関数][関数]]
+    - [[#ファイル名操作][ファイル名操作]]
+    - [[#整形][整形]]
 
 * これは何か？
 漁海況業務のリポジトリ．
@@ -45,11 +50,18 @@
 - バイナリなのでバージョン管理ができない
 - 資源評価と漁海況の両方で使用されるが，両業務で集計方法が異なるので紛らわしい．
 *** 解決策
-- 各県の提出データを読み込み，県ごとに csv 形式のデータベースを作成する．
-- データベースから範囲を指定して体長階級×月形式のテーブルを作成する
+2段階の抽象度（精密測定 & 体長組成）で体長整理する．
+- 精密データを提出する県については，県ごとに csv 形式の精密測定データベースを作成する．
+- 精密はなく，体長組成データを提出する県については，県ごとにcsv 型式の体長組成データベースを作成する．
+- 精密・体長各データベースから範囲を指定して体長階級×月形式のテーブルを作成できるようにする．
+
 使用イメージ
 #+BEGIN_SRC R :exports code :results silent
-fmt_bl("./data.git/漁海況/2018年10月/各県資料/長崎県/", gyokaikyo = TRUE, plot = TRUE)
+kumamoto    <- fmt_bl("./data.git/漁海況/2018年10月/各県資料/熊本県", gyokaikyo = TRUE, plot = TRUE)
+db_kumamoto <- read_csv("./output.git/kumamoto_2018oct.csv")
+out         <- bind_rows(db_kumamoto, kumamoto)
+write.csv(out, "./output.git/kumamoto_2019mar.csv", row.names = FALSE)
+
 get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, end = 2017)
 #+END_SRC
 **** なぜデータベースか？
@@ -80,15 +92,14 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 # usethis::create_package("gyokaikyor")
 #+END_SRC
 ** セットアップ
-#+BEGIN_SRC R
+#+BEGIN_SRC R :results silent
 setwd("gyokaikyor")
 #+END_SRC
-
-#+RESULTS:
 
 ** 本バッケージ内部で使用するパッケージ
 #+BEGIN_SRC R :results silent
   usethis::use_package("magrittr", "Imports")
+  usethis::use_package("hash")
   # usethis::use_package("ggplot2", "Imports")
   # usethis::use_package("tibble", "Imports")
   usethis::use_testthat()
@@ -100,6 +111,7 @@ cat gyokaikyor/DESCRIPTION
 
 #+RESULTS[26e6d91ffe9c3ff5d95f888fb0006e9154a02abb]:
 #+begin_example
+
 Package: gyokaikyor
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
@@ -113,9 +125,11 @@ License: What license it uses
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    magrittr
+    magrittr,
+    hash
 Suggests: 
     testthat
+RoxygenNote: 6.1.1
 #+end_example
 
 * 開発
@@ -129,145 +143,64 @@ Suggests:
 #+END_SRC
 ** 各県ファイルの処理概要
 *** 体長
+**** 山口
+fresco
+**** 福岡
+カタクチ測定なし
+**** 佐賀
+fresco
+**** 長崎
+- シートを読み込む．対象は春と秋とで違う．
+  - 3月漁海況: 2017.09-2018.01小型まき網体長組成.xls
+  - 10月漁海況: 2018.02-2018.08小型まき網体長組成.xls
+- 漁法名をF2から取得
 **** 熊本
 列方向に続いた精密測定データ．
+10月漁海況のときには前年ファイルも一緒に送ってくれる．
+- 04 【熊本県】H29まき網＆棒受網 体長組成.xlsx を開く <- *4月始まり*
 - 「カタクチ」シートを読み込み
+- df.out を初期化
 - 日付が入った列（H29.4.30形式）を取得
 - 漁法名を取得
 - できればその他情報も取得（操業海域・陸揚げ港）
 - 測定データ（全長・被鱗体長・体重）を取得
-#+BEGIN_SRC R
-# data[duplicated(paste(data$Date, data$No, sep = ",")), ]
-source("./_packages.R")
-source("./_constants.R")
-library(lubridate)
-prefecture          <- "kumamoto"
-prefec_name         <- PREFEC_TABLE[[prefecture]]
-species             <- c("Sardine", "Anchovy", "Round herring", "Mackerels")
-spname_translate    <- hash(species, c("マイワシ", "カタクチイワシ", "ウルメイワシ", "サハ゛類")) #do not use character "サバ"
-header_width        <- 7
-rowpos_of_1stdata   <- 8
-offset_tl           <- -1
-colshift_bw         <- 3
-colshift_sex        <- 4
-colshift_gw         <- 5
-colshift_date       <- 2
-colpos_of_hist      <- 3
-n_of_histclass      <- 45
-dattype             <- c("体長", "精密")
-out                 <- NULL
-need_check          <- NULL
-gyokaikyo_oct       <- gsub("3月", "10月", GYOKAIKYODIR)
-bldatdir            <- paste(gyokaikyo_oct, "/各県資料/",PREFEC_TABLE[[prefecture]],"県", sep="")
-infiles              <- list.files(bldatdir, recursive = TRUE, full.names = TRUE, pattern="^[^~$].+体長.+")
-char2num <- function(df) {
-  vec <- df %>% unlist() %>% parse_number()
-  vec
-}
-char2date <- function(df) {
-  num <- df %>% unlist() %>% parse_number()
-  date <- as.Date(num - 2, origin="1900-01-01")
-}
-out <- NULL
-for(f in infiles){
-  if (gregexpr("xlsx", f) > 0) {
-    data        <- read_xlsx(f, sheet="カタクチ", col_names = FALSE)
-  } else {
-    data        <- read_xls(f, sheet="カタクチ", col_names = FALSE)
-  }
-  datcols     <- NULL
-  date.org  <- data[1,]
-  cols2read <- which((!is.na(date.org) & (gregexpr(".+[0-9].+", date.org) > 0)) == TRUE)
-  nacnt     <- 0
-  df        <- matrix(NA, nrow=100*length(cols2read), ncol=7)
-  cnt       <- 0
-  for(j in cols2read){
-    pos2replace <- 1:100 + 100 * cnt
-    date <- char2date(date.org[j])
-    if (is.na(date) == TRUE) {browser()}
-    total.length_mm <- data[rowpos_of_1stdata:nrow(data), j+offset_tl] %>% char2num
-    bl_mm           <- data[rowpos_of_1stdata:nrow(data), j] %>% char2num()
-    sample_no       <- 1:length(bl_mm)
-    bw_g            <- data[rowpos_of_1stdata:nrow(data), j + 1] %>% char2num()
-    sex             <- data[rowpos_of_1stdata:nrow(data), j + 2] %>% char2num() # male: 1; female:2
-    gw              <- data[rowpos_of_1stdata:nrow(data), j + 3] %>% char2num()
-    year      <- year(date)
-    month     <- month(date)
-    day       <- day(date)
-    fisheries_type  <- as.character(data[1, j+header_width-3])
-    ifelse(gregexpr("[巻ま]き", fisheries_type)>0,
-           fisheries_type <- "Makiami",
-           ifelse(gregexpr("棒受け?", fisheries_type)>0,
-           fisheries_type <- "Bouukeami",
-           ""))
-    df[pos2replace, 1] <- sample_no
-    df[pos2replace, 2] <- as.character(date)
-    df[pos2replace, 3] <- fisheries_type
-    df[pos2replace, 4] <- bl_mm
-    df[pos2replace, 5] <- bw_g
-    df[pos2replace, 6] <- sex
-    df[pos2replace, 7] <- gw
-    cnt <- cnt + 1
-  }
-  out <- rbind(out, df)
-}
-out <- as.tibble(out)
-colnames(out) <- c("sample.no", "date","fisheries.type","bl_mm","bw_g","sex","gw_g")
-out <- out[!is.na(out$bl_mm),]
-
-out2 <- out %>%
-  mutate(sample.no = parse_number(sample.no),
-         date = parse_date(date),
-         year = year(date),
-         month = month(date),
-         day = day(date),
-         bl_mm = parse_number(bl_mm),
-         bw_g = parse_number(bw_g),
-         sex = parse_integer(sex),
-         gw_g = parse_number(gw_g))
-tail(out2)
-
-out2 %>%
-  ggplot(aes(bl_mm, bw_g)) +
-  geom_point()
-
-formatted_data <- subset(out2, year==YEAR)
-out_all  <- matrix(NA, nrow = length(CLASSNAME4Excel), ncol = 12)
-out_maki <- matrix(NA, nrow = length(CLASSNAME4Excel), ncol = 12)
-for(m in MONTHS){
-  # m=6
-  mdata   <- filter(formatted_data, month==m)
-  if(nrow(mdata)>0){
-      hist <- hist(mdata$bl_mm, breaks=BREAKS4Excel, right=F)$counts
-  }else{
-      hist <- rep(0, length(CLASSNAME4Excel))
-  }
-  out_all[,m]        <- hist
-
-  mdata_maki <- filter(formatted_data, month==m & fisheries.type == "Makiami")
-  if(nrow(mdata_maki) > 0){
-      hist_maki <- hist(mdata_maki$bl_mm, breaks=BREAKS4Excel, right=FALSE)$counts
-  }else{
-      hist_maki<- rep(0, length(CLASSNAME4Excel))
-  }
-  out_maki[,m]        <- hist_maki
-}
-
-outfname    <- paste0("../", OUTDIR, "/体長組成_熊本.csv")
-rownames(out_all) <- CLASSNAME4Excel
-colnames(out_all) <- paste0(month.abb, YEAR)
-out_all           <- out_all[rownames(out_all) %in% CLASSNAME4Excel, ]
-write.csv(out_all, outfname)
-outfname_maki      <- paste0("../", OUTDIR, "/体長組成_熊本_まき網のみ.csv")
-rownames(out_maki) <- CLASSNAME4Excel
-colnames(out_maki) <- paste0(month.abb, YEAR)
-out_maki           <- out_maki[rownames(out_maki) %in% CLASSNAME4Excel, ]
-write.csv(out_maki, outfname_maki)
-
-print(out_all)
-
-#+END_SRC
+- df.out を初期化
+- 過去のデータベースに df.out を結合
+- 重複除去
+- 新データベースをkumamoto_2018Oct.csv として書き出し
+**** 鹿児島
+- 体長組成(H29年度).xlsx を開く　<- *4月始まり*
+- 「ｶﾀｸﾁ」シートを読み込み
+- 日付が入った列を取得
+- 漁法名などの情報を取得
+- 個体数情報を体長階級ブロックごと取得
+- 過去のdbに結合...
 *** 漁獲量
+** どう問題を解くか
+各県ごとに，データフォーマットをリストで持たせる
+| prefec | format |
+|--------+--------|
+| 長崎県 | 体長   |
+| 熊本県 | 精密   |
+
+| prefec | key.topleft |
+|--------+-------------|
+| 長崎県 | FL(mm)      |
+
+| fname                                    | prefec |
+|------------------------------------------+--------|
+| 03 漁獲努力量（1804~1903）（熊本県）.xls | 熊本県 |
+| 04 漁獲努力量（1704~1803）（熊本県）.xls | 熊本県 |
+
+
+各県のファイル名を fmtbl() に与えると，データ形式に適した形で整形される．
+水面下でデータ型式を読みに行き，ファイル名に属性として付与している
+
+fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
+
+
+
+*** get_topleft(key = "FL(mm)")
 ** テストコード
 :PROPERTIES:
 :header-args: :results silent :exports code
@@ -295,4 +228,13 @@ print(out_all)
     class(out) <- format
     out
   }
+#+END_SRC
+*** 整形
+#+BEGIN_SRC R
+  fmtbl <- function(fname) {
+    UseMethod(fmtbl)
+  }
+
+  fmtbl.taichou  <- function(fname)
+  fmtbl.seimitsu <- function(fname)
 #+END_SRC
