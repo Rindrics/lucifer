@@ -23,12 +23,12 @@
   - [[#セットアップ][セットアップ]]
   - [[#本バッケージ内部で使用するパッケージ][本バッケージ内部で使用するパッケージ]]
 - [[#開発][開発]]
-  - [[#リロード--自動テスト][リロード & 自動テスト]]
   - [[#各県ファイルの処理概要][各県ファイルの処理概要]]
     - [[#体長][体長]]
     - [[#漁獲量][漁獲量]]
   - [[#どう問題を解くか][どう問題を解くか]]
     - [[#get_topleftkey--flmm][get_topleft(key = "FL(mm)")]]
+  - [[#リロード--自動テスト][リロード & 自動テスト]]
   - [[#テストコード][テストコード]]
     - [[#テスト-ファイル名操作][テスト/ ファイル名操作]]
   - [[#関数][関数]]
@@ -139,28 +139,21 @@ Suggests:
 #+end_example
 
 * 開発
-** リロード & 自動テスト
-#+BEGIN_SRC R :results output
-  setwd("gyokaikyor")
-  devtools::load_all()
-  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
-  devtools::test()
-  devtools::document(roclets=c('rd', 'collate', 'namespace'))
-#+END_SRC
 ** 各県ファイルの処理概要
 *** 体長
-**** 山口
+**** まず県別に整理
+***** 山口
 fresco
-**** 福岡
+***** 福岡
 カタクチ測定なし
-**** 佐賀
+***** 佐賀
 fresco
-**** 長崎
+***** 長崎
 - シートを読み込む．対象は春と秋とで違う．
   - 3月漁海況: 2017.09-2018.01小型まき網体長組成.xls
   - 10月漁海況: 2018.02-2018.08小型まき網体長組成.xls
 - 漁法名をF2から取得
-**** 熊本
+***** 熊本
 列方向に続いた精密測定データ．
 10月漁海況のときには前年ファイルも一緒に送ってくれる．
 - 04 【熊本県】H29まき網＆棒受網 体長組成.xlsx を開く <- *4月始まり*
@@ -174,29 +167,44 @@ fresco
 - 過去のデータベースに df.out を結合
 - 重複除去
 - 新データベースをkumamoto_2018Oct.csv として書き出し
-**** 鹿児島
+***** 鹿児島
 - 体長組成(H29年度).xlsx を開く　<- *4月始まり*
 - 「ｶﾀｸﾁ」シートを読み込み
 - 日付が入った列を取得
 - 漁法名などの情報を取得
 - 個体数情報を体長階級ブロックごと取得
 - 過去のdbに結合...
+**** まとめると
+精密，体長のような分け方はしないほうが良い．
+あくまでも，関数を部品として作り，各県ごとにそれを組み合わせて使う．
+強いて分類するなら，以下のようになる．
+- 精密タイプ: 熊本
+- 体長タイプ: 長崎，鹿児島
+- fresco タイプ: 山口，佐賀
+**** 必要な部品
+- get_cols2load(regex = )
+- get_top(regex = )
+- get_left(regex = )
+- get_topleft(regex = )
+- get_bottom(regex = )
+- get_right(regex = )
+- get_bottomright(regex = )
+- parse_jpdate(format = )
+- 
 *** 漁獲量
 ** どう問題を解くか
-各県ごとに，データフォーマットをリストで持たせる
-| prefec | format |
-|--------+--------|
-| 長崎県 | 体長   |
-| 熊本県 | 精密   |
+県ごとに，どうしてもデータ処理の振る舞いを変える必要がある
+そこで， 各県のファイル名に，県名を属性として与える
+#+TBLNAME: tbl_fname_prefec
+| fname                                    | prefec   |
+|------------------------------------------+----------|
+| 03 漁獲努力量（1804~1903）（熊本県）.xls | kumamoto |
+| 04 漁獲努力量（1704~1803）（熊本県）.xls | kumamoto |
 
-| prefec | key.topleft |
-|--------+-------------|
-| 長崎県 | FL(mm)      |
-
-| fname                                    | prefec |
-|------------------------------------------+--------|
-| 03 漁獲努力量（1804~1903）（熊本県）.xls | 熊本県 |
-| 04 漁獲努力量（1704~1803）（熊本県）.xls | 熊本県 |
+#+TBLNAME: tbl_prefec_key
+| prefec   | key.topleft |
+|----------+-------------|
+| nagasaki | FL(mm)      |
 
 
 各県のファイル名を fmtbl() に与えると，データ形式に適した形で整形される．
@@ -207,6 +215,14 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 
 
 *** get_topleft(key = "FL(mm)")
+** リロード & 自動テスト
+#+BEGIN_SRC R :results output
+  setwd("gyokaikyor")
+  devtools::load_all()
+  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
+  devtools::test()
+  devtools::document(roclets=c('rd', 'collate', 'namespace'))
+#+END_SRC
 ** テストコード
 :PROPERTIES:
 :header-args: :results silent :exports code
@@ -214,11 +230,12 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 *** テスト/ ファイル名操作
 #+BEGIN_SRC R :tangle gyokaikyor/tests/testthat/test_handle_fname.R
   context("Handle file name")
-  fname     <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
-  tbl_fname <- hash::hash(c("04 漁獲努力量（1704~1803）（熊本県）.xls"), "熊本")
-  tbl_fmt   <- hash::hash(c("熊本"), c("seimitsu"))
+  fn_kumamoto  <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
+  fn_kagoshima <- "体長組成(H29年度).xlsx"
+  tbl_fname <- hash::hash(c(fn_kumamoto, fn_kagoshima), c("kumamoto", "kagoshima"))
   test_that("give_class() gives fname its file format as class", {
-    expect_is(give_class(fname, tbl_fname, tbl_fmt), "seimitsu")
+    expect_is(give_class(fn_kumamoto, tbl_fname), "kumamoto")
+    expect_is(give_class(fn_kagoshima, tbl_fname), "kagoshima")
   })
 #+END_SRC
 ** 関数
@@ -227,11 +244,10 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 :END:
 *** ファイル名操作
 #+BEGIN_SRC R :tangle gyokaikyor/R/handle_fname.R
-  give_class   <- function(fname, tbl.fname, tbl.fmt) {
+  give_class   <- function(fname, tbl.fname) {
     out        <- fname
     prefec     <- tbl.fname[[fname]]
-    format     <- tbl.fmt[[prefec]]
-    class(out) <- format
+    class(out) <- prefec
     out
   }
 #+END_SRC
@@ -241,6 +257,6 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     UseMethod(fmtbl)
   }
 
-  fmtbl.taichou  <- function(fname)
-  fmtbl.seimitsu <- function(fname)
+  fmtbl.nagasaki  <- function(fname) {}
+  fmtbl.kagoshima <- function(fname) {}
 #+END_SRC
