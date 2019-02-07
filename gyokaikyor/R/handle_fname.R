@@ -1,7 +1,6 @@
-give_class   <- function(fname, tbl.fname, tbl.fmt) {
+give_class   <- function(fname, tbl.fname) {
   out        <- fname
   prefec     <- tbl.fname[[fname]]
-  format     <- tbl.fmt[[prefec]]
-  class(out) <- format
+  class(out) <- prefec
   out
 }
