@@ -31,8 +31,10 @@
   - [[#リロード--自動テスト][リロード & 自動テスト]]
   - [[#テストコード][テストコード]]
     - [[#テスト-ファイル名操作][テスト/ ファイル名操作]]
+    - [[#テスト-セル位置取得][テスト/ セル位置取得]]
   - [[#関数][関数]]
     - [[#ファイル名操作][ファイル名操作]]
+    - [[#セル位置取得][セル位置取得]]
     - [[#整形][整形]]
 
 * これは何か？
@@ -194,11 +196,7 @@ fresco
 - fresco タイプ: 山口，佐賀
 **** 必要な部品
 - get_cols2load(regex = )
-- get_top(regex = )
-- get_left(regex = )
 - get_topleft(regex = )
-- get_bottom(regex = )
-- get_right(regex = )
 - get_bottomright(regex = )
 - parse_jpdate(format = )
 - 
