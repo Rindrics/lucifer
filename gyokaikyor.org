@@ -238,6 +238,19 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     expect_is(give_class(fn_kagoshima, tbl_fname), "kagoshima")
   })
 #+END_SRC
+*** テスト/ セル位置取得
+#+BEGIN_SRC R :tangle gyokaikyor/tests/testthat/test_locate_cellpos.R
+  context("Locate cell position")
+  library(tibble)
+  df <- tribble(~A, ~B, ~C, ~D,
+                NA, NA, NA, 1,
+                NA, "name", "value", 2,
+                "", "foo", 12, 3,
+                "", "bar", 123, 4,
+                "", "baz", 1234, 5,
+                "", "bum", 12345, 6,
+                "", "foo", 12, 7)
+
   test_that("quot_ring() throws value on given quotient ring", {
     expect_equal(quot_ring(0, 3), 3)
     expect_equal(quot_ring(1, 3), 1)
@@ -274,6 +287,7 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     expect_equal(get_bottomright(df, "12345"), "$C$6")
     expect_equal(get_bottomright(df, "foo"), "$B$7")
   })
+#+END_SRC
 ** 関数
 :PROPERTIES:
 :header-args: :results silent :exports code
@@ -287,6 +301,8 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     out
   }
 #+END_SRC
+*** セル位置取得
+#+BEGIN_SRC R :tangle gyokaikyor/R/locate_cellpos.R
   quot_ring <- function(mod, ideal) {
     if (mod == 0) {
       a <- ideal
@@ -334,6 +350,7 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     pos <- locate_patterns(df, regex)
     rev(pos)[1]
   }
+#+END_SRC
 *** 整形
 #+BEGIN_SRC R
   fmtbl <- function(fname) {
