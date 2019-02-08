@@ -238,6 +238,32 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     expect_is(give_class(fn_kagoshima, tbl_fname), "kagoshima")
   })
 #+END_SRC
+  test_that("quot_ring() throws value on given quotient ring", {
+    expect_equal(quot_ring(0, 3), 3)
+    expect_equal(quot_ring(1, 3), 1)
+    expect_equal(quot_ring(2, 3), 2)
+    expect_equal(quot_ring(0, 5), 5)
+    expect_equal(quot_ring(1, 5), 1)
+    expect_equal(quot_ring(2, 5), 2)
+    expect_equal(quot_ring(3, 5), 3)
+    expect_equal(quot_ring(4, 5), 4)
+  })
+
+  test_that("quot2col() throws col position from
+   quotient of given match position in matrix", {
+    expect_equal(quot2col(3, 0), 3)
+    expect_equal(quot2col(3, 1), 4)
+    expect_equal(quot2col(4, 1), 5)
+    expect_equal(quot2col(5, 1), 6)
+    expect_equal(quot2col(5, 2), 6)
+  })
+
+  test_that("get_locate_patterns() locates cell position that has given regex", {
+    expect_equal(locate_patterns(df, "name"), "$B$2")
+    expect_equal(locate_patterns(df, "nam."), "$B$2")
+    expect_equal(locate_patterns(df, "foo"), c("$B$3", "$B$7"))
+  })
+
 ** 関数
 :PROPERTIES:
 :header-args: :results silent :exports code
@@ -251,6 +277,44 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     out
   }
 #+END_SRC
+  quot_ring <- function(mod, ideal) {
+    if (mod == 0) {
+      a <- ideal
+    } else {
+      a <- mod
+    }
+    a
+  }
+
+  quot2col <- function(quotient, mod) {
+    if (mod == 0) {
+      col <- quotient
+    } else {
+      col <- quotient + 1
+    }
+    col
+  }
+
+  make_RC <- function(row, col) {
+    rc <- paste0("R", row, "C", col)
+    rc
+  }
+
+  locate_patterns <- function(df, regex) {
+    nrows <- dim(df)[1]
+    ncols <- dim(df)[2]
+    match <- apply(df, 2, gregexpr, pattern = regex) %>%
+      unlist()
+    pos <- which(match == TRUE)
+    quo <- purrr::map(pos, `%/%`, nrows)
+    mod <- purrr::map(pos, `%%`, nrows)
+    col <- purrr::map2(quo, mod, quot2col)
+    row <- purrr::map2(mod, nrows, quot_ring)
+    rc  <- purrr::map2(row, col, make_RC)
+    pos <- cellranger::R1C1_to_A1(paste0("R", row, "C", col))
+    pos
+  }
+
 *** 整形
 #+BEGIN_SRC R
   fmtbl <- function(fname) {
