@@ -264,6 +264,16 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     expect_equal(locate_patterns(df, "foo"), c("$B$3", "$B$7"))
   })
 
+  test_that("get_topleft() locates cell position that has given regex", {
+    expect_equal(get_topleft(df, "name"), "$B$2")
+    expect_equal(get_topleft(df, "nam."), "$B$2")
+    expect_equal(get_topleft(df, "foo"), "$B$3")
+  })
+
+  test_that("get_bottomright() locates cell position that has given regex", {
+    expect_equal(get_bottomright(df, "12345"), "$C$6")
+    expect_equal(get_bottomright(df, "foo"), "$B$7")
+  })
 ** 関数
 :PROPERTIES:
 :header-args: :results silent :exports code
@@ -315,6 +325,15 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     pos
   }
 
+  get_topleft <- function(df, regex) {
+    pos <- locate_patterns(df, regex)
+    pos[1]
+  }
+
+  get_bottomright <- function(df, regex) {
+    pos <- locate_patterns(df, regex)
+    rev(pos)[1]
+  }
 *** 整形
 #+BEGIN_SRC R
   fmtbl <- function(fname) {
