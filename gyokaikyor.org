@@ -280,5 +280,28 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
   }
 
   fmtbl.nagasaki  <- function(fname) {}
-  fmtbl.kagoshima <- function(fname) {}
+
+  unlist(date)
+  str <- date
+  str <- "42845"
+
+  char2date <- function(str) {
+    if(any(stringr::str_detect(str, "\\."))) {
+      print("yes")
+    } else {
+      date <- str %>% as.numeric() %>%
+        as.Date(origin = "")
+      date
+    }
+  }
+  char2date(str)
+
+  fname <- "../data.git/漁海況/2018年3月/各県資料/熊本県/04 【熊本県】H29まき網＆棒受網 体長組成.xlsx"
+  fmtbl.kagoshima <- function(fname) {
+    alldata   <- readxl::read_excel(fname, sheet = "カタクチ", col_names = FALSE)
+    cpos_date <- get_col2load(alldata[1,], regex = "[0-9]+", offset = 0)
+    date      <- alldata[1, cpos_date] %>%
+      char2date()
+    method    <- alldata[1, cpos_date + 4]
+  }
 #+END_SRC
