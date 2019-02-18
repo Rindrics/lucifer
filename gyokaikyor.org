@@ -89,7 +89,12 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 * デモ
 ** ファイル情報を整備する
 #+BEGIN_SRC R
-  fname <- tribble()
+  fname <- c("体長組成(H29年度).xlsx")
+  prefec <- c("kumamoto")
+  tbl_fname <- hash(fname, prefec)
+
+  test <- give_class(fname, tbl_fname)
+  test
 #+END_SRC
 * 開発環境の整備
 ** ディレクトリ作成
