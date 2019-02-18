@@ -31,8 +31,10 @@
   - [[#リロード--自動テスト][リロード & 自動テスト]]
   - [[#テストコード][テストコード]]
     - [[#テスト-ファイル名操作][テスト/ ファイル名操作]]
+    - [[#テスト-文字列操作][テスト/ 文字列操作]]
   - [[#関数][関数]]
     - [[#ファイル名操作][ファイル名操作]]
+    - [[#文字列操作][文字列操作]]
     - [[#整形][整形]]
 
 * これは何か？
@@ -187,14 +189,14 @@ fresco
 - 体長タイプ: 長崎，鹿児島
 - fresco タイプ: 山口，佐賀
 **** 必要な部品
-- get_cols2load(regex = )
-- get_top(regex = )
-- get_left(regex = )
-- get_topleft(regex = )
-- get_bottom(regex = )
-- get_right(regex = )
-- get_bottomright(regex = )
-- parse_jpdate(format = )
+***** DONE get_cols2load(regex = , offset = )
+***** get_top(regex = )
+***** get_left(regex = )
+***** get_topleft(regex = )
+***** get_bottom(regex = )
+***** get_right(regex = )
+***** get_bottomright(regex = )
+***** parse_jpdate(format = )
 - 
 *** 漁獲量
 ** どう問題を解くか
