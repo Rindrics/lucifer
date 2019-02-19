@@ -1,0 +1,67 @@
+#+TITLE: tinyplyr プロジェクトノート
+#+PROPERTY: header-args :exports code :results scalar :session *R:tidyNAS*
+#+STARTUP: contents
+
+* 目次                                                                :TOC_3:
+- [[#開発セットアップ][開発セットアップ]]
+  - [[#使用したパッケージ][使用したパッケージ]]
+- [[#再ロードしてテストを実行][再ロードしてテストを実行]]
+- [[#テスト][テスト]]
+- [[#関数][関数]]
+
+* 開発セットアップ
+#+BEGIN_SRC R
+  usethis::create_package("tinyplyr")
+#+END_SRC
+** 使用したパッケージ
+#+BEGIN_SRC R :results silent
+  devtools::use_testthat("tinyplyr")
+#+END_SRC
+* 再ロードしてテストを実行
+#+BEGIN_SRC R :results output
+  setwd("tinyplyr")
+  devtools::load_all()
+  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
+  devtools::test()
+  devtools::document(roclets=c('rd', 'collate', 'namespace'))
+#+END_SRC
+* テスト
+#+BEGIN_SRC R :exports none :tangle tinyplyr/tests/testthat/test_util.R
+  # -------------------------------------------------------------------.
+  # This file is tangled from tinyplyr.org.                            |
+  # (https://github.com/smxshxishxad/tidyNAS/blob/master/tinyplyr.org) |
+  # Do not edit by hand.                                               |
+  # ------------------------------------------------------------------'
+  context("Util functions work correctly")
+
+  test_that("num2date () convert numdate from Excel correctly", {
+    expect_equal(num2date(58), "1900-02-27")
+    expect_equal(num2date(59), "1900-02-28")
+    expect_error(num2date(60), "This date is not correct in Excel.")
+    expect_equal(num2date(61), "1900-03-01")
+    expect_equal(num2date(62), "1900-03-02")
+  })
+
+  #+END_SRC
+
+* 関数
+#+BEGIN_SRC R :tangle tinyplyr/R/util.R :exports code
+  # ----------------------------------------------------------------------------.
+  # This file is tangled from tinyplyr.org.                                     |
+  # (https://github.com/smxshxishxad/tinyplyr/blob/master/tinyplyrjmdatar.org)  |
+  # Do not edit by hand.                                                        |
+  # ---------------------------------------------------------------------------'
+
+  num2date <- function(x) {
+    jday_march01 <- 60
+    x            <- as.numeric(x)
+    if (x == jday_march01) {
+      stop("This date is not correct in Excel.")
+    }
+    if (x > jday_march01) {
+      x <- x - 1 # because of leap year
+    }
+    x <- x - 1 # because of origin
+    date <- as.character(as.Date(x, origin = "1900-01-01"))
+  }
+#+END_SRC
