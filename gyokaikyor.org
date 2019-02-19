@@ -32,9 +32,11 @@
   - [[#テストコード][テストコード]]
     - [[#テスト-ファイル名操作][テスト/ ファイル名操作]]
     - [[#テスト-セル位置取得][テスト/ セル位置取得]]
+    - [[#テスト-文字列操作][テスト/ 文字列操作]]
   - [[#関数][関数]]
     - [[#ファイル名操作][ファイル名操作]]
     - [[#セル位置取得][セル位置取得]]
+    - [[#文字列操作][文字列操作]]
     - [[#整形][整形]]
 
 * これは何か？
@@ -91,7 +93,12 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 * デモ
 ** ファイル情報を整備する
 #+BEGIN_SRC R
-  fname <- tribble()
+  fname <- c("体長組成(H29年度).xlsx")
+  prefec <- c("kumamoto")
+  tbl_fname <- hash(fname, prefec)
+
+  test <- give_class(fname, tbl_fname)
+  test
 #+END_SRC
 * 開発環境の整備
 ** ディレクトリ作成
@@ -195,10 +202,14 @@ fresco
 - 体長タイプ: 長崎，鹿児島
 - fresco タイプ: 山口，佐賀
 **** 必要な部品
-- get_cols2load(regex = )
-- get_topleft(regex = )
-- get_bottomright(regex = )
-- parse_jpdate(format = )
+***** DONE get_cols2load(regex = , offset = )
+***** get_top(regex = )
+***** get_left(regex = )
+***** get_topleft(regex = )
+***** get_bottom(regex = )
+***** get_right(regex = )
+***** get_bottomright(regex = )
+***** parse_jpdate(format = )
 - 
 *** 漁獲量
 ** どう問題を解くか
@@ -296,6 +307,19 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     expect_equal(get_bottomright(df, "12345"), "$C$6")
     expect_equal(get_bottomright(df, "foo"), "$B$7")
   })
+*** テスト/ 文字列操作
+#+BEGIN_SRC R :tangle gyokaikyor/tests/testthat/test_handle_str.R
+  context("Handle string")
+
+  target <-
+    c("漁獲年月日", "", "2017.4.20", "操業海域", "八代海", "漁法", "まき網",
+    "漁獲年月日", "", "2017.5.19", "操業海域", "八代海", "漁法", "まき網",
+    "漁獲年月日", "", "2017.6.23", "操業海域", "八代海", "漁法", "まき網")
+
+  expect_equal(get_col2load(target,
+                            regex = "20[0-9]{2}\\.[0-9][0-9]?\\.[0-9][0-9]?",
+                            offset = -2),
+               c(1, 8, 15))
 #+END_SRC
 ** 関数
 :PROPERTIES:
@@ -358,6 +382,12 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
   get_bottomright <- function(df, regex) {
     pos <- locate_patterns(df, regex)
     rev(pos)[1]
+*** 文字列操作
+#+BEGIN_SRC R :tangle gyokaikyor/R/handle_str.R
+  get_col2load   <- function(target, regex, offset) {
+    match <- stringr::str_detect(target, regex)
+    out <- which(match == TRUE) + offset
+    out
   }
 #+END_SRC
 *** 整形
@@ -367,5 +397,28 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
   }
 
   fmtbl.nagasaki  <- function(fname) {}
-  fmtbl.kagoshima <- function(fname) {}
+
+  unlist(date)
+  str <- date
+  str <- "42845"
+
+  char2date <- function(str) {
+    if(any(stringr::str_detect(str, "\\."))) {
+      print("yes")
+    } else {
+      date <- str %>% as.numeric() %>%
+        as.Date(origin = "")
+      date
+    }
+  }
+  char2date(str)
+
+  fname <- "../data.git/漁海況/2018年3月/各県資料/熊本県/04 【熊本県】H29まき網＆棒受網 体長組成.xlsx"
+  fmtbl.kagoshima <- function(fname) {
+    alldata   <- readxl::read_excel(fname, sheet = "カタクチ", col_names = FALSE)
+    cpos_date <- get_col2load(alldata[1,], regex = "[0-9]+", offset = 0)
+    date      <- alldata[1, cpos_date] %>%
+      char2date()
+    method    <- alldata[1, cpos_date + 4]
+  }
 #+END_SRC
