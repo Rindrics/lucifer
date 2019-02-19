@@ -13,7 +13,9 @@ LazyData: true
 Imports: 
     magrittr,
     hash,
-    tibble
+    tibble,
+    cellranger,
+    tinyplyr
 Suggests: 
     testthat
 RoxygenNote: 6.1.1
