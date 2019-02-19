@@ -117,6 +117,7 @@ setwd("gyokaikyor")
   usethis::use_package("hash")
   usethis::use_package("tibble")
   usethis::use_package("cellranger")
+  usethis::use_package("tinyplyr")
   # usethis::use_package("ggplot2", "Imports")
   # usethis::use_package("tibble", "Imports")
   usethis::use_testthat()
@@ -128,6 +129,7 @@ cat gyokaikyor/DESCRIPTION
 
 #+RESULTS[26e6d91ffe9c3ff5d95f888fb0006e9154a02abb]:
 #+begin_example
+
 Package: gyokaikyor
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
@@ -143,8 +145,7 @@ LazyData: true
 Imports: 
     magrittr,
     hash,
-    tibble,
-    cellranger
+    tibble
 Suggests: 
     testthat
 RoxygenNote: 6.1.1
@@ -382,6 +383,8 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
   get_bottomright <- function(df, regex) {
     pos <- locate_patterns(df, regex)
     rev(pos)[1]
+  }
+  #+END_SRC
 *** 文字列操作
 #+BEGIN_SRC R :tangle gyokaikyor/R/handle_str.R
   get_col2load   <- function(target, regex, offset) {
@@ -415,10 +418,11 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 
   fname <- "../data.git/漁海況/2018年3月/各県資料/熊本県/04 【熊本県】H29まき網＆棒受網 体長組成.xlsx"
   fmtbl.kagoshima <- function(fname) {
+    out       <- list()
     alldata   <- readxl::read_excel(fname, sheet = "カタクチ", col_names = FALSE)
     cpos_date <- get_col2load(alldata[1,], regex = "[0-9]+", offset = 0)
     date      <- alldata[1, cpos_date] %>%
-      char2date()
+      purrr::map(num2date)
     method    <- alldata[1, cpos_date + 4]
   }
 #+END_SRC
