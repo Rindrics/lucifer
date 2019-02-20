@@ -44,6 +44,12 @@
 
   test_that("jpdate2julian() convert Japanese date to Julian day", {
     expect_equal(jpdate2julian(58), "H.29.8.22")
+  test_that("is.jpdate() judge if given str is a jpdate", {
+    expect_true(is.jpdate("H.29.8.22"))
+    expect_true(is.jpdate("H29.8.22"))
+    expect_false(is.jpdate("2000.8.22"))
+  })
+
   })
 
   #+END_SRC
@@ -68,4 +74,8 @@
     x <- x - 1 # because of origin
     date <- as.character(as.Date(x, origin = "1900-01-01"))
   }
+  is.jpdate <- function(x) {
+    stringr::str_detect(x, "[A-Z]\\.?[0-9]+\\..")
+  }
+
 #+END_SRC
