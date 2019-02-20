@@ -4,7 +4,7 @@
 # Do not edit by hand.                                                        |
 # ---------------------------------------------------------------------------'
 
-num2date <- function(x) {
+num2datei <- function(x) {
   jday_march01 <- 60
   x            <- as.numeric(x)
   if (x == jday_march01) {
@@ -15,4 +15,56 @@ num2date <- function(x) {
   }
   x <- x - 1 # because of origin
   date <- as.character(as.Date(x, origin = "1900-01-01"))
+}
+
+num2date <- function(x) {
+  out <- purrr::map(x, num2datei)
+  unlist(out)
+}
+
+is.jpdate <- function(x) {
+  stringr::str_detect(x, "[A-Z]\\.?[0-9]+\\..")
+}
+
+split_jpdate <- function(x) {
+  initial <- substr(x, 1, 1)
+  switch(initial,
+       "H" = era <- "heisei")
+
+  year  <- stringr::str_match(x, "^[A-Za-z]\\.?([0-9]+)\\.")[2]
+  month <- stringr::str_match(x, "^[A-Za-z]\\.?[0-9]+\\.([0-9]+)")[2]
+  day   <- stringr::str_match(x, "^[A-Za-z]\\.?[0-9]+\\.[0-9]+\\.([0-9]+)")[2]
+  out   <- list("era"   = era,
+                "year"  = as.numeric(year),
+                "month" = as.numeric(month),
+                "day"   = as.numeric(day)
+                )
+  out
+}
+split_jpdate("H20.4.30")
+
+jpdate2juliani <- function(x) {
+  if (is.jpdate(x) == TRUE) {
+    split  <- split_jpdate(x)
+    era    <- split$era
+    jpyear <- stringr::str_match(x, "[A-Z]")
+    switch(era,
+           "heisei" = {
+             year  <- split$year + 1988
+             month <- split$month
+             day   <- split$day
+             date  <- as.Date(paste(year, month, day, sep = "-"))
+           })
+    jday <- julian.Date(date, origin = as.Date("1900-01-01"))
+    jday <- jday + 1 # Correct origin difference
+    jday <- jday + 1 # Correct leap year bug
+  } else {
+    jday <- x
+  }
+  jday[1]
+}
+
+jpdate2julian <- function(x) {
+  out <- purrr::map(x, jpdate2juliani)
+  unlist(out)
 }
