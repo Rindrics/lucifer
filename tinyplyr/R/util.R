@@ -17,15 +17,18 @@ num2datei <- function(x) {
   date <- as.character(as.Date(x, origin = "1900-01-01"))
 }
 
+#' @export
 num2date <- function(x) {
   out <- purrr::map(x, num2datei)
   unlist(out)
 }
 
+#' @export
 is.jpdate <- function(x) {
   stringr::str_detect(x, "[A-Z]\\.?[0-9]+\\..")
 }
 
+#' @export
 split_jpdate <- function(x) {
   initial <- substr(x, 1, 1)
   switch(initial,
@@ -41,7 +44,6 @@ split_jpdate <- function(x) {
                 )
   out
 }
-split_jpdate("H20.4.30")
 
 jpdate2juliani <- function(x) {
   if (is.jpdate(x) == TRUE) {
@@ -64,6 +66,7 @@ jpdate2juliani <- function(x) {
   jday[1]
 }
 
+#' @export
 jpdate2julian <- function(x) {
   out <- purrr::map(x, jpdate2juliani)
   unlist(out)
