@@ -34,12 +34,12 @@
   # ------------------------------------------------------------------'
   context("Parse strings correctly")
 
-  test_that("num2date () convert numdate from Excel correctly", {
-    expect_equal(num2date(58), "1900-02-27")
-    expect_equal(num2date(59), "1900-02-28")
-    expect_error(num2date(60), "This date is not correct in Excel.")
-    expect_equal(num2date(61), "1900-03-01")
-    expect_equal(num2date(62), "1900-03-02")
+  test_that("num2datei () convert numdate from Excel correctly", {
+    expect_equal(num2datei(58), "1900-02-27")
+    expect_equal(num2datei(59), "1900-02-28")
+    expect_error(num2datei(60), "This date is not correct in Excel.")
+    expect_equal(num2datei(61), "1900-03-01")
+    expect_equal(num2datei(62), "1900-03-02")
   })
 
   test_that("jpdate2julian() convert Japanese date to Julian day", {
@@ -62,7 +62,7 @@
   # Do not edit by hand.                                                        |
   # ---------------------------------------------------------------------------'
 
-  num2date <- function(x) {
+  num2datei <- function(x) {
     jday_march01 <- 60
     x            <- as.numeric(x)
     if (x == jday_march01) {
