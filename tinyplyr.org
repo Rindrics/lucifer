@@ -74,6 +74,12 @@
     x <- x - 1 # because of origin
     date <- as.character(as.Date(x, origin = "1900-01-01"))
   }
+
+  num2date <- function(x) {
+    out <- purrr::map(x, num2datei)
+    unlist(out)
+  }
+
   is.jpdate <- function(x) {
     stringr::str_detect(x, "[A-Z]\\.?[0-9]+\\..")
   }
