@@ -422,7 +422,7 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     alldata   <- readxl::read_excel(fname, sheet = "カタクチ", col_names = FALSE)
     cpos_date <- get_col2load(alldata[1,], regex = "[0-9]+", offset = 0)
     date      <- alldata[1, cpos_date] %>%
-      purrr::map(num2date)
+      purrr::map(tinyplyr::num2date)
     method    <- alldata[1, cpos_date + 4]
   }
 #+END_SRC
