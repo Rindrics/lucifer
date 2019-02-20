@@ -42,8 +42,6 @@
     expect_equal(num2datei(62), "1900-03-02")
   })
 
-  test_that("jpdate2julian() convert Japanese date to Julian day", {
-    expect_equal(jpdate2julian(58), "H.29.8.22")
   test_that("is.jpdate() judge if given str is a jpdate", {
     expect_true(is.jpdate("H.29.8.22"))
     expect_true(is.jpdate("H29.8.22"))
@@ -58,6 +56,9 @@
     expect_equal(split$day, 22)
   })
 
+  test_that("jpdate2juliani() convert Japanese date to Julian day", {
+    expect_equal(jpdate2juliani("H.29.8.22"), 42969)
+    expect_equal(jpdate2juliani("H29.8.22"), 42969)
   })
 
   #+END_SRC
@@ -106,5 +107,31 @@
                   "day"   = as.numeric(day)
                   )
     out
+  }
+
+  jpdate2juliani <- function(x) {
+    if (is.jpdate(x) == TRUE) {
+      split  <- split_jpdate(x)
+      era    <- split$era
+      jpyear <- stringr::str_match(x, "[A-Z]")
+      switch(era,
+             "heisei" = {
+               year  <- split$year + 1988
+               month <- split$month
+               day   <- split$day
+               date  <- as.Date(paste(year, month, day, sep = "-"))
+             })
+      jday <- julian.Date(date, origin = as.Date("1900-01-01"))
+      jday <- jday + 1 # Correct origin difference
+      jday <- jday + 1 # Correct leap year bug
+    } else {
+      jday <- x
+    }
+    jday[1]
+  }
+
+  jpdate2julian <- function(x) {
+    out <- purrr::map(x, jpdate2juliani)
+    unlist(out)
   }
 #+END_SRC
