@@ -37,6 +37,7 @@
     - [[#ファイル名操作][ファイル名操作]]
     - [[#セル位置取得][セル位置取得]]
     - [[#文字列操作][文字列操作]]
+    - [[#計測データ取得][計測データ取得]]
     - [[#整形][整形]]
 
 * これは何か？
@@ -93,12 +94,27 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 * デモ
 ** ファイル情報を整備する
 #+BEGIN_SRC R
-  fname <- c("体長組成(H29年度).xlsx")
-  prefec <- c("kumamoto")
+  library(gyokaikyor)
+  library(hash)
+  fname  <- c("../data.git/漁海況/2018年3月/各県資料/熊本県/04 【熊本県】H29まき網＆棒受網 体長組成.xlsx",
+              "foo")
+  prefec <- c("kumamoto",
+              "nagasaki")
   tbl_fname <- hash(fname, prefec)
 
-  test <- give_class(fname, tbl_fname)
-  test
+  fname2 <- give_class(fname, tbl_fname)
+  fname2[[1]]
+  fname2[[2]]
+
+  kumamoto_nested <- fmtbl(fname2[[1]])
+  kumamoto        <- fmtbl(fname2[[1]], nest = FALSE)
+  nagasaki        <- fmtbl(fname2[[2]])
+
+  kumamoto %>%
+    ggplot(aes(bl, fill = as.factor(month))) +
+    geom_histogram() +
+    facet_grid(month ~ year, scale = "free_y")
+
 #+END_SRC
 * 開発環境の整備
 ** ディレクトリ作成
@@ -117,6 +133,10 @@ setwd("gyokaikyor")
   usethis::use_package("hash")
   usethis::use_package("tibble")
   usethis::use_package("cellranger")
+  usethis::use_package("tibble")
+  usethis::use_package("tidyr")
+  usethis::use_package("lubridate")
+  usethis::use_package("purrr")
   usethis::use_package("tinyplyr")
   # usethis::use_package("ggplot2", "Imports")
   # usethis::use_package("tibble", "Imports")
@@ -145,7 +165,12 @@ LazyData: true
 Imports: 
     magrittr,
     hash,
-    tibble
+    tibble,
+    cellranger,
+    tinyplyr,
+    tidyr,
+    lubridate,
+    purrr
 Suggests: 
     testthat
 RoxygenNote: 6.1.1
@@ -253,10 +278,12 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
   context("Handle file name")
   fn_kumamoto  <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
   fn_kagoshima <- "体長組成(H29年度).xlsx"
-  tbl_fname <- hash::hash(c(fn_kumamoto, fn_kagoshima), c("kumamoto", "kagoshima"))
+  tbl_fname    <- hash::hash(c(fn_kumamoto, fn_kagoshima),
+                             c("kumamoto", "kagoshima"))
   test_that("give_class() gives fname its file format as class", {
-    expect_is(give_class(fn_kumamoto, tbl_fname), "kumamoto")
-    expect_is(give_class(fn_kagoshima, tbl_fname), "kagoshima")
+    expect_is(give_class(fn_kumamoto, tbl_fname), "list")
+    expect_is(give_class(fn_kumamoto, tbl_fname)[[1]], "kumamoto")
+    expect_is(give_class(fn_kagoshima, tbl_fname)[[1]], "kagoshima")
   })
 #+END_SRC
 *** テスト/ セル位置取得
@@ -308,6 +335,7 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     expect_equal(get_bottomright(df, "12345"), "$C$6")
     expect_equal(get_bottomright(df, "foo"), "$B$7")
   })
+  #+END_SRC
 *** テスト/ 文字列操作
 #+BEGIN_SRC R :tangle gyokaikyor/tests/testthat/test_handle_str.R
   context("Handle string")
@@ -328,10 +356,16 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 :END:
 *** ファイル名操作
 #+BEGIN_SRC R :tangle gyokaikyor/R/handle_fname.R
-  give_class   <- function(fname, tbl.fname) {
+  give_classi   <- function(fname, prefec) {
     out        <- fname
-    prefec     <- tbl.fname[[fname]]
     class(out) <- prefec
+    out
+  }
+
+  #' @export
+  give_class <- function(fname, tbl.fname) {
+    prefec     <- hash::values(tbl.fname, keys = fname)
+    out <- purrr::map2(fname, prefec, give_classi)
     out
   }
 #+END_SRC
@@ -393,36 +427,54 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     out
   }
 #+END_SRC
+*** 計測データ取得
+#+BEGIN_SRC R :tangle gyokaikyor/R/get_measdata.R
+  get_measdata <- function(df, col) {
+    rows <- 8:107
+    out  <- df[rows, col] %>%
+      unlist() %>%
+      as.numeric() %>%
+      na.omit() %>%
+      as.vector()
+    out
+  }
+#+END_SRC
 *** 整形
 #+BEGIN_SRC R
-  fmtbl <- function(fname) {
-    UseMethod(fmtbl)
+  fmtbl <- function(fname, nest = FALSE) {
+    UseMethod("fmtbl")
   }
 
   fmtbl.nagasaki  <- function(fname) {}
-
-  unlist(date)
-  str <- date
-  str <- "42845"
-
-  char2date <- function(str) {
-    if(any(stringr::str_detect(str, "\\."))) {
-      print("yes")
-    } else {
-      date <- str %>% as.numeric() %>%
-        as.Date(origin = "")
-      date
-    }
-  }
-  char2date(str)
-
-  fname <- "../data.git/漁海況/2018年3月/各県資料/熊本県/04 【熊本県】H29まき網＆棒受網 体長組成.xlsx"
-  fmtbl.kagoshima <- function(fname) {
+  fmtbl.kumamoto  <- function(fname, nest = TRUE) {
     out       <- list()
-    alldata   <- readxl::read_excel(fname, sheet = "カタクチ", col_names = FALSE)
+    suppressMessages(
+      alldata   <- readxl::read_excel(fname,
+                                      sheet = "カタクチ", col_names = FALSE)
+    )
     cpos_date <- get_col2load(alldata[1,], regex = "[0-9]+", offset = 0)
+    cpos_bl   <- cpos_date # Column position of "被鱗体長" is
+                           #   same as that of "%Y.%m.%d" column
     date      <- alldata[1, cpos_date] %>%
-      purrr::map(tinyplyr::num2date)
-    method    <- alldata[1, cpos_date + 4]
+      tinyplyr::jpdate2julian() %>%
+      tinyplyr::num2date()
+    method    <- alldata[1, cpos_date + 4] %>%
+      unlist() %>%
+      as.vector()
+    bl        <- purrr::map(cpos_date, get_measdata, df = alldata)
+    unlist(bl)
+
+    out$date   <- date
+    out$method <- method
+    out$year   <- lubridate::year(out$date)
+    out$month  <- lubridate::month(out$date)
+    out$bl     <- bl
+
+    out <- tibble::as_tibble(out)
+    if (nest == FALSE) {
+      out <- tidyr::unnest(out)
+    }
+    out
   }
+
 #+END_SRC
