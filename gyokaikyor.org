@@ -93,12 +93,27 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 * デモ
 ** ファイル情報を整備する
 #+BEGIN_SRC R
-  fname <- c("体長組成(H29年度).xlsx")
-  prefec <- c("kumamoto")
+  library(gyokaikyor)
+  library(hash)
+  fname  <- c("../data.git/漁海況/2018年3月/各県資料/熊本県/04 【熊本県】H29まき網＆棒受網 体長組成.xlsx",
+              "foo")
+  prefec <- c("kumamoto",
+              "nagasaki")
   tbl_fname <- hash(fname, prefec)
 
-  test <- give_class(fname, tbl_fname)
-  test
+  fname2 <- give_class(fname, tbl_fname)
+  fname2[[1]]
+  fname2[[2]]
+
+  kumamoto_nested <- fmtbl(fname2[[1]])
+  kumamoto        <- fmtbl(fname2[[1]], nest = FALSE)
+  nagasaki        <- fmtbl(fname2[[2]])
+
+  kumamoto %>%
+    ggplot(aes(bl, fill = as.factor(month))) +
+    geom_histogram() +
+    facet_grid(month ~ year, scale = "free_y")
+
 #+END_SRC
 * 開発環境の整備
 ** ディレクトリ作成
