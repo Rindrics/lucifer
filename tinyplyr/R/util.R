@@ -13,14 +13,14 @@ num2datei <- function(x) {
   if (x > jday_march01) {
     x <- x - 1 # because of leap year
   }
-  x <- x - 1 # because of origin
+  x    <- x - 1 # because of origin
   date <- as.character(as.Date(x, origin = "1900-01-01"))
 }
 
 #' @export
 num2date <- function(x) {
   out <- purrr::map(x, num2datei)
-  unlist(out)
+  out <- as.vector(unlist(out))
 }
 
 #' @export
@@ -63,11 +63,12 @@ jpdate2juliani <- function(x) {
   } else {
     jday <- x
   }
-  jday[1]
+  as.numeric(jday[1])
 }
 
 #' @export
 jpdate2julian <- function(x) {
   out <- purrr::map(x, jpdate2juliani)
-  unlist(out)
+  out <- as.vector(unlist(out))
+  out
 }
