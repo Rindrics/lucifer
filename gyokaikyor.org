@@ -413,8 +413,8 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 #+END_SRC
 *** 整形
 #+BEGIN_SRC R
-  fmtbl <- function(fname) {
-    UseMethod(fmtbl)
+  fmtbl <- function(fname, nest = FALSE) {
+    UseMethod("fmtbl")
   }
 
   fmtbl.nagasaki  <- function(fname) {}
