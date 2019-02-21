@@ -440,7 +440,8 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
   }
 #+END_SRC
 *** 整形
-#+BEGIN_SRC R
+#+BEGIN_SRC R :tangle gyokaikyor/R/fmtbl.R
+  #' @export
   fmtbl <- function(fname, nest = FALSE) {
     UseMethod("fmtbl")
   }
