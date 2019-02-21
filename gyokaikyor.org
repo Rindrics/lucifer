@@ -399,6 +399,18 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     out
   }
 #+END_SRC
+*** 計測データ取得
+#+BEGIN_SRC R :tangle gyokaikyor/R/get_measdata.R
+  get_measdata <- function(df, col) {
+    rows <- 8:107
+    out  <- df[rows, col] %>%
+      unlist() %>%
+      as.numeric() %>%
+      na.omit() %>%
+      as.vector()
+    out
+  }
+#+END_SRC
 *** 整形
 #+BEGIN_SRC R
   fmtbl <- function(fname) {
