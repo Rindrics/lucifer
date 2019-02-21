@@ -15,7 +15,10 @@ Imports:
     hash,
     tibble,
     cellranger,
-    tinyplyr
+    tinyplyr,
+    tidyr,
+    lubridate,
+    purrr
 Suggests: 
     testthat
 RoxygenNote: 6.1.1

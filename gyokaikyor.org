@@ -133,6 +133,10 @@ setwd("gyokaikyor")
   usethis::use_package("hash")
   usethis::use_package("tibble")
   usethis::use_package("cellranger")
+  usethis::use_package("tibble")
+  usethis::use_package("tidyr")
+  usethis::use_package("lubridate")
+  usethis::use_package("purrr")
   usethis::use_package("tinyplyr")
   # usethis::use_package("ggplot2", "Imports")
   # usethis::use_package("tibble", "Imports")
@@ -161,7 +165,12 @@ LazyData: true
 Imports: 
     magrittr,
     hash,
-    tibble
+    tibble,
+    cellranger,
+    tinyplyr,
+    tidyr,
+    lubridate,
+    purrr
 Suggests: 
     testthat
 RoxygenNote: 6.1.1
