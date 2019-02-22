@@ -33,10 +33,12 @@
     - [[#テスト-ファイル名操作][テスト/ ファイル名操作]]
     - [[#テスト-セル位置取得][テスト/ セル位置取得]]
     - [[#テスト-文字列操作][テスト/ 文字列操作]]
+    - [[#テスト-種名正規表現生成][テスト/ 種名正規表現生成]]
   - [[#関数][関数]]
     - [[#ファイル名操作][ファイル名操作]]
     - [[#セル位置取得][セル位置取得]]
     - [[#文字列操作][文字列操作]]
+    - [[#種名シート名生成][種名シート名生成]]
     - [[#計測データ取得][計測データ取得]]
     - [[#整形][整形]]
 
@@ -76,8 +78,8 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 差分管理を確実に実施するため
 ** 各県いわし
 * ディレクトリの構成
-通常の R パッケージのディレクトリは全て GitHub で公開する．
-ただし，以下のディレクトリは GitHub にはアップロードせず，ローカルで管理する（リモートリポジトリを GitHub ではなく，NAS にする）．
+R パッケージのディレクトリは全て GitHub で公開する．
+ただし，以下のディレクトリは GitHub にはアップロードせず，ローカルで管理する（リモートリポジトリを GitHub ではなく，NAS に設定する）．
 - data.git/: 各県から提供されたデータ．
 - docs.git/: 予報文案など．
   
@@ -96,8 +98,9 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
 #+BEGIN_SRC R
   library(gyokaikyor)
   library(hash)
+  library(ggplot2)
   fname  <- c("../data.git/漁海況/2018年3月/各県資料/熊本県/04 【熊本県】H29まき網＆棒受網 体長組成.xlsx",
-              "foo")
+              "../data.git/漁海況/2018年3月/各県資料/長崎県/2017.09-2018.01小型まき網体長組成.xls")
   prefec <- c("kumamoto",
               "nagasaki")
   tbl_fname <- hash(fname, prefec)
@@ -106,9 +109,11 @@ get_table("./output.git/nagasaki_2018oct.csv", gyokaikyo = TRUE, start = 2016, e
   fname2[[1]]
   fname2[[2]]
 
-  kumamoto_nested <- fmtbl(fname2[[1]])
-  kumamoto        <- fmtbl(fname2[[1]], nest = FALSE)
-  nagasaki        <- fmtbl(fname2[[2]])
+  kumamoto_nested <- fmtbl(fname2[[1]], spcs = "katakuchi")
+  kumamoto        <- fmtbl(fname2[[1]], spcs = "katakuchi", nest = FALSE)
+  kumamoto        <- fmtbl(fname2[[1]], spcs = "maiwashi", nest = FALSE)
+  nagasaki_nested <- fmtbl(fname2[[2]], spcs = "katakuchi")
+  nagasaki        <- fmtbl(fname2[[2]], spcs = "katakuchi", nest = FALSE)
 
   kumamoto %>%
     ggplot(aes(bl, fill = as.factor(month))) +
@@ -236,7 +241,7 @@ fresco
 ***** get_right(regex = )
 ***** get_bottomright(regex = )
 ***** parse_jpdate(format = )
-- 
+***** make_regex(spcs = katakuchi)
 *** 漁獲量
 ** どう問題を解くか
 県ごとに，どうしてもデータ処理の振る舞いを変える必要がある
@@ -350,6 +355,15 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
                             offset = -2),
                c(1, 8, 15))
 #+END_SRC
+*** テスト/ 種名正規表現生成
+#+BEGIN_SRC  R :tangle gyokaikyor/tests/testthat/test_make_shtname.R
+  context("Make shtname by prefecture")
+
+  expect_equal(make_shtname(prefec = "kumamoto", spcs = "katakuchi"), "カタクチ")
+  expect_equal(make_shtname(prefec = "kumamoto", spcs = "urume"), "ウルメ")
+  expect_equal(make_shtname(prefec = "kumamoto", spcs = "maiwashi"), "マイワシ")
+  expect_equal(make_shtname(prefec = "kumamoto", spcs = "sabarui"), "サバ類")
+#+END_SRC
 ** 関数
 :PROPERTIES:
 :header-args: :results silent :exports code
@@ -427,6 +441,34 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     out
   }
 #+END_SRC
+*** 種名シート名生成
+#+BEGIN_SRC  R :tangle gyokaikyor/R/make_shtname.R
+  make_shtname <- function(prefecture, spcs) {
+    switch(prefecture,
+           "kumamoto" = {
+             switch(spcs,
+                    "katakuchi" = shtname <- "カタクチ",
+                    "urume"     = shtname <- "ウルメ",
+                    "maiwashi"  = shtname <- "マイワシ",
+                    "sabarui"   = shtname <- "サバ類",
+                    stop("Unknown spcs name"))
+
+           },
+           "nagasaki" = {
+             switch(spcs,
+                    "katakuchi" = shtname <- "カタクチ",
+                    "urume"     = shtname <- "ウルメ",
+                    "maiwashi"  = shtname <- "マイワシ",
+                    "masaba"    = shtname <- "マサバ",
+                    "gomasaba"  = shtname <- "ゴマサバ",
+                    "maaji"     = shtname <- "マアジ",
+                    stop("Unknown spcs name"))
+           },
+           stop("Unknown prefecture")
+           )
+    shtname
+  }
+#+END_SRC
 *** 計測データ取得
 #+BEGIN_SRC R :tangle gyokaikyor/R/get_measdata.R
   get_measdata <- function(df, col) {
@@ -442,17 +484,118 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 *** 整形
 #+BEGIN_SRC R :tangle gyokaikyor/R/fmtbl.R
   #' @export
-  fmtbl <- function(fname, nest = FALSE) {
+  fmtbl <- function(fname, spcs, nest = FALSE) {
     UseMethod("fmtbl")
   }
 
-  fmtbl.nagasaki  <- function(fname) {}
-  fmtbl.kumamoto  <- function(fname, nest = TRUE) {
-    out       <- list()
+  load_alldata <- function(fname, shtname) {
     suppressMessages(
       alldata   <- readxl::read_excel(fname,
-                                      sheet = "カタクチ", col_names = FALSE)
+                                      sheet = shtname, col_names = FALSE)
     )
+  }
+
+  make_blclass <- function(left, right) {
+    left %<>% unlist() %>%
+      as.vector() %>%
+      as.numeric() %>%
+      formatC(width = 3, flag = 0)
+    right %<>% unlist() %>%
+      as.vector() %>%
+      as.numeric() %>%
+      formatC(width = 3, flag = 0)
+    out <- paste(left, right, sep = "-")
+    out
+  }
+
+  get_histdata <- function(df, col, rows, name) {
+    out <- df[rows, col] %>%
+      unlist() %>%
+      as.numeric() %>%
+      as.vector()
+    names(out) <- name
+    out
+  }
+
+  jpmonth2num <- function(x) {
+    out <- x %>%
+      as.vector() %>%
+      gsub("月", "", .) %>%
+      as.numeric()
+    out
+  }
+
+  fmtbl.nagasaki  <- function(fname, spcs, nest = TRUE) {
+    shtname   <- make_shtname(prefecture = "nagasaki", spcs = spcs)
+    alldata   <- load_alldata(fname, shtname)
+    colpos    <- get_col2load(target = alldata[4,], regex = ".月", offset = 0)
+    month     <- jpmonth2num(alldata[4, colpos])
+    classname <- make_blclass(alldata[5:86, 2], alldata[5:86, 3])
+    classname
+    histdata  <- purrr::map(colpos, get_histdata, df = alldata, rows = 5:86, name = classname)
+    histdata
+
+    out       <- list()
+
+    parse_ym <- function(fname, months) {
+      ym_start_match <- stringr::str_match(fname, "/([0-9]{4})\\.((?:0|1)[1-9])")
+      year_start     <- ym_start_match[2] %>% as.numeric()
+      month_start    <- ym_start_match[3] %>% as.numeric()
+      ym_end_match   <-
+        stringr::str_match(fname,
+                           "/[0-9]{4}\\.(?:0|1)[1-9]-([0-9]{4})\\.((?:0|1)[1-9])")
+      year_end       <- ym_end_match[2] %>% as.numeric()
+      month_end      <- ym_end_match[3] %>% as.numeric()
+      out <- list()
+      out$year_start  <- year_start
+      out$month_start <- month_start
+      out$year_end    <- year_end
+      out$month_end   <- month_end
+      out
+    }
+    parsedym <- parse_ym(fname)
+
+    check_month <- function(months, month_start, month_end) {
+      if (!(month_start == months[1]) | (!month_end == rev(months)[1])) {
+        stop ("Check month data")
+      }
+    }
+    check_month(month, parsedym$month_start, parsedym$month_end)
+
+    give_yr2month <- function(mvec, year.start) {
+      out           <- list()
+      is_yr_changed <- FALSE
+      for (i in seq_along(mvec)) {
+         m            <- mvec[i]
+         out$month[i] <- m
+
+         if (i >= 2) {
+           if (m < out$month[i - 1]) {
+           is_yr_changed <- TRUE
+           }
+         }
+
+         if (is_yr_changed) {
+           out$year[i] <- year.start + 1
+         } else {
+           out$year[i] <- year.start
+         }
+      }
+      out
+    }
+    give_yr2month(month, year_start)
+
+    year_start <- parsedym$year_start
+    out$year   <- give_yr2month(month, year_start)$year
+    out$month  <- give_yr2month(month, year_start)$month
+    out$hist   <- histdata
+    out        <- tibble::as_tibble(out)
+    tidyr::unnest(out)
+    if (nest == FALSE) {
+      out <- tidyr::unnest(out)
+    }
+    out
+  }
     cpos_date <- get_col2load(alldata[1,], regex = "[0-9]+", offset = 0)
     cpos_bl   <- cpos_date # Column position of "被鱗体長" is
                            #   same as that of "%Y.%m.%d" column
