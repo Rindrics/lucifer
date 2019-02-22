@@ -479,13 +479,10 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
 *** 整形
 #+BEGIN_SRC R :tangle gyokaikyor/R/fmtbl.R
   #' @export
-  fmtbl <- function(fname, nest = FALSE) {
+  fmtbl <- function(fname, spcs, nest = FALSE) {
     UseMethod("fmtbl")
   }
 
-  fmtbl.nagasaki  <- function(fname) {}
-  fmtbl.kumamoto  <- function(fname, nest = TRUE) {
-    out       <- list()
   load_alldata <- function(fname, shtname) {
     suppressMessages(
       alldata   <- readxl::read_excel(fname,
