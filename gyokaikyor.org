@@ -350,6 +350,15 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
                             offset = -2),
                c(1, 8, 15))
 #+END_SRC
+*** テスト/ 種名正規表現生成
+#+BEGIN_SRC  R :tangle gyokaikyor/tests/testthat/test_make_shtname.R
+  context("Make shtname by prefecture")
+
+  expect_equal(make_shtname(prefec = "kumamoto", spcs = "katakuchi"), "カタクチ")
+  expect_equal(make_shtname(prefec = "kumamoto", spcs = "urume"), "ウルメ")
+  expect_equal(make_shtname(prefec = "kumamoto", spcs = "maiwashi"), "マイワシ")
+  expect_equal(make_shtname(prefec = "kumamoto", spcs = "sabarui"), "サバ類")
+#+END_SRC
 ** 関数
 :PROPERTIES:
 :header-args: :results silent :exports code
@@ -425,6 +434,34 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     match <- stringr::str_detect(target, regex)
     out <- which(match == TRUE) + offset
     out
+  }
+#+END_SRC
+*** 種名シート名生成
+#+BEGIN_SRC  R :tangle gyokaikyor/R/make_shtname.R
+  make_shtname <- function(prefecture, spcs) {
+    switch(prefecture,
+           "kumamoto" = {
+             switch(spcs,
+                    "katakuchi" = shtname <- "カタクチ",
+                    "urume"     = shtname <- "ウルメ",
+                    "maiwashi"  = shtname <- "マイワシ",
+                    "sabarui"   = shtname <- "サバ類",
+                    stop("Unknown spcs name"))
+
+           },
+           "nagasaki" = {
+             switch(spcs,
+                    "katakuchi" = shtname <- "カタクチ",
+                    "urume"     = shtname <- "ウルメ",
+                    "maiwashi"  = shtname <- "マイワシ",
+                    "masaba"    = shtname <- "マサバ",
+                    "gomasaba"  = shtname <- "ゴマサバ",
+                    "maaji"     = shtname <- "マアジ",
+                    stop("Unknown spcs name"))
+           },
+           stop("Unknown prefecture")
+           )
+    shtname
   }
 #+END_SRC
 *** 計測データ取得
