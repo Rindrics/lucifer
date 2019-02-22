@@ -1,5 +1,5 @@
 #' @export
-fmtbl <- function(fname, nest = FALSE) {
+fmtbl <- function(fname, spcs, nest = FALSE) {
   UseMethod("fmtbl")
 }
 
