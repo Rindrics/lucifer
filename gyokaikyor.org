@@ -522,6 +522,77 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     out
   }
 
+  fmtbl.nagasaki  <- function(fname, spcs, nest = TRUE) {
+    shtname   <- make_shtname(prefecture = "nagasaki", spcs = spcs)
+    alldata   <- load_alldata(fname, shtname)
+    colpos    <- get_col2load(target = alldata[4,], regex = ".月", offset = 0)
+    month     <- jpmonth2num(alldata[4, colpos])
+    classname <- make_blclass(alldata[5:86, 2], alldata[5:86, 3])
+    classname
+    histdata  <- purrr::map(colpos, get_histdata, df = alldata, rows = 5:86, name = classname)
+    histdata
+
+    out       <- list()
+
+    parse_ym <- function(fname, months) {
+      ym_start_match <- stringr::str_match(fname, "/([0-9]{4})\\.((?:0|1)[1-9])")
+      year_start     <- ym_start_match[2] %>% as.numeric()
+      month_start    <- ym_start_match[3] %>% as.numeric()
+      ym_end_match   <-
+        stringr::str_match(fname,
+                           "/[0-9]{4}\\.(?:0|1)[1-9]-([0-9]{4})\\.((?:0|1)[1-9])")
+      year_end       <- ym_end_match[2] %>% as.numeric()
+      month_end      <- ym_end_match[3] %>% as.numeric()
+      out <- list()
+      out$year_start  <- year_start
+      out$month_start <- month_start
+      out$year_end    <- year_end
+      out$month_end   <- month_end
+      out
+    }
+    parsedym <- parse_ym(fname)
+
+    check_month <- function(months, month_start, month_end) {
+      if (!(month_start == months[1]) | (!month_end == rev(months)[1])) {
+        stop ("Check month data")
+      }
+    }
+    check_month(month, parsedym$month_start, parsedym$month_end)
+
+    give_yr2month <- function(mvec, year.start) {
+      out           <- list()
+      is_yr_changed <- FALSE
+      for (i in seq_along(mvec)) {
+         m            <- mvec[i]
+         out$month[i] <- m
+
+         if (i >= 2) {
+           if (m < out$month[i - 1]) {
+           is_yr_changed <- TRUE
+           }
+         }
+
+         if (is_yr_changed) {
+           out$year[i] <- year.start + 1
+         } else {
+           out$year[i] <- year.start
+         }
+      }
+      out
+    }
+    give_yr2month(month, year_start)
+
+    year_start <- parsedym$year_start
+    out$year   <- give_yr2month(month, year_start)$year
+    out$month  <- give_yr2month(month, year_start)$month
+    out$hist   <- histdata
+    out        <- tibble::as_tibble(out)
+    tidyr::unnest(out)
+    if (nest == FALSE) {
+      out <- tidyr::unnest(out)
+    }
+    out
+  }
     cpos_date <- get_col2load(alldata[1,], regex = "[0-9]+", offset = 0)
     cpos_bl   <- cpos_date # Column position of "被鱗体長" is
                            #   same as that of "%Y.%m.%d" column
