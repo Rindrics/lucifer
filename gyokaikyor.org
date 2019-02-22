@@ -505,6 +505,15 @@ fname <- "04 漁獲努力量（1704~1803）（熊本県）.xls"
     out
   }
 
+  get_histdata <- function(df, col, rows, name) {
+    out <- df[rows, col] %>%
+      unlist() %>%
+      as.numeric() %>%
+      as.vector()
+    names(out) <- name
+    out
+  }
+
     cpos_date <- get_col2load(alldata[1,], regex = "[0-9]+", offset = 0)
     cpos_bl   <- cpos_date # Column position of "被鱗体長" is
                            #   same as that of "%Y.%m.%d" column
