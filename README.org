@@ -1,6 +1,7 @@
 #+TITLE: tinyplyr
 #+STARTUP: overview
-
+[![Travis build status](https://travis-ci.org/smxshxishxad/tinyplyr.svg?branch=master)](https://travis-ci.org/smxshxishxad/tinyplyr)
+[![Coverage status](https://coveralls.io/repos/github/smxshxishxad/tinyplyr/badge.svg)](https://coveralls.io/r/smxshxishxad/tinyplyr?branch=master)
 業務でよく使う関数を集めたもの．
 
 改善案は [[https://github.com/smxshxishxad/tinyplyr/issues][Issues]] にて随時募集中
