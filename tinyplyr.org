@@ -6,12 +6,14 @@
 - [[#開発セットアップ][開発セットアップ]]
   - [[#使用したパッケージ][使用したパッケージ]]
 - [[#再ロードしてテストを実行][再ロードしてテストを実行]]
+- [[#リリース][リリース]]
 - [[#テスト][テスト]]
 - [[#関数][関数]]
 
 * 開発セットアップ
 #+BEGIN_SRC R
   usethis::create_package("tinyplyr")
+  usethis::use_coverage(type = "coveralls")
 #+END_SRC
 ** 使用したパッケージ
 #+BEGIN_SRC R :results silent
@@ -23,7 +25,15 @@
   system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
   lintr::lint_package()
   devtools::test()
+
   devtools::document(roclets=c('rd', 'collate', 'namespace'))
+  devtools::check(args = "--as-cran")
+  covr::package_coverage()
+#+END_SRC
+* リリース
+#+BEGIN_SRC R
+  devtools::spell_check()
+  devtools::release()
 #+END_SRC
 * テスト
 #+BEGIN_SRC R :exports none :tangle tests/testthat/test_util.R
