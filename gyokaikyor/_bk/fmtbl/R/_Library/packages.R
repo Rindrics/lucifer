@@ -1,7 +1,0 @@
-library(hash)
-#library(XLConnect)
-#library(readxl)
-library(beepr)
-library(xlsx)
-library(RCurl)
-library(maptools)
