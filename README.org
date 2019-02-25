@@ -1,5 +1,6 @@
 #+TITLE: tidyNAS
 #+STARTUP: overview
+gyokaikyor: [![Travis build status](https://travis-ci.org/smxshxishxad/tidyNAS.svg?branch=master)](https://travis-ci.org/smxshxishxad/tidyNAS)
 * 目次                                                                :TOC_3:
 - [[#これは何か][これは何か？]]
 - [[#プロジェクトの構成][プロジェクトの構成]]
