@@ -1,5 +1,5 @@
 #+TITLE: tinyplyr プロジェクトノート
-#+PROPERTY: header-args :exports code :results scalar :session *R:tidyNAS*
+#+PROPERTY: header-args :exports code :results scalar :session *R:tinyplyr*
 #+STARTUP: contents
 
 * 目次                                                                :TOC_3:
@@ -19,19 +19,18 @@
 #+END_SRC
 * 再ロードしてテストを実行
 #+BEGIN_SRC R :results output
-  setwd("tinyplyr")
   devtools::load_all()
   system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
+  lintr::lint_package()
   devtools::test()
   devtools::document(roclets=c('rd', 'collate', 'namespace'))
 #+END_SRC
 * テスト
-#+BEGIN_SRC R :exports none :tangle tinyplyr/tests/testthat/test_util.R
-  # -------------------------------------------------------------------.
-  # This file is tangled from tinyplyr.org.                            |
-  # (https://github.com/smxshxishxad/tidyNAS/blob/master/tinyplyr.org) |
-  # Do not edit by hand.                                               |
-  # ------------------------------------------------------------------'
+#+BEGIN_SRC R :exports none :tangle tests/testthat/test_util.R
+  # This file is tangled from tinyplyr.org.
+  # (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
+  # Edit that file.
+
   context("Parse strings correctly")
 
   test_that("num2datei () convert numdate from Excel correctly", {
@@ -61,15 +60,13 @@
     expect_equal(jpdate2juliani("H29.8.22"), 42969)
   })
 
-  #+END_SRC
+#+END_SRC
 
 * 関数
-#+BEGIN_SRC R :tangle tinyplyr/R/util.R :exports code
-  # ----------------------------------------------------------------------------.
-  # This file is tangled from tinyplyr.org.                                     |
-  # (https://github.com/smxshxishxad/tinyplyr/blob/master/tinyplyrjmdatar.org)  |
-  # Do not edit by hand.                                                        |
-  # ---------------------------------------------------------------------------'
+#+BEGIN_SRC R :tangle R/util.R :exports code
+  # This file is tangled from tinyplyr.org.
+  # (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
+  # Edit that file.
 
   num2datei <- function(x) {
     jday_march01 <- 60
@@ -82,6 +79,7 @@
     }
     x    <- x - 1 # because of origin
     date <- as.character(as.Date(x, origin = "1900-01-01"))
+    date
   }
 
   #' @export
@@ -116,7 +114,6 @@
     if (is.jpdate(x) == TRUE) {
       split  <- split_jpdate(x)
       era    <- split$era
-      jpyear <- stringr::str_match(x, "[A-Z]")
       switch(era,
              "heisei" = {
                year  <- split$year + 1988
