@@ -113,7 +113,7 @@
 
   #' @export
   is.jpdate <- function(x) {
-    stringr::str_detect(x, "[A-Z]\\.?[0-9]+\\..")
+    stringr::str_detect(x, "[A-Z]\\.?[0-9]+(\\..|-)")
   }
 
   #' @export
@@ -122,9 +122,12 @@
     switch(initial,
          "H" = era <- "heisei")
 
-    year  <- stringr::str_match(x, "^[A-Za-z]\\.?([0-9]+)\\.")[2]
-    month <- stringr::str_match(x, "^[A-Za-z]\\.?[0-9]+\\.([0-9]+)")[2]
-    day   <- stringr::str_match(x, "^[A-Za-z]\\.?[0-9]+\\.[0-9]+\\.([0-9]+)")[2]
+    year  <- stringr::str_match(x, "^[A-Za-z]\\.?([0-9]+)(?:\\.|-)")[2]
+    month <- stringr::str_match(x, "^[A-Za-z]\\.?[0-9]+(?:\\.|-)([0-9]+)")[2]
+    day   <-
+      stringr::str_match(x,
+                         "^[A-Za-z]\\.?[0-9]+(?:\\.|-)[0-9]+(?:\\.|-)([0-9]+)"
+                         )[2]
     out   <- list("era"   = era,
                   "year"  = as.numeric(year),
                   "month" = as.numeric(month),
