@@ -12,7 +12,7 @@
 
 * 開発セットアップ
 #+BEGIN_SRC R
-  usethis::create_package("tinyplyr")
+  # usethis::create_package("tinyplyr")
 
   usethis::use_mit_license("Akira Hayashi")
   usethis::use_coverage(type = "coveralls")
