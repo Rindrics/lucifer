@@ -3,9 +3,10 @@
 language: R
 sudo: false
 cache: packages;
+r_packages:
+  - covr
 after_success:
-  - Rscript -e 'covr::coveralls()'
-  - codecov
+  - Rscript -e 'covr::codecov()'
 before_deploy:
   - git config --local user.name "smxshxishxad"
   - git config --local user.email "akira.hayashi.1987@gmail.com"
