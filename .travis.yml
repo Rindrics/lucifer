@@ -5,6 +5,7 @@ sudo: false
 cache: packages;
 after_success:
   - Rscript -e 'covr::coveralls()'
+  - codecov
 before_deploy:
   - git config --local user.name "smxshxishxad"
   - git config --local user.email "akira.hayashi.1987@gmail.com"
