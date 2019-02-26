@@ -99,6 +99,13 @@
   }
 
   #' @export
+  #' Convert Excel julian date to %Y-%m-%d
+  #' 
+  #' @param x Julian date read from Excel spredsheets.
+  #' @return Date character in %Y-%m-%d format.
+  #' @examples
+  #' num2date(43466)
+  #' num2date(c(43466, 43467, "43468"))
   num2date <- function(x) {
     out <- purrr::map(x, num2datei)
     out <- as.vector(unlist(out))
