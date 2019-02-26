@@ -64,7 +64,7 @@ split_jpdate <- function(x) {
   out
 }
 
-jpdate2juliani <- function(x) {
+date2juliani <- function(x) {
   if (is.jpdate(x) == TRUE) {
     split  <- split_jpdate(x)
     era    <- split$era
@@ -75,27 +75,28 @@ jpdate2juliani <- function(x) {
              day   <- split$day
              date  <- as.Date(paste(year, month, day, sep = "-"))
            })
-    jday <- julian.Date(date, origin = as.Date("1900-01-01"))
-    jday <- jday + 1 # Correct origin difference
-    jday <- jday + 1 # Correct leap year bug
   } else {
-    jday <- x
+    date <- gsub("\\.", "-", x) %>%
+      as.Date()
   }
+  jday <- julian.Date(date, origin = as.Date("1900-01-01"))
+  jday <- jday + 1 # Correct origin difference
+  jday <- jday + 1 # Correct leap year bug
   as.numeric(jday[1])
 }
 
-#' Convert Japanese Calendar date to Excel Julian day
+#' Convert date to Excel Julian day
 #'
-#' @param x Date string in Japanes Calendar format.
+#' @param x Date string in Gregorian or Japanes Calendar format.
 #' @return Julian day (Microsoft Excel style: origin = 1900-01-01).
 #' @examples
-#' jpdate2julian("H30.01.01")
-#' jpdate2julian("H30-01-01")
-#' jpdate2julian("H30.1.1")
-#' jpdate2julian("H30-1-1")
+#' date2julian("H30.01.01")
+#' date2julian("H30-01-01")
+#' date2julian("H30.1.1")
+#' date2julian("H30-1-1")
 #' @export
-jpdate2julian <- function(x) {
-  out <- purrr::map(x, jpdate2juliani)
+date2julian <- function(x) {
+  out <- purrr::map(x, date2juliani)
   out <- as.vector(unlist(out))
   out
 }
