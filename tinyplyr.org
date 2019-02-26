@@ -19,6 +19,7 @@
   usethis::use_package("magrittr")
   usethis::use_package("stringr")
   usethis::use_package("purrr")
+  usethis::use_lifecycle_badge("experimental")
 #+END_SRC
 ** 使用したパッケージ
 #+BEGIN_SRC R :results silent
