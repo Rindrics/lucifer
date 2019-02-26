@@ -12,6 +12,10 @@ test_that("num2datei () convert numdate from Excel correctly", {
   expect_equal(num2datei(62), "1900-03-02")
 })
 
+test_that("num2date () convert numdate from Excel correctly", {
+  expect_setequal(num2date(56:58), c("1900-02-25", "1900-02-26", "1900-02-27"))
+})
+
 test_that("is.jpdate() judge if given str is a jpdate", {
   expect_true(is.jpdate("H.29.8.22"))
   expect_true(is.jpdate("H29.8.22"))
@@ -29,4 +33,11 @@ test_that("split_jpdate() returns factors of jpdate", {
 test_that("jpdate2juliani() convert Japanese date to Julian day", {
   expect_equal(jpdate2juliani("H.29.8.22"), 42969)
   expect_equal(jpdate2juliani("H29.8.22"), 42969)
+})
+
+
+test_that("jpdate2julian() convert Japanese date to Julian day", {
+  expect_setequal(jpdate2julian(c("H.29.8.22", "H.29.8.23")), c(42969, 42970))
+  expect_setequal(jpdate2julian(c("H.29.8.22", "H29-8-23")), c(42969, 42970))
+  expect_setequal(jpdate2julian(c("H.29.8.22", "H29-08-23")), c(42969, 42970))
 })
