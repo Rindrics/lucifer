@@ -100,7 +100,7 @@
 
   #' @export
   #' Convert Julian date (Microsoft Excel style: origin = 1900-01-01)
-  #'   to %Y-%m-%d
+  #'   to \%Y-\%m-\%d
   #'
   #' @param x Julian day read from Excel spredsheets.
   #' @return Date character in %Y-%m-%d format.
