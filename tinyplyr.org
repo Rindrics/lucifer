@@ -36,7 +36,7 @@
   devtools::release()
 #+END_SRC
 * テスト
-#+BEGIN_SRC R :exports none :tangle tests/testthat/test_util.R
+#+BEGIN_SRC R :exports none :tangle tests/testthat/test_numdate.R
   # This file is tangled from tinyplyr.org.
   # (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
   # Edit that file.
@@ -73,7 +73,7 @@
 #+END_SRC
 
 * 関数
-#+BEGIN_SRC R :tangle R/util.R :exports code
+#+BEGIN_SRC R :tangle R/numdate.R :exports code
   # This file is tangled from tinyplyr.org.
   # (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
   # Edit that file.
