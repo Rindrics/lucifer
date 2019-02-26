@@ -100,7 +100,7 @@
 
   #' @export
   #' Convert Excel julian date to %Y-%m-%d
-  #' 
+  #'
   #' @param x Julian date read from Excel spredsheets.
   #' @return Date character in %Y-%m-%d format.
   #' @examples
