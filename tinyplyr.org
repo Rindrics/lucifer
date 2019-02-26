@@ -16,14 +16,14 @@
 
   usethis::use_mit_license("Akira Hayashi")
   usethis::use_coverage(type = "coveralls")
-  usethis::use_package("magrittr")
-  usethis::use_package("stringr")
-  usethis::use_package("purrr")
   usethis::use_lifecycle_badge("experimental")
 #+END_SRC
 ** 使用したパッケージ
 #+BEGIN_SRC R :results silent
   devtools::use_testthat("tinyplyr")
+  usethis::use_package("magrittr")
+  usethis::use_package("stringr")
+  usethis::use_package("purrr")
 #+END_SRC
 * 再ロードしてテストを実行
 #+BEGIN_SRC R :results output
