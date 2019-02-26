@@ -147,3 +147,15 @@
     out
   }
 #+END_SRC
+
+#+BEGIN_SRC R :tangle R/util.R :exports code
+#' Pipe operator
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @export
+#' @importFrom magrittr %>%
+#' @usage lhs \%>\% rhs
+NULL
+#+END_SRC
