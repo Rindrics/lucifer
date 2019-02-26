@@ -30,14 +30,15 @@ test_that("split_jpdate() returns factors of jpdate", {
   expect_equal(split$day, 22)
 })
 
-test_that("jpdate2juliani() convert Japanese date to Julian day", {
-  expect_equal(jpdate2juliani("H.29.8.22"), 42969)
-  expect_equal(jpdate2juliani("H29.8.22"), 42969)
+test_that("date2juliani() convert Japanese date to Julian day", {
+  expect_equal(date2juliani("H.29.8.22"), 42969)
+  expect_equal(date2juliani("H29.8.22"), 42969)
+  expect_equal(date2juliani("2017.8.22"), 42969)
 })
 
 
-test_that("jpdate2julian() convert Japanese date to Julian day", {
-  expect_setequal(jpdate2julian(c("H.29.8.22", "H.29.8.23")), c(42969, 42970))
-  expect_setequal(jpdate2julian(c("H.29.8.22", "H29-8-23")), c(42969, 42970))
-  expect_setequal(jpdate2julian(c("H.29.8.22", "H29-08-23")), c(42969, 42970))
+test_that("date2julian() convert Japanese date to Julian day", {
+  expect_setequal(date2julian(c("H.29.8.22", "H.29.8.23")), c(42969, 42970))
+  expect_setequal(date2julian(c("H.29.8.22", "H29-8-23")), c(42969, 42970))
+  expect_setequal(date2julian(c("H.29.8.22", "H29-08-23")), c(42969, 42970))
 })
