@@ -16,24 +16,23 @@ num2datei <- function(x) {
   date
 }
 
-#' @export
 #' Convert Julian date (Microsoft Excel style: origin = 1900-01-01)
-#'   to %Y-%m-%d
+#'   to \%Y-\%m-\%d
 #'
 #' @param x Julian day read from Excel spredsheets.
 #' @return Date character in %Y-%m-%d format.
 #' @examples
 #' num2date(43466)
 #' num2date(c(43466:43468, "43469"))
+#' @export
 num2date <- function(x) {
   out <- purrr::map(x, num2datei)
   out <- as.vector(unlist(out))
   out
 }
 
-#' @export
 #' Judge whether date string is written in Japanese Calendar or not
-#' 
+#'
 #' @param x Date string. Both '.' and '-' are allowed for separaters.
 #' @return Bool.
 #' @examples
@@ -41,6 +40,7 @@ num2date <- function(x) {
 #' is.jpdate("H31.01.01")
 #' is.jpdate("H31-01-01")
 #' is.jpdate("H3100-01-01")
+#' @export
 is.jpdate <- function(x) {
   stringr::str_detect(x, "[A-Z]\\.?[0-9]+(\\..|-)")
 }
@@ -84,16 +84,16 @@ jpdate2juliani <- function(x) {
   as.numeric(jday[1])
 }
 
-#' @export
 #' Convert Japanese Calendar date to Excel Julian day
 #'
 #' @param x Date string in Japanes Calendar format.
 #' @return Julian day (Microsoft Excel style: origin = 1900-01-01).
-#' @example
+#' @examples
 #' jpdate2julian("H30.01.01")
 #' jpdate2julian("H30-01-01")
 #' jpdate2julian("H30.1.1")
 #' jpdate2julian("H30-1-1")
+#' @export
 jpdate2julian <- function(x) {
   out <- purrr::map(x, jpdate2juliani)
   out <- as.vector(unlist(out))
