@@ -5,5 +5,7 @@
 [![Coverage status](https://coveralls.io/repos/github/smxshxishxad/tinyplyr/badge.svg)](https://coveralls.io/r/smxshxishxad/tinyplyr?branch=master)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
+プロジェクトの詳細は[[こちら](tinyplyr/tinyplyr.org)]
+
 改善案は [Issues](https://github.com/smxshxishxad/tinyplyr/issues) にて随時募集中
 
