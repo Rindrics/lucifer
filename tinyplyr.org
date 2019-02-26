@@ -13,7 +13,12 @@
 * 開発セットアップ
 #+BEGIN_SRC R
   usethis::create_package("tinyplyr")
+
+  usethis::use_mit_license("Akira Hayashi")
   usethis::use_coverage(type = "coveralls")
+  usethis::use_package("magrittr")
+  usethis::use_package("stringr")
+  usethis::use_package("purrr")
 #+END_SRC
 ** 使用したパッケージ
 #+BEGIN_SRC R :results silent
