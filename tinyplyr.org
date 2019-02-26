@@ -78,6 +78,7 @@
   test_that("date2juliani() convert Japanese date to Julian day", {
     expect_equal(date2juliani("H.29.8.22"), 42969)
     expect_equal(date2juliani("H29.8.22"), 42969)
+    expect_equal(date2juliani("2017.8.22"), 42969)
   })
 
 
