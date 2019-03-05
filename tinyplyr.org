@@ -59,10 +59,19 @@
     expect_equal(num2datei(62), "1900-03-02")
   })
 
+  test_that("get_datefmt() parse str into %Y-%m-%d format", {
+    expect_equal(get_datefmt("20180101", 2018), "%Y%m%d")
+    expect_equal(get_datefmt("0101", 2018), "%m%d")
+    expect_equal(get_datefmt("43101", 2018), "XLjday")
+    expect_equal(get_datefmt("43101", 2018), "XLjday")
+    expect_equal(get_datefmt("H.30.01.01", 2018), "heisei")
+    expect_equal(get_datefmt("H30.1.1", 2018), "heisei")
+  })
 
   test_that("stdz_date() parse str into %Y-%m-%d format", {
     expect_equal(stdz_date("20180101", 2018), "2018-01-01")
     expect_equal(stdz_date("0101", 2018), "2018-01-01")
+    expect_equal(stdz_date("43101", 2018), "2018-01-01")
     expect_equal(stdz_date("43101", 2018), "2018-01-01")
     expect_equal(stdz_date("H.30.01.01", 2018), "2018-01-01")
     expect_equal(stdz_date("H30.1.1", 2018), "2018-01-01")
