@@ -12,8 +12,13 @@ test_that("num2datei () convert numdate from Excel correctly", {
   expect_equal(num2datei(62), "1900-03-02")
 })
 
+
 test_that("stdz_date() parse str into %Y-%m-%d format", {
   expect_equal(stdz_date("20180101", 2018), "2018-01-01")
+  expect_equal(stdz_date("0101", 2018), "2018-01-01")
+  expect_equal(stdz_date("43101", 2018), "2018-01-01")
+  expect_error(stdz_date("1", 2018),
+               "Something's wrong with \"date\" data.", fix = TRUE)
 })
 
 test_that("num2date () convert numdate from Excel correctly", {

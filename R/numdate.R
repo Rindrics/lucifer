@@ -38,6 +38,7 @@ get_datefmt <- function(x, year) {
 #'
 #' @inheritParams get_datefmt
 #' @return Date string standardized as "\%Y-\%m-\%d" format.
+#' @export
 stdz_date <- function(x, year) {
   format <- get_datefmt(x, year)
   switch(format,
