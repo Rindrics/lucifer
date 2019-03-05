@@ -23,7 +23,9 @@ num2datei <- function(x) {
 #' @return Format of date string, one of '\%Y\%m\%d', '\%m\%d', or 'XLjday'.
 get_datefmt <- function(x, year) {
   format <- NA
-  if (nchar(x) == 4)
+  if (stringr::str_detect(x, "^H\\.?\\d"))
+    format <- "heisei"
+  else if (nchar(x) == 4)
     format <- "%m%d"
   else if (nchar(x) == 8 && substr(x, 1, 4) == as.character(year))
     format <- "%Y%m%d"
@@ -34,6 +36,32 @@ get_datefmt <- function(x, year) {
   format
 }
 
+#' Split date str in japanese date format
+#'
+#' @param x Date string with year in Japanese era
+#' @examples
+#' split_jpdate("H30.01.01")
+#' split_jpdate("H.30.01.01")
+#' @export
+split_jpdate <- function(x) {
+  initial <- substr(x, 1, 1)
+  switch(initial,
+       "H" = era <- "heisei")
+
+  year  <- stringr::str_match(x, "^[A-Za-z]\\.?([0-9]+)(?:\\.|-)")[2]
+  month <- stringr::str_match(x, "^[A-Za-z]\\.?[0-9]+(?:\\.|-)([0-9]+)")[2]
+  day   <-
+    stringr::str_match(x,
+                       "^[A-Za-z]\\.?[0-9]+(?:\\.|-)[0-9]+(?:\\.|-)([0-9]+)"
+                       )[2]
+  out   <- list("era"   = era,
+                "year"  = as.numeric(year),
+                "month" = as.numeric(month),
+                "day"   = as.numeric(day)
+                )
+  out
+}
+
 #' Standardize date string in format "\%Y-\%m-\%d" format
 #'
 #' @inheritParams get_datefmt
@@ -42,6 +70,13 @@ get_datefmt <- function(x, year) {
 stdz_date <- function(x, year) {
   format <- get_datefmt(x, year)
   switch(format,
+         "heisei" = {
+           split  <- tinyplyr::split_jpdate(x)
+           year <- paste0(split$era, split$year, "年") %>%
+             Nippon::wareki2AD()
+           date <-
+             lubridate::ymd(paste(year, split$month, split$day, sep = "-"))
+         },
          "%Y%m%d" = {
            yyyymmdd <- x
            date     <- lubridate::ymd(yyyymmdd)
@@ -85,24 +120,6 @@ is.jpdate <- function(x) {
   stringr::str_detect(x, "[A-Z]\\.?[0-9]+(\\..|-)")
 }
 
-split_jpdate <- function(x) {
-  initial <- substr(x, 1, 1)
-  switch(initial,
-       "H" = era <- "heisei")
-
-  year  <- stringr::str_match(x, "^[A-Za-z]\\.?([0-9]+)(?:\\.|-)")[2]
-  month <- stringr::str_match(x, "^[A-Za-z]\\.?[0-9]+(?:\\.|-)([0-9]+)")[2]
-  day   <-
-    stringr::str_match(x,
-                       "^[A-Za-z]\\.?[0-9]+(?:\\.|-)[0-9]+(?:\\.|-)([0-9]+)"
-                       )[2]
-  out   <- list("era"   = era,
-                "year"  = as.numeric(year),
-                "month" = as.numeric(month),
-                "day"   = as.numeric(day)
-                )
-  out
-}
 
 date2juliani <- function(x) {
   if (is.jpdate(x) == TRUE) {

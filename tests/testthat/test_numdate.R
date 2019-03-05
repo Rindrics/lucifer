@@ -17,6 +17,8 @@ test_that("stdz_date() parse str into %Y-%m-%d format", {
   expect_equal(stdz_date("20180101", 2018), "2018-01-01")
   expect_equal(stdz_date("0101", 2018), "2018-01-01")
   expect_equal(stdz_date("43101", 2018), "2018-01-01")
+  expect_equal(stdz_date("H.30.01.01", 2018), "2018-01-01")
+  expect_equal(stdz_date("H30.1.1", 2018), "2018-01-01")
   expect_error(stdz_date("1", 2018),
                "Something's wrong with \"date\" data.", fix = TRUE)
 })
@@ -34,6 +36,7 @@ test_that("is.jpdate() judge if given str is a jpdate", {
 test_that("split_jpdate() returns factors of jpdate", {
   split <- split_jpdate("H.29.08.22")
   expect_is(split, "list")
+  expect_equal(split$era, "heisei")
   expect_equal(split$year, 29)
   expect_equal(split$month, 8)
   expect_equal(split$day, 22)

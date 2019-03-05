@@ -20,4 +20,5 @@ Imports:
     magrittr,
     stringr,
     purrr,
-    lubridate
+    lubridate,
+    Nippon
