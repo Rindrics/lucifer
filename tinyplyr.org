@@ -130,7 +130,9 @@
   #' @return Format of date string, one of '\%Y\%m\%d', '\%m\%d', or 'XLjday'.
   get_datefmt <- function(x, year) {
     format <- NA
-    if (nchar(x) == 4)
+    if (stringr::str_detect(x, "^H\\.?\\d"))
+      format <- "heisei"
+    else if (nchar(x) == 4)
       format <- "%m%d"
     else if (nchar(x) == 8 && substr(x, 1, 4) == as.character(year))
       format <- "%Y%m%d"
