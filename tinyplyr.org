@@ -64,6 +64,8 @@
     expect_equal(stdz_date("20180101", 2018), "2018-01-01")
     expect_equal(stdz_date("0101", 2018), "2018-01-01")
     expect_equal(stdz_date("43101", 2018), "2018-01-01")
+    expect_equal(stdz_date("H.30.01.01", 2018), "2018-01-01")
+    expect_equal(stdz_date("H30.1.1", 2018), "2018-01-01")
     expect_error(stdz_date("1", 2018),
                  "Something's wrong with \"date\" data.", fix = TRUE)
   })
