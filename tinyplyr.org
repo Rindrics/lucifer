@@ -31,8 +31,8 @@
 #+BEGIN_SRC R :results output
   devtools::load_all()
   system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
-  lintr::lint_package()
   devtools::test()
+  lintr::lint_package()
 
   devtools::document(roclets=c('rd', 'collate', 'namespace'))
   devtools::check(args = "--as-cran")
