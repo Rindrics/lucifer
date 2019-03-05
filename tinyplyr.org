@@ -141,6 +141,13 @@
     format
   }
 
+  #' Split date str in japanese date format
+  #'
+  #' @param x Date string with year in Japanese era
+  #' @examples
+  #' split_jpdate("H30.01.01")
+  #' split_jpdate("H.30.01.01")
+  #' @export
   split_jpdate <- function(x) {
     initial <- substr(x, 1, 1)
     switch(initial,
