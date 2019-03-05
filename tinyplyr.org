@@ -22,6 +22,7 @@
 #+BEGIN_SRC R :results silent
   devtools::use_testthat("tinyplyr")
   usethis::use_package("magrittr")
+  usethis::use_package("lubridate")
   usethis::use_package("stringr")
   usethis::use_package("purrr")
 #+END_SRC
