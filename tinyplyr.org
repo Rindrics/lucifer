@@ -22,6 +22,7 @@
 #+BEGIN_SRC R :results silent
   devtools::use_testthat("tinyplyr")
   usethis::use_package("magrittr")
+  usethis::use_package("lubridate")
   usethis::use_package("stringr")
   usethis::use_package("purrr")
 #+END_SRC
@@ -55,6 +56,10 @@
     expect_error(num2datei(60), "This date is not correct in Excel.")
     expect_equal(num2datei(61), "1900-03-01")
     expect_equal(num2datei(62), "1900-03-02")
+  })
+
+  test_that("stdz_date() parse str into %Y-%m-%d format", {
+    expect_equal(stdz_date("20180101", 2018), "2018-01-01")
   })
 
   test_that("num2date () convert numdate from Excel correctly", {
@@ -107,6 +112,45 @@
     x    <- x - 1 # because of origin
     date <- as.character(as.Date(x, origin = "1900-01-01"))
     date
+  }
+
+  #' Get format of given date string
+  #'
+  #' @param x Date string to be judged
+  #' @param year \%Y of date string
+  #' @return Format of date string, one of '\%Y\%m\%d', '\%m\%d', or 'XLjday'.
+  get_datefmt <- function(x, year) {
+    format <- NA
+    if (nchar(x) == 4)
+      format <- "%m%d"
+    else if (nchar(x) == 8 && substr(x, 1, 4) == as.character(year))
+      format <- "%Y%m%d"
+    else if (tinyplyr::num2date(x) %>% substr(1, 4) == as.character(year))
+      format <- "XLjday"
+    else
+      stop("Something's wrong with \"date\" data.")
+    format
+  }
+
+  #' Standardize date string in format "\%Y-\%m-\%d" format
+  #'
+  #' @inheritParams get_datefmt
+  #' @return Date string standardized as "\%Y-\%m-\%d" format.
+  stdz_date <- function(x, year) {
+    format <- get_datefmt(x, year)
+    switch(format,
+           "%Y%m%d" = {
+             yyyymmdd <- x
+             date     <- lubridate::ymd(yyyymmdd)
+           },
+           "%m%d"   = {
+             yyyymmdd <- paste0(year, x)
+             date     <- lubridate::ymd(yyyymmdd)
+           },
+           "XLjday" = {
+             date <- tinyplyr::num2date(x)
+           })
+    as.character(date)
   }
 
   #' Convert Julian date (Microsoft Excel style: origin = 1900-01-01)

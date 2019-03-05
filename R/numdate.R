@@ -16,6 +16,45 @@ num2datei <- function(x) {
   date
 }
 
+#' Get format of given date string
+#'
+#' @param x Date string to be judged
+#' @param year \%Y of date string
+#' @return Format of date string, one of '\%Y\%m\%d', '\%m\%d', or 'XLjday'.
+get_datefmt <- function(x, year) {
+  format <- NA
+  if (nchar(x) == 4)
+    format <- "%m%d"
+  else if (nchar(x) == 8 && substr(x, 1, 4) == as.character(year))
+    format <- "%Y%m%d"
+  else if (tinyplyr::num2date(x) %>% substr(1, 4) == as.character(year))
+    format <- "XLjday"
+  else
+    stop("Something's wrong with \"date\" data.")
+  format
+}
+
+#' Standardize date string in format "\%Y-\%m-\%d" format
+#'
+#' @inheritParams get_datefmt
+#' @return Date string standardized as "\%Y-\%m-\%d" format.
+stdz_date <- function(x, year) {
+  format <- get_datefmt(x, year)
+  switch(format,
+         "%Y%m%d" = {
+           yyyymmdd <- x
+           date     <- lubridate::ymd(yyyymmdd)
+         },
+         "%m%d"   = {
+           yyyymmdd <- paste0(year, x)
+           date     <- lubridate::ymd(yyyymmdd)
+         },
+         "XLjday" = {
+           date <- tinyplyr::num2date(x)
+         })
+  as.character(date)
+}
+
 #' Convert Julian date (Microsoft Excel style: origin = 1900-01-01)
 #'   to \%Y-\%m-\%d
 #'
