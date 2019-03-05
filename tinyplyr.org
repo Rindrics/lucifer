@@ -20,11 +20,12 @@
 #+END_SRC
 ** 使用したパッケージ
 #+BEGIN_SRC R :results silent
-  devtools::use_testthat("tinyplyr")
+  usethis::use_testthat("tinyplyr")
   usethis::use_package("magrittr")
   usethis::use_package("lubridate")
   usethis::use_package("stringr")
   usethis::use_package("purrr")
+  usethis::use_package("Nippon")
 #+END_SRC
 * 再ロードしてテストを実行
 #+BEGIN_SRC R :results output
