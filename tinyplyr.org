@@ -168,6 +168,13 @@
   stdz_date <- function(x, year) {
     format <- get_datefmt(x, year)
     switch(format,
+           "heisei" = {
+             split  <- tinyplyr::split_jpdate(x)
+             year <- paste0(split$era, split$year, "年") %>%
+               Nippon::wareki2AD()
+             date <-
+               lubridate::ymd(paste(year, split$month, split$day, sep = "-"))
+           },
            "%Y%m%d" = {
              yyyymmdd <- x
              date     <- lubridate::ymd(yyyymmdd)
