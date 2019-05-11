@@ -1,11 +1,8 @@
-# **tinyplyr**
+# **lucifer**
 
-### Tiny toolkits for work
-[![Travis build status](<https://travis-ci.org/smxshxishxad/tinyplyr.svg?branch=master>)](<https://travis-ci.org/smxshxishxad/tinyplyr>)
-[![Coverage status](https://codecov.io/gh/smxshxishxad/tinyplyr/branch/master/graph/badge.svg)](https://codecov.io/github/smxshxishxad/tinyplyr?branch=master)
-[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+![Satan/Lucifer arousing rebel angels](https://upload.wikimedia.org/wikipedia/commons/4/41/ParadiseLButts1.jpg)
 
-プロジェクトの詳細は[こちら](https://github.com/smxshxishxad/tinyplyr/blob/master/tinyplyr.org)
+Satan/Lucifer arousing rebel angels in Milton's Paradise Lost, by William Blake (https://en.wikipedia.org/wiki/Lucifer#/media/File:ParadiseLButts1.jpg)
 
-改善案は [Issues](https://github.com/smxshxishxad/tinyplyr/issues) にて随時募集中
+## ネ申エクセルに反逆するためのパッケージ
 
