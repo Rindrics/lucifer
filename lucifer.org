@@ -1,5 +1,5 @@
-#+TITLE: tinyplyr プロジェクトノート
-#+PROPERTY: header-args :exports code :results scalar :session *R:tinyplyr*
+#+TITLE: lucifer プロジェクトノート
+#+PROPERTY: header-args :exports code :results scalar :session *R:lucifer*
 #+STARTUP: contents
 
 * 目次                                                                :TOC_3:
@@ -12,7 +12,7 @@
 
 * 開発セットアップ
 #+BEGIN_SRC R
-  # usethis::create_package("tinyplyr")
+  # usethis::create_package("lucifer")
 
   usethis::use_mit_license("Akira Hayashi")
   usethis::use_coverage(type = "coveralls")
@@ -20,7 +20,7 @@
 #+END_SRC
 ** 使用したパッケージ
 #+BEGIN_SRC R :results silent
-  usethis::use_testthat("tinyplyr")
+  usethis::use_testthat("lucifer")
   usethis::use_package("magrittr")
   usethis::use_package("lubridate")
   usethis::use_package("stringr")
@@ -45,8 +45,8 @@
 #+END_SRC
 * テスト
 #+BEGIN_SRC R :exports none :tangle tests/testthat/test_numdate.R
-  # This file is tangled from tinyplyr.org.
-  # (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
+  # This file is tangled from lucifer.org.
+  # (https://github.com/smxshxishxad/lucifer/lucifer.org)
   # Edit that file.
 
   context("Parse strings correctly")
@@ -114,8 +114,8 @@
 
 * 関数
 #+BEGIN_SRC R :tangle R/numdate.R :exports code
-  # This file is tangled from tinyplyr.org.
-  # (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
+  # This file is tangled from lucifer.org.
+  # (https://github.com/smxshxishxad/lucifer/lucifer.org)
   # Edit that file.
 
   num2datei <- function(x) {
@@ -145,7 +145,7 @@
       format <- "%m%d"
     else if (nchar(x) == 8 && substr(x, 1, 4) == as.character(year))
       format <- "%Y%m%d"
-    else if (tinyplyr::num2date(x) %>% substr(1, 4) == as.character(year))
+    else if (lucifer::num2date(x) %>% substr(1, 4) == as.character(year))
       format <- "XLjday"
     else
       stop("Something's wrong with \"date\" data.")
@@ -187,7 +187,7 @@
     format <- get_datefmt(x, year)
     switch(format,
            "heisei" = {
-             split  <- tinyplyr::split_jpdate(x)
+             split  <- lucifer::split_jpdate(x)
              year <- paste0(split$era, split$year, "年") %>%
                Nippon::wareki2AD()
              date <-
@@ -202,7 +202,7 @@
              date     <- lubridate::ymd(yyyymmdd)
            },
            "XLjday" = {
-             date <- tinyplyr::num2date(x)
+             date <- lucifer::num2date(x)
            })
     as.character(date)
   }
