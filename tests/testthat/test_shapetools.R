@@ -11,3 +11,11 @@ test_that("make_rect() makes weired df into rectangular shape", {
   expect_equivalent(make_rect(data, range = "C5:B1"),
                     data.frame(B = 11:15, C = 21:25))
 })
+
+test_that("unmerge_horiz() fill NAs of merged columns", {
+  merged  <- load_alldata("merged.xlsx", sheet = "Sheet1")
+  newname <- unmerge_horiz(merged, 1) %>%
+    dplyr::slice(1) %>%
+    unlist(use.names = FALSE)
+  expect_equal(newname, c(NA, rep("A1", 3), rep("E1", 4)))
+})

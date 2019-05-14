@@ -15,3 +15,16 @@ make_rect <- function(df, range) {
   r <- max(from$col, to$col)
   df[t:b, l:r]
 }
+
+#' Fill NAs of merged columns by 'varname'
+#'
+#' @param row Row position of the cells to be filled by 'varname'
+#' @param regex Regex matches varname for filling
+unmerge_horiz <- function(df, row, regex = ".+") {
+  out        <- df
+  vars       <- df[row, ]
+  new_col    <- stringr::str_match(vars, regex) %>%
+    rep_na_rep()
+  out[row, ] <- new_col
+  out
+}
