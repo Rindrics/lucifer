@@ -27,3 +27,10 @@ test_that("unmerge_vert() fill NAs of merged rows", {
     as.vector()
   expect_equal(newname, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
 })
+
+test_that("rm_sumrow() remove summary rows from df", {
+  contami <- load_alldata("colsum_contami.xlsx", sheet = "Sheet1")
+  expect_equal(rm_sumrow(contami, key = "sum", colname = "A1") %>%
+                 dplyr::pull(1),
+               c(paste0("A", c(1:10, 12:20, 22:30))))
+})

@@ -41,3 +41,14 @@ unmerge_vert <- function(df, col, regex = ".+") {
   out[, col] <- new_row
   out
 }
+
+#' Remove summary rows from df
+#'
+#' @param key Regex to detect summary rows
+#' @param colname Name of the colmun contains key
+rm_sumrow <- function(df, key, colname) {
+  colpos <- stringr::str_which(df[1, ], colname)
+  target <- dplyr::pull(df, colpos)
+  df[-stringr::str_which(target, key), ]
+}
+
