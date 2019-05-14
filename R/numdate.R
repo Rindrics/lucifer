@@ -1,7 +1,3 @@
-# This file is tangled from tinyplyr.org.
-# (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
-# Edit that file.
-
 num2datei <- function(x) {
   jday_march01 <- 60
   x            <- as.numeric(x)
@@ -29,7 +25,7 @@ get_datefmt <- function(x, year) {
     format <- "%m%d"
   else if (nchar(x) == 8 && substr(x, 1, 4) == as.character(year))
     format <- "%Y%m%d"
-  else if (tinyplyr::num2date(x) %>% substr(1, 4) == as.character(year))
+  else if (lucifer::num2date(x) %>% substr(1, 4) == as.character(year))
     format <- "XLjday"
   else
     stop("Something's wrong with \"date\" data.")
