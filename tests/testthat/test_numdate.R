@@ -1,7 +1,3 @@
-# This file is tangled from tinyplyr.org.
-# (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
-# Edit that file.
-
 context("Parse strings correctly")
 
 test_that("num2datei () convert numdate from Excel correctly", {
