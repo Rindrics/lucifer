@@ -5,10 +5,14 @@
 * 目次                                                                :TOC_3:
 - [[#開発セットアップ][開発セットアップ]]
   - [[#使用したパッケージ][使用したパッケージ]]
+- [[#使ってみる][使ってみる]]
 - [[#再ロードしてテストを実行][再ロードしてテストを実行]]
 - [[#リリース][リリース]]
 - [[#テスト][テスト]]
 - [[#関数][関数]]
+  - [[#データ読み込み][データ読み込み]]
+  - [[#日付][日付]]
+  - [[#パイプ][パイプ]]
 
 * 開発セットアップ
 #+BEGIN_SRC R
@@ -27,13 +31,32 @@
   usethis::use_package("purrr")
   usethis::use_package("Nippon")
 #+END_SRC
+* 使ってみる
+	#+begin_src R
+      fname <- "../../../Google Drive/gkk/2017年3月/各県資料/山口県/106回湊市場資料.xlsx"
+
+      devtools::load_all()
+      (a <- load_rect(fname, "2015", range = "A3:Z40"))
+
+      devtools::load_all()
+      a <- load_rect(fname, "2015", range = "A3:Z40") %>%
+        unmerge_col(1, ".+") %>%
+        unmerge_row(1, ".+月") %>%
+        rm_sumrow(colname = "漁業種類", regex = "月") %>%
+        merge_colname(rows = c(1, 2)) %>%
+        make_ascii(1, rm = "\\s月") %>%
+        rm_sumcol(row = 1, regex = "合計") %>%
+        headerize(1) %>%
+        dplyr::rename(month = `NA`) %>%
+        data.frame()
+      a
+	#+end_src
 * 再ロードしてテストを実行
 #+BEGIN_SRC R :results output
   devtools::load_all()
-  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
   devtools::test()
-  lintr::lint_package()
 
+  lintr::lint_package()
   devtools::document(roclets=c('rd', 'collate', 'namespace'))
   devtools::check(args = "--as-cran")
   covr::package_coverage()
@@ -113,3 +136,6 @@
 #+END_SRC
 
 * 関数
+** [[file:R/load_data.R][データ読み込み]]
+** [[file:R/numdate.R][日付]]
+** [[file:R/util.R][パイプ]]
