@@ -52,3 +52,18 @@ rm_sumrow <- function(df, key, colname) {
   df[-stringr::str_which(target, key), ]
 }
 
+#' Remove summary cols from df
+#'
+#' @param key Regex to detect summary cols
+#' @param rowname Name of the row contains key
+rm_sumcol <- function(df, key, rowname, regex = FALSE) {
+  if (regex == TRUE) {
+    rowpos <- stringr::str_which(dplyr::pull(df, 1), rowname)
+  } else {
+    rowpos <- which(df[, 1] == rowname)
+  }
+  target <- dplyr::slice(df, rowpos) %>%
+    unlist() %>%
+    as.vector()
+  df[, -stringr::str_which(target, key)]
+}

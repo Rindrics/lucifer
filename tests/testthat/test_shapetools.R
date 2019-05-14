@@ -34,3 +34,19 @@ test_that("rm_sumrow() remove summary rows from df", {
                  dplyr::pull(1),
                c(paste0("A", c(1:10, 12:20, 22:30))))
 })
+
+test_that("rm_sumcol() remove summary cols from df", {
+  contami <- load_alldata("rowsum_contami.xlsx", sheet = "Sheet1")
+  expect_equal(rm_sumcol(contami, key = "sum", rowname = "A1") %>%
+                 dplyr::slice(1) %>%
+                 unlist() %>%
+                 as.vector(),
+               c(paste0(LETTERS[1:8][c(-4, -7)], 1)))
+
+  expect_equal(rm_sumcol(contami, key = "sum",
+                         rowname = "A1$", regex = TRUE) %>%
+                 dplyr::slice(1) %>%
+                 unlist() %>%
+                 as.vector(),
+               c(paste0(LETTERS[1:8][c(-4, -7)], 1)))
+})
