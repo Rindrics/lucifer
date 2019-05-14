@@ -28,3 +28,16 @@ unmerge_horiz <- function(df, row, regex = ".+") {
   out[row, ] <- new_col
   out
 }
+
+#' Fill NAs of merged rows by 'varname'
+#'
+#' @param col Col position of the cells to be filled by 'varname'
+#' @param regex Regex matches varname for filling
+unmerge_vert <- function(df, col, regex = ".+") {
+  out        <- df
+  vars       <- dplyr::pull(df, col)
+  new_row    <- stringr::str_match(vars, regex) %>%
+    rep_na_rep()
+  out[, col] <- new_row
+  out
+}

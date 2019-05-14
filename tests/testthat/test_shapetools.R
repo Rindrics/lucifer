@@ -19,3 +19,11 @@ test_that("unmerge_horiz() fill NAs of merged columns", {
     unlist(use.names = FALSE)
   expect_equal(newname, c(NA, rep("A1", 3), rep("E1", 4)))
 })
+
+test_that("unmerge_vert() fill NAs of merged rows", {
+  merged  <- load_alldata("merged.xlsx", sheet = "Sheet1")
+  newname <- unmerge_vert(merged, 1) %>%
+    dplyr::pull(1) %>%
+    as.vector()
+  expect_equal(newname, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
+})
