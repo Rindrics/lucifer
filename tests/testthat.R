@@ -1,4 +1,4 @@
 library(testthat)
-library(tinyplyr)
+library(lucifer)
 
-test_check("tinyplyr")
+test_check("lucifer")
