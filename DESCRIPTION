@@ -21,4 +21,7 @@ Imports:
     stringr,
     purrr,
     lubridate,
-    Nippon
+    Nippon,
+    cellranger,
+    dplyr,
+    readxl

@@ -5,10 +5,14 @@
 * 目次                                                                :TOC_3:
 - [[#開発セットアップ][開発セットアップ]]
   - [[#使用したパッケージ][使用したパッケージ]]
+- [[#使ってみる][使ってみる]]
 - [[#再ロードしてテストを実行][再ロードしてテストを実行]]
 - [[#リリース][リリース]]
 - [[#テスト][テスト]]
 - [[#関数][関数]]
+  - [[#データ読み込み][データ読み込み]]
+  - [[#日付][日付]]
+  - [[#パイプ][パイプ]]
 
 * 開発セットアップ
 #+BEGIN_SRC R
@@ -26,14 +30,36 @@
   usethis::use_package("stringr")
   usethis::use_package("purrr")
   usethis::use_package("Nippon")
+  usethis::use_package("cellranger")
+  usethis::use_package("dplyr")
+  usethis::use_package("readxl")
 #+END_SRC
+* 使ってみる
+	#+begin_src R
+      fname <- "../../../Google Drive/gkk/2017年3月/各県資料/山口県/106回湊市場資料.xlsx"
+
+      devtools::load_all()
+      (a <- load_rect(fname, "2015", range = "A3:Z40"))
+
+      devtools::load_all()
+      a <- load_rect(fname, "2015", range = "A3:Z40") %>%
+        unmerge_col(1, ".+") %>%
+        unmerge_row(1, ".+月") %>%
+        rm_sumrow(colname = "漁業種類", regex = "月") %>%
+        merge_colname(rows = c(1, 2)) %>%
+        make_ascii(1, rm = "\\s月") %>%
+        rm_sumcol(row = 1, regex = "合計") %>%
+        headerize(1) %>%
+        dplyr::rename(month = `NA`) %>%
+        data.frame()
+      a
+	#+end_src
 * 再ロードしてテストを実行
 #+BEGIN_SRC R :results output
   devtools::load_all()
-  system("R CMD INSTALL --preclean --no-multiarch --with-keep.source .")
   devtools::test()
-  lintr::lint_package()
 
+  lintr::lint_package()
   devtools::document(roclets=c('rd', 'collate', 'namespace'))
   devtools::check(args = "--as-cran")
   covr::package_coverage()
@@ -113,176 +139,6 @@
 #+END_SRC
 
 * 関数
-#+BEGIN_SRC R :tangle R/numdate.R :exports code
-  # This file is tangled from lucifer.org.
-  # (https://github.com/smxshxishxad/lucifer/lucifer.org)
-  # Edit that file.
-
-  num2datei <- function(x) {
-    jday_march01 <- 60
-    x            <- as.numeric(x)
-    if (x == jday_march01) {
-      stop("This date is not correct in Excel.")
-    }
-    if (x > jday_march01) {
-      x <- x - 1 # because of leap year
-    }
-    x    <- x - 1 # because of origin
-    date <- as.character(as.Date(x, origin = "1900-01-01"))
-    date
-  }
-
-  #' Get format of given date string
-  #'
-  #' @param x Date string to be judged
-  #' @param year \%Y of date string
-  #' @return Format of date string, one of '\%Y\%m\%d', '\%m\%d', or 'XLjday'.
-  get_datefmt <- function(x, year) {
-    format <- NA
-    if (stringr::str_detect(x, "^H\\.?\\d"))
-      format <- "heisei"
-    else if (nchar(x) == 4)
-      format <- "%m%d"
-    else if (nchar(x) == 8 && substr(x, 1, 4) == as.character(year))
-      format <- "%Y%m%d"
-    else if (lucifer::num2date(x) %>% substr(1, 4) == as.character(year))
-      format <- "XLjday"
-    else
-      stop("Something's wrong with \"date\" data.")
-    format
-  }
-
-  #' Split date str in japanese date format
-  #'
-  #' @param x Date string with year in Japanese era
-  #' @examples
-  #' split_jpdate("H30.01.01")
-  #' split_jpdate("H.30.01.01")
-  #' @export
-  split_jpdate <- function(x) {
-    initial <- substr(x, 1, 1)
-    switch(initial,
-         "H" = era <- "heisei")
-
-    year  <- stringr::str_match(x, "^[A-Za-z]\\.?([0-9]+)(?:\\.|-)")[2]
-    month <- stringr::str_match(x, "^[A-Za-z]\\.?[0-9]+(?:\\.|-)([0-9]+)")[2]
-    day   <-
-      stringr::str_match(x,
-                         "^[A-Za-z]\\.?[0-9]+(?:\\.|-)[0-9]+(?:\\.|-)([0-9]+)"
-                         )[2]
-    out   <- list("era"   = era,
-                  "year"  = as.numeric(year),
-                  "month" = as.numeric(month),
-                  "day"   = as.numeric(day)
-                  )
-    out
-  }
-
-  #' Standardize date string in format "\%Y-\%m-\%d" format
-  #'
-  #' @inheritParams get_datefmt
-  #' @return Date string standardized as "\%Y-\%m-\%d" format.
-  #' @export
-  stdz_date <- function(x, year) {
-    format <- get_datefmt(x, year)
-    switch(format,
-           "heisei" = {
-             split  <- lucifer::split_jpdate(x)
-             year <- paste0(split$era, split$year, "年") %>%
-               Nippon::wareki2AD()
-             date <-
-               lubridate::ymd(paste(year, split$month, split$day, sep = "-"))
-           },
-           "%Y%m%d" = {
-             yyyymmdd <- x
-             date     <- lubridate::ymd(yyyymmdd)
-           },
-           "%m%d"   = {
-             yyyymmdd <- paste0(year, x)
-             date     <- lubridate::ymd(yyyymmdd)
-           },
-           "XLjday" = {
-             date <- lucifer::num2date(x)
-           })
-    as.character(date)
-  }
-
-  #' Convert Julian date (Microsoft Excel style: origin = 1900-01-01)
-  #'   to \%Y-\%m-\%d
-  #'
-  #' @param x Julian day read from Excel spredsheets.
-  #' @return Date character in %Y-%m-%d format.
-  #' @examples
-  #' num2date(43466)
-  #' num2date(c(43466:43468, "43469"))
-  #' @export
-  num2date <- function(x) {
-    out <- purrr::map(x, num2datei)
-    out <- as.vector(unlist(out))
-    out
-  }
-
-  #' Judge whether date string is written in Japanese Calendar or not
-  #'
-  #' @param x Date string. Both '.' and '-' are allowed for separaters.
-  #' @return Bool.
-  #' @examples
-  #' is.jpdate("H31.1.1")
-  #' is.jpdate("H31.01.01")
-  #' is.jpdate("H31-01-01")
-  #' is.jpdate("H3100-01-01")
-  #' @export
-  is.jpdate <- function(x) {
-    stringr::str_detect(x, "[A-Z]\\.?[0-9]+(\\..|-)")
-  }
-
-
-  date2juliani <- function(x) {
-    if (is.jpdate(x) == TRUE) {
-      split  <- split_jpdate(x)
-      era    <- split$era
-      switch(era,
-             "heisei" = {
-               year  <- split$year + 1988
-               month <- split$month
-               day   <- split$day
-               date  <- as.Date(paste(year, month, day, sep = "-"))
-             })
-    } else {
-      date <- gsub("\\.", "-", x) %>%
-        as.Date()
-    }
-    jday <- julian.Date(date, origin = as.Date("1900-01-01"))
-    jday <- jday + 1 # Correct origin difference
-    jday <- jday + 1 # Correct leap year bug
-    as.numeric(jday[1])
-  }
-
-  #' Convert date to Excel Julian day
-  #'
-  #' @param x Date string in Gregorian or Japanes Calendar format.
-  #' @return Julian day (Microsoft Excel style: origin = 1900-01-01).
-  #' @examples
-  #' date2julian("H30.01.01")
-  #' date2julian("H30-01-01")
-  #' date2julian("H30.1.1")
-  #' date2julian("H30-1-1")
-  #' @export
-  date2julian <- function(x) {
-    out <- purrr::map(x, date2juliani)
-    out <- as.vector(unlist(out))
-    out
-  }
-#+END_SRC
-
-#+BEGIN_SRC R :tangle R/util.R :exports code
-#' Pipe operator
-#'
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
-#' @export
-#' @importFrom magrittr %>%
-#' @usage lhs \%>\% rhs
-NULL
-#+END_SRC
+** [[file:R/load_data.R][データ読み込み]]
+** [[file:R/numdate.R][日付]]
+** [[file:R/util.R][パイプ]]

@@ -67,7 +67,7 @@ stdz_date <- function(x, year) {
   format <- get_datefmt(x, year)
   switch(format,
          "heisei" = {
-           split  <- tinyplyr::split_jpdate(x)
+           split  <- lucifer::split_jpdate(x)
            year <- paste0(split$era, split$year, "年") %>%
              Nippon::wareki2AD()
            date <-
@@ -82,7 +82,7 @@ stdz_date <- function(x, year) {
            date     <- lubridate::ymd(yyyymmdd)
          },
          "XLjday" = {
-           date <- tinyplyr::num2date(x)
+           date <- lucifer::num2date(x)
          })
   as.character(date)
 }
