@@ -95,3 +95,23 @@ merge_colname <- function(df, rows, cols = NULL) {
   stringr::str_remove_all("_\\s|_NA")
   rbind(cname, nocname)
 }
+#' Convert full-width numbers in df into ASCII numbers
+#'
+#' @inheritParams make_rect
+#' @param col Number of the target column
+#' @param numerize If TRUE, remove characters convert column to numeric
+#' @export
+make_ascii <- function(df, col, numerize = FALSE) {
+  ascii <- df %>%
+    dplyr::pull(col) %>%
+    purrr::map_chr(Nippon::zen2han)
+  if (numerize) {
+    df[, col] <- ascii %>%
+      stringr::str_remove_all("\\D") %>%
+      readr::parse_number()
+  } else {
+    df[, col] <- ascii
+  }
+  df
+}
+
