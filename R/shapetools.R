@@ -67,3 +67,19 @@ rm_sumcol <- function(df, key, rowname, regex = FALSE) {
     as.vector()
   df[, -stringr::str_which(target, key)]
 }
+
+#' Merge colnames of multiple rows
+#'
+#' @param rows Rows of the target colnames to be concatenated
+#' @param cols Numbers of target columns if given
+#' @export
+merge_colname <- function(df, rows, cols = NULL) {
+  cname   <- df[rows[1], ]
+  nocname <- df[-rows, ]
+  if (is.null(cols)) {
+    cols <- 1:ncol(df)
+  }
+  cname[cols] <- purrr::map(cols, paste_rows, rows, df) %>%
+  stringr::str_remove_all("_\\s|_NA")
+  rbind(cname, nocname)
+}
