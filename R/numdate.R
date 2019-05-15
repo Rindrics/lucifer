@@ -29,7 +29,7 @@ get_datefmt <- function(x, year) {
     format <- "%m%d"
   else if (nchar(x) == 8 && substr(x, 1, 4) == as.character(year))
     format <- "%Y%m%d"
-  else if (tinyplyr::num2date(x) %>% substr(1, 4) == as.character(year))
+  else if (lucifer::num2date(x) %>% substr(1, 4) == as.character(year))
     format <- "XLjday"
   else
     stop("Something's wrong with \"date\" data.")
@@ -71,7 +71,7 @@ stdz_date <- function(x, year) {
   format <- get_datefmt(x, year)
   switch(format,
          "heisei" = {
-           split  <- tinyplyr::split_jpdate(x)
+           split  <- lucifer::split_jpdate(x)
            year <- paste0(split$era, split$year, "年") %>%
              Nippon::wareki2AD()
            date <-
@@ -86,7 +86,7 @@ stdz_date <- function(x, year) {
            date     <- lubridate::ymd(yyyymmdd)
          },
          "XLjday" = {
-           date <- tinyplyr::num2date(x)
+           date <- lucifer::num2date(x)
          })
   as.character(date)
 }

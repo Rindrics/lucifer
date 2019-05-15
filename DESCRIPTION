@@ -14,8 +14,8 @@ Suggests:
     testthat,
     covr
 RoxygenNote: 6.1.1
-URL: https://github.com/smxshxishxad/tinyplyr
-BugReports: https://github.com/smxshxishxad/tinyplyr/issues
+URL: https://github.com/kikirinrin/lucifer
+BugReports: https://github.com/kikirinrin/lucifer/issues
 Imports: 
     magrittr,
     stringr,
