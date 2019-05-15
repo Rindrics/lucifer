@@ -5,7 +5,7 @@ test_that("rep_na_rep() replace NAs", {
                c(NA, 1, rep(2, 4)))
 })
 
-test_that("paste_rows() pastes multiple cells on the given column" ,{
+test_that("paste_rows() pastes multiple cells on the given column", {
   df <- data.frame(a = c("foo", "bar", "baz", "bum"),
                    b = c("this", "is", "a", "test"),
                    c = 1:4)
