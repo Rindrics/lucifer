@@ -74,29 +74,29 @@ test_that("merge_colname() concatenates colnames in multiple rows", {
                  "D1_D2", "E1_E2", "F2_F2"))
 })
 
-test_that("make_ascii() convert full-width numbers into ASCII numbers", {
-  zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1")
-  expect_equal(make_ascii(zenkaku, 1) %>% dplyr::pull(1),
-               as.character(c("full", 1:5)))
-  expect_equal(make_ascii(zenkaku[-1, ], 1, numerize = TRUE) %>% dplyr::pull(1),
-               1:5)
-  expect_equal(make_ascii(zenkaku[-1, ], 2, numerize = TRUE) %>% dplyr::pull(2),
-               11:15)
-  expect_equal(make_ascii(zenkaku[-1, ], 3, numerize = TRUE) %>% dplyr::pull(3),
-               21:25)
-  expect_equal(make_ascii(zenkaku[-1, ], 4, numerize = TRUE) %>% dplyr::pull(4),
-               311:315)
-  expect_equal(make_ascii(zenkaku[-1, ], 5, numerize = TRUE) %>% dplyr::pull(5),
-               11:15)
-  expect_equal(make_ascii(zenkaku[-1, ], 6, numerize = TRUE) %>% dplyr::pull(6),
-               1:5)
-  expect_equal(make_ascii(zenkaku[-1, ], 7, numerize = TRUE) %>% dplyr::pull(7),
-               1:5)
-  expect_equal(make_ascii(zenkaku[-1, ], 6, numerize = FALSE) %>% dplyr::pull(6),
-               paste0(1:5, "月"))
-  expect_equal(make_ascii(zenkaku[-1, ], 7, numerize = FALSE) %>% dplyr::pull(7),
-               paste0(1:5, "トン"))
-})
+# test_that("make_ascii() convert full-width numbers into ASCII numbers", {
+#   zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1")
+#   expect_equal(make_ascii(zenkaku, 1) %>% dplyr::pull(1),
+#                as.character(c("full", 1:5)))
+#   expect_equal(make_ascii(zenkaku[-1, ], 1, numerize = TRUE) %>% dplyr::pull(1),
+#                1:5)
+#   expect_equal(make_ascii(zenkaku[-1, ], 2, numerize = TRUE) %>% dplyr::pull(2),
+#                11:15)
+#   expect_equal(make_ascii(zenkaku[-1, ], 3, numerize = TRUE) %>% dplyr::pull(3),
+#                21:25)
+#   expect_equal(make_ascii(zenkaku[-1, ], 4, numerize = TRUE) %>% dplyr::pull(4),
+#                311:315)
+#   expect_equal(make_ascii(zenkaku[-1, ], 5, numerize = TRUE) %>% dplyr::pull(5),
+#                11:15)
+#   expect_equal(make_ascii(zenkaku[-1, ], 6, numerize = TRUE) %>% dplyr::pull(6),
+#                1:5)
+#   expect_equal(make_ascii(zenkaku[-1, ], 7, numerize = TRUE) %>% dplyr::pull(7),
+#                1:5)
+#   expect_equal(make_ascii(zenkaku[-1, ], 6, numerize = FALSE) %>% dplyr::pull(6),
+#                paste0(1:5, "月"))
+#   expect_equal(make_ascii(zenkaku[-1, ], 7, numerize = FALSE) %>% dplyr::pull(7),
+#                paste0(1:5, "トン"))
+# })
 
 
 test_that("headerize() change specific row into df header", {
