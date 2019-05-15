@@ -1,6 +1,8 @@
 #' Make loaded df as rectangular-shape df
 #'
 #' @inheritParams readxl::read_excel
+#' @param df Data frame to be processed
+#' @param range Cell range to be extracted in Excel-format("A1:Z10")
 #' @export
 make_rect <- function(df, range) {
   from  <- stringr::str_extract(range, "^[A-Z]+[0-9]+") %>%
@@ -20,6 +22,8 @@ make_rect <- function(df, range) {
 #'
 #' @param row Row position of the cells to be filled by 'varname'
 #' @param regex Regex matches varname for filling
+#' @inheritParams make_rect
+#' @export
 unmerge_horiz <- function(df, row, regex = ".+") {
   out        <- df
   vars       <- df[row, ]
@@ -33,6 +37,8 @@ unmerge_horiz <- function(df, row, regex = ".+") {
 #'
 #' @param col Col position of the cells to be filled by 'varname'
 #' @param regex Regex matches varname for filling
+#' @inheritParams make_rect
+#' @export
 unmerge_vert <- function(df, col, regex = ".+") {
   out        <- df
   vars       <- dplyr::pull(df, col)
@@ -46,6 +52,8 @@ unmerge_vert <- function(df, col, regex = ".+") {
 #'
 #' @param key Regex to detect summary rows
 #' @param colname Name of the colmun contains key
+#' @inheritParams make_rect
+#' @export
 rm_sumrow <- function(df, key, colname) {
   colpos <- stringr::str_which(df[1, ], colname)
   target <- dplyr::pull(df, colpos)
@@ -56,6 +64,9 @@ rm_sumrow <- function(df, key, colname) {
 #'
 #' @param key Regex to detect summary cols
 #' @param rowname Name of the row contains key
+#' @param regex If TRUE, rowname was recognized by regular expression
+#' @inheritParams make_rect
+#' @export
 rm_sumcol <- function(df, key, rowname, regex = FALSE) {
   if (regex == TRUE) {
     rowpos <- stringr::str_which(dplyr::pull(df, 1), rowname)
@@ -72,6 +83,7 @@ rm_sumcol <- function(df, key, rowname, regex = FALSE) {
 #'
 #' @param rows Rows of the target colnames to be concatenated
 #' @param cols Numbers of target columns if given
+#' @inheritParams make_rect
 #' @export
 merge_colname <- function(df, rows, cols = NULL) {
   cname   <- df[rows[1], ]

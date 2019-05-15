@@ -17,6 +17,7 @@ rep_na_rep <- function(x) {
 #'
 #' @param col Position of the target column
 #' @param rows Rows to be concatenated
+#' @inheritParams make_rect
 paste_rows <- function(col, rows, df) {
   df[rows, ] %>%
   dplyr::pull(col) %>%
