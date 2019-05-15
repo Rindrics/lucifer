@@ -73,6 +73,7 @@ test_that("merge_colname() concatenates colnames in multiple rows", {
                c("A1_A2", "B1_B2", "C1_C2",
                  "D1_D2", "E1_E2", "F2_F2"))
 })
+
 test_that("make_ascii() convert full-width numbers into ASCII numbers", {
   zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1")
   expect_equal(make_ascii(zenkaku, 1) %>% dplyr::pull(1),
@@ -97,3 +98,10 @@ test_that("make_ascii() convert full-width numbers into ASCII numbers", {
                paste0(1:5, "トン"))
 })
 
+
+test_that("headerize() change specific row into df header", {
+  df <- data.frame(a = 1:10, b = 11:20, c = 21:30)
+  expect_equal(colnames(headerize(df, 1)), c("1", "11", "21"))
+  expect_equal(colnames(headerize(df, 2)), c("2", "12", "22"))
+  expect_equal(colnames(headerize(df, 3)), c("3", "13", "23"))
+})
