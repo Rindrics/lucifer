@@ -1,4 +1,5 @@
 # **lucifer**
+[![Build Status](https://travis-ci.org/kikirinrin/lucifer.svg?branch=master)](https://travis-ci.org/kikirinrin/lucifer)
 
 ![Satan/Lucifer arousing rebel angels](https://upload.wikimedia.org/wikipedia/commons/4/41/ParadiseLButts1.jpg)
 
