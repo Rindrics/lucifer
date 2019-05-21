@@ -46,3 +46,23 @@ make_hougan <- function(str) {
   out %<>% stringr::str_c(collapse = "")
   out
 }
+
+#' Locate keywords in row or column of the given data frame
+#'
+#' @inheritParams make_rect
+#' @param row Row position of df where the keyword appears
+#' @param col Column position of df where the keyword appears
+#' @param regex Regex to match keyword
+locate_keys <- function(df, row = NULL, col = NULL, regex){
+  if ( (!is.null(row) & !is.null(col)) |
+      (is.null(row) & is.null(col))) {
+    stop("Give either 'row' or 'col'")
+  } else if (!is.null(row)){
+    str <- df[row, ]
+  } else if (!is.null(col)){
+    str <- df[, col]
+  } else {
+    stop("Unknown case")
+  }
+  stringr::str_which(str, regex)
+}
