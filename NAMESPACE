@@ -2,8 +2,10 @@
 
 export("%>%")
 export(date2julian)
+export(headerize)
 export(is.jpdate)
 export(load_alldata)
+export(make_ascii)
 export(make_rect)
 export(merge_colname)
 export(num2date)
