@@ -5,6 +5,8 @@
 \title{Pipe operator}
 \usage{
 lhs \%>\% rhs
+
+#' @name %<>%
 }
 \description{
 Pipe operator
