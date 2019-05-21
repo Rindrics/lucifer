@@ -126,3 +126,52 @@ headerize <- function(df, row) {
   head <- df[row, ]
   magrittr::set_colnames(body, head)
 }
+
+#' Extract a block from df using the keyword
+#'
+#' This function is the substancial function of \code{extract_blocks()}.
+#' @inheritParams make_rect
+#' @param direction The direction to which data blocks distribute
+#' @param find_from The row or column position
+#'   which \code{excract_block()} search key
+#' @param pos.key Position where the \code{regex} of \code{extract_blocks()}
+#'   matched the keyword
+#' @param offset The offset (\code{c(row, pos})) of the block topleft from
+#'   the coordination of keyword
+#' @param dim Dimension (\code{c(row, col)}) of the block
+extract_a_block <- function(pos.key, find_from, direction, df,
+                          offset = c(0, 0), dim) {
+  rofst <- offset[1]
+  cofst <- offset[2]
+  nrow  <- dim[1]
+  ncol  <- dim[2]
+  if (direction == "row") {
+    row <- pos.key + rofst
+    col <- find_from + cofst
+  } else {
+    row <- find_from + rofst
+    col <- pos.key + cofst
+  }
+  df[row:(row + nrow - 1), col:(col + ncol - 1)]
+}
+#' Extract data blocks from data frame using the keyword
+#'
+#' @inheritParams make_rect
+#' @inheritParams extract_a_block
+#' @param regex Regular expression to match keywords
+#' @param col Column position from which the keyword to be searched
+#' @param row Row position from which the keyword to be searched
+extract_blocks <- function(df, regex, col = NULL, row = NULL,
+                           offset = c(0, 0), dim) {
+  if (!is.null(row)) {
+    pos <- locate_keys(df = df, row = row, regex = regex)
+    purrr::map(pos, extract_a_block, find_from = row,
+               direction = "col", df = df, offset = offset, dim = dim)
+  } else if (!is.null(col)) {
+    pos <- locate_keys(df = df, col = col, regex = regex)
+    purrr::map(pos, extract_a_block, find_from = col,
+               direction = "row", df = df, offset = offset, dim = dim)
+  } else {
+    stop("Unknown case")
+  }
+}
