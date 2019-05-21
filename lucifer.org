@@ -11,6 +11,7 @@
 - [[#テスト][テスト]]
 - [[#関数][関数]]
   - [[#データ読み込み][データ読み込み]]
+  - [[#filershapetoolsr][file:R/shapetools.R]]
   - [[#日付][日付]]
   - [[#パイプ][パイプ]]
 
@@ -31,6 +32,8 @@
   usethis::use_package("purrr")
   usethis::use_package("Nippon")
   usethis::use_package("cellranger")
+  usethis::use_package("readr")
+  usethis::use_package("tidyr")
   usethis::use_package("dplyr")
   usethis::use_package("readxl")
 #+END_SRC
@@ -60,7 +63,7 @@
   devtools::test()
 
   lintr::lint_package()
-  devtools::document(roclets=c('rd', 'collate', 'namespace'))
+  devtools::document(roclets = c("rd", "collate", "namespace"))
   devtools::check(args = "--as-cran")
   covr::package_coverage()
 #+END_SRC
@@ -140,5 +143,6 @@
 
 * 関数
 ** [[file:R/load_data.R][データ読み込み]]
+** file:R/shapetools.R
 ** [[file:R/numdate.R][日付]]
 ** [[file:R/util.R][パイプ]]
