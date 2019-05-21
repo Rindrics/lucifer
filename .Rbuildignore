@@ -1,4 +1,4 @@
 ^LICENSE\.md$
 ^codecov\.yml$
 ^\.travis\.yml$
-.+org$
+.+\.org$
