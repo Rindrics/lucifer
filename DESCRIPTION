@@ -24,4 +24,6 @@ Imports:
     Nippon,
     cellranger,
     dplyr,
-    readxl
+    readxl,
+    readr,
+    tidyr
