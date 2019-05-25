@@ -66,3 +66,52 @@ locate_keys <- function(df, row = NULL, col = NULL, regex){
   }
   stringr::str_which(str, regex)
 }
+
+#' Return the location of decrese in given vector
+#'
+#' @param x Numeric vector to be scanned
+which_decrease <- function(x) {
+  if (any(diff(x) < 0)) {
+    message("There is a decrease in given vector.")
+    out <- which(diff(x) < 0)
+    out <- structure(out, is.decrease = TRUE)
+    return(out)
+  } else {
+    x <- structure(x, is.decrease = FALSE)
+    x
+  }
+}
+
+#' Alert if skip detected in given vector
+#'
+#' @inheritParams which_decrease
+alert_skip <- function(x) {
+  if (any(abs(diff(x)) > 1)) {
+    stop("There is a skip in given vector")
+  } else {
+    x
+  }
+}
+
+#' Convert vectors composed only numeric jpyear without names of the eras.
+#'
+#' @param x numeric jpyear vectors
+#' @param start Name of the era
+jpyr2ad <- function(x, start) {
+  conv <- vector(mode = "integer") # To store conversion coefficients
+  suppressMessages(era_changed <- attributes(which_decrease(x))$is.decrease)
+  if (start == "showa") {
+    if (era_changed) {
+      pos_lastyr <- which_decrease(x)
+      conv[(pos_lastyr + 1):length(x)] <- 1988
+    } else {
+      pos_lastyr <- length(x)
+    }
+    conv[1:pos_lastyr] <- 1925
+  } else {
+    stop("jpyr2ad")
+  }
+  ad <- x + conv[1:length(x)]
+  alert_skip(ad)
+  ad
+}

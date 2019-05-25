@@ -49,3 +49,29 @@ test_that("locate_keys() locate positions of keys
   expect_error(locate_keys(df = data, regex = "a", row = 1, col = 1),
                "Give either 'row' or 'col'")
 })
+
+test_that("which_decrease() detect decrease in num vector", {
+  expect_silent(which_decrease(1:3))
+  expect_equal(which_decrease(1:3), 1:3, check.attributes = FALSE)
+  expect_equal(which_decrease(c(1:3, 7:10)),
+               c(1:3, 7:10), check.attributes = FALSE)
+  expect_equal(which_decrease(c(5:3)), c(1, 2), check.attributes = FALSE)
+  expect_equal(which_decrease(c(1:5, 4, 6:8)),
+               5, check.attributes = FALSE)
+  expect_message(which_decrease(c(1:5, 4, 6:8)),
+                 "There is a decrease in given vector")
+})
+
+test_that("Stop if alert_skip() detect skip in num vector", {
+  expect_silent(alert_skip(1:3))
+  expect_equal(alert_skip(1:3), 1:3)
+  expect_equal(alert_skip(c(5:3)), c(5:3))
+  expect_error(alert_skip(c(1:3, 7:10)))
+  expect_error(alert_skip(c(1:5, 4, 6:8)))
+})
+
+test_that("jpyr2ad() convert jpyear to A.D.", {
+  expect_equal(jpyr2ad(1:10, "showa"), 1926:1935)
+  expect_error(jpyr2ad(c(60:62, 1), "showa"))
+  expect_equal(jpyr2ad(c(60:63, 1), "showa"), c(1985:1989))
+})

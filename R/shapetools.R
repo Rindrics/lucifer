@@ -175,3 +175,40 @@ extract_blocks <- function(df, regex, col = NULL, row = NULL,
     stop("Unknown case")
   }
 }
+
+#' Gather month columns to rows
+#'
+#' @param df Data frame with month column
+mcol2row <- function(df) {
+  rtype <- attributes(df)$row.type
+  if (!is.null(rtype)) {
+    if (rtype == "jY") {
+      out <- df %>%
+        dplyr::mutate(year = jpyr2ad(year, "showa"))
+    } else if (rtype %in% c("fisY", "Y")){
+      out <- df
+    } else {
+      stop("Unknown row.type")
+    }
+  } else {
+    message("No row.type in df.")
+  }
+  out <- out %>%
+    dplyr::mutate(rowname = 1:nrow(df)) %>% #To resort after tidyr::gather()
+    tidyr::gather(key = month, value = catch,
+                  `1`, `2`, `3`, `4`, `5`, `6`,
+                  `7`, `8`, `9`, `10`, `11`, `12`) %>%
+    dplyr::arrange(year) %>%
+    dplyr::mutate(month = as.integer(month)) %>%
+    dplyr::arrange(rowname) %>%
+    dplyr::select(-rowname)
+  if (rtype == "fisY") {
+    out %>%
+      dplyr::mutate(year = ifelse(dplyr::between(month, 1, 3),
+                                  year + 1,
+                                  year)) %>%
+      dplyr::arrange(year)
+  } else {
+    out
+  }
+}
