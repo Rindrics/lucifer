@@ -196,7 +196,7 @@ mcol2row <- function(df) {
   out <- out %>%
     dplyr::mutate(rowname = 1:nrow(df)) %>% #To resort after tidyr::gather()
     tidyr::gather(key = month, value = catch,
-                  tidyselect::matches("[0-9]+")) %>%
+                  tidyselect::matches("[0-9][0-9]?")) %>%
     dplyr::arrange(year) %>%
     dplyr::mutate(month = as.integer(month)) %>%
     dplyr::arrange(rowname) %>%
