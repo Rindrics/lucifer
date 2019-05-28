@@ -4,10 +4,12 @@
 \alias{mcol2row}
 \title{Gather month columns to rows}
 \usage{
-mcol2row(df)
+mcol2row(df, varname)
 }
 \arguments{
 \item{df}{Data frame with month column}
+
+\item{varname}{Name of the new colname after gathering}
 }
 \description{
 Gather month columns to rows
