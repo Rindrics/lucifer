@@ -1,4 +1,4 @@
-#' Pipe operator
+#' Pipe operators
 #'
 #' @name %>%
 #' @rdname pipe
@@ -13,4 +13,8 @@
 #' @export
 #' @importFrom magrittr %<>%
 #' @usage lhs \%<>\% rhs
+
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c(".", "year", "month", "catch", "rowname"))
+}
 NULL
