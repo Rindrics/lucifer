@@ -33,6 +33,7 @@
   usethis::use_package("Nippon")
   usethis::use_package("cellranger")
   usethis::use_package("readr")
+  usethis::use_package("rlang")
   usethis::use_package("tidyr")
   usethis::use_package("dplyr")
   usethis::use_package("readxl")

@@ -229,3 +229,13 @@ test_that("ycol2row() gather ycol data", {
   converted <- ycol2row(df, varname = "catch")
   expect_equal(converted$year, rep(2019:2020, each = 12))
 })
+
+test_that("sheet2var() convert sheetname to variable", {
+  data <- load_alldata("sheetname.xlsx", sheet = "foo") %>%
+    headerize(1) %>%
+    structure(sheetname = "foo")
+  conv <- sheet2var(data, as = "misc")
+  expect_equal(unique(conv$misc), "foo")
+  conv <- sheet2var(data, as = "bar")
+  expect_equal(unique(conv$bar), "foo")
+})

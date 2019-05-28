@@ -223,3 +223,15 @@ ycol2row <- function(df, varname) {
     dplyr::select(year, month, tidyselect::everything()) %>%
     dplyr::mutate(year = as.integer(year))
 }
+
+#' Convert sheetname to variable
+#'
+#' @inheritParams mcol2row
+#' @param as Name of the new column which contains sheetnames
+sheet2var <- function(df, as) {
+  sheetname <- attr(df, "sheetname")
+  out <- df %>%
+    dplyr::mutate(!! as := sheetname)
+}
+
+#' Merge data from different sheets into single df
