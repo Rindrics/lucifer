@@ -192,7 +192,7 @@ test_that("mcol2row() gather YrowMcol data", {
                    month = rep(1:12, 19), catch = 1:(19 * 12)) %>%
     tidyr::spread(key = month, value = catch)
   df <- structure(df, row.type = "Y")
-  expect_equal(mcol2row(df),
+  expect_equal(mcol2row(df, varname = "catch"),
                data.frame(year = rep(2001:2019, each = 12),
                           month = rep(1:12, 19),
                           catch = 1:(19 * 12)))
@@ -205,7 +205,7 @@ test_that("mcol2row() gather fisYrowMcol data", {
     dplyr::select("year", as.character(4:12), as.character(1:3))
   df_fisy <- structure(df_fisy, row.type = "fisY")
 
-  converted <- mcol2row(df_fisy)
+  converted <- mcol2row(df_fisy, varname = "catch")
   expect_equal(converted$month, rep(c(4:12, 1:3), 19))
   expect_equal(converted$catch, 1:(19 * 12))
 })
@@ -216,7 +216,7 @@ test_that("mcol2row() gather jYrowMcol data", {
   colnames(df) <- c("year", as.character(1:12))
   df <- structure(df, row.type = "jY")
 
-  converted <- mcol2row(df)
+  converted <- mcol2row(df, varname = "catch")
   expect_equal(converted$year, rep(1985:2003, each = 12))
   expect_equal(converted$month, rep(1:12, 19))
 })

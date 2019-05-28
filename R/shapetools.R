@@ -179,7 +179,8 @@ extract_blocks <- function(df, regex, col = NULL, row = NULL,
 #' Gather month columns to rows
 #'
 #' @param df Data frame with month column
-mcol2row <- function(df) {
+#' @param varname Name of the new colname after gathering
+mcol2row <- function(df, varname) {
   rtype <- attributes(df)$row.type
   if (!is.null(rtype)) {
     if (rtype == "jY") {
@@ -195,8 +196,8 @@ mcol2row <- function(df) {
   }
   out <- out %>%
     dplyr::mutate(rowname = 1:nrow(df)) %>% #To resort after tidyr::gather()
-    tidyr::gather(key = month, value = catch,
-                  tidyselect::matches("[0-9]+")) %>%
+    tidyr::gather(key = month, value = !!varname,
+                  tidyselect::matches("[0-9][0-9]?")) %>%
     dplyr::arrange(year) %>%
     dplyr::mutate(month = as.integer(month)) %>%
     dplyr::arrange(rowname) %>%
