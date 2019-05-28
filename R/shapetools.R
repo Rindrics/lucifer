@@ -195,9 +195,9 @@ mcol2row <- function(df, varname) {
     message("No row.type in df.")
   }
   out <- out %>%
-    dplyr::mutate(rowname = 1:nrow(df)) %>% #To resort after tidyr::gather()
+    dplyr::mutate(rowname = 1:nrow(df)) %>% #To re-sort after tidyr::gather()
     tidyr::gather(key = month, value = !!varname,
-                  tidyselect::matches("[0-9][0-9]?")) %>%
+                  tidyselect::matches("^[0-9][0-9]?$")) %>%
     dplyr::arrange(year) %>%
     dplyr::mutate(month = as.integer(month)) %>%
     dplyr::arrange(rowname) %>%
@@ -211,4 +211,15 @@ mcol2row <- function(df, varname) {
   } else {
     out
   }
+}
+
+#' Gather year column to rows
+#'
+#' @inheritParams mcol2row
+ycol2row <- function(df, varname) {
+  df %>%
+    tidyr::gather(key = year, value = !!varname,
+                  tidyselect::matches("[0-9]{4}")) %>%
+    dplyr::select(year, month, tidyselect::everything()) %>%
+    dplyr::mutate(year = as.integer(year))
 }

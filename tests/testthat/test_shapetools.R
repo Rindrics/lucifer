@@ -220,3 +220,12 @@ test_that("mcol2row() gather jYrowMcol data", {
   expect_equal(converted$year, rep(1985:2003, each = 12))
   expect_equal(converted$month, rep(1:12, 19))
 })
+
+
+test_that("ycol2row() gather ycol data", {
+  df <- data.frame(month = 1:12, "2019" = 13:24, "2020" = 25:36) %>%
+    dplyr::rename(`2019` = X2019,
+                  `2020` = X2020)
+  converted <- ycol2row(df, varname = "catch")
+  expect_equal(converted$year, rep(2019:2020, each = 12))
+})
