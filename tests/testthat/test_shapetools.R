@@ -186,3 +186,56 @@ test_that("extract_blocks() returns row blocks", {
   expect_equal(data2[[2]]$b, 8:10)
   expect_equal(data2[[2]]$c, 18:20)
 })
+
+test_that("mcol2row() gather YrowMcol data", {
+  df <- data.frame(year = rep(2001:2019, each = 12),
+                   month = rep(1:12, 19), catch = 1:(19 * 12)) %>%
+    tidyr::spread(key = month, value = catch)
+  df <- structure(df, row.type = "Y")
+  expect_equal(mcol2row(df, varname = "catch"),
+               data.frame(year = rep(2001:2019, each = 12),
+                          month = rep(1:12, 19),
+                          catch = 1:(19 * 12)))
+})
+
+test_that("mcol2row() gather fisYrowMcol data", {
+  df_fisy <- data.frame(year = rep(2001:2019, each = 12),
+                        month = rep(c(4:12, 1:3), 19), catch = 1:(19 * 12)) %>%
+    tidyr::spread(key = month, value = catch) %>%
+    dplyr::select("year", as.character(4:12), as.character(1:3))
+  df_fisy <- structure(df_fisy, row.type = "fisY")
+
+  converted <- mcol2row(df_fisy, varname = "catch")
+  expect_equal(converted$month, rep(c(4:12, 1:3), 19))
+  expect_equal(converted$catch, 1:(19 * 12))
+})
+
+test_that("mcol2row() gather jYrowMcol data", {
+  df <- data.frame(cbind(year = c(60:63, 1:15),
+                         matrix(1:228, nrow = 19, ncol = 12, byrow = TRUE)))
+  colnames(df) <- c("year", as.character(1:12))
+  df <- structure(df, row.type = "jY")
+
+  converted <- mcol2row(df, varname = "catch")
+  expect_equal(converted$year, rep(1985:2003, each = 12))
+  expect_equal(converted$month, rep(1:12, 19))
+})
+
+
+test_that("ycol2row() gather ycol data", {
+  df <- data.frame(month = 1:12, "2019" = 13:24, "2020" = 25:36) %>%
+    dplyr::rename(`2019` = X2019,
+                  `2020` = X2020)
+  converted <- ycol2row(df, varname = "catch")
+  expect_equal(converted$year, rep(2019:2020, each = 12))
+})
+
+test_that("sheet2var() convert sheetname to variable", {
+  data <- load_alldata("sheetname.xlsx", sheet = "foo") %>%
+    headerize(1) %>%
+    structure(sheetname = "foo")
+  conv <- sheet2var(data, as = "misc")
+  expect_equal(unique(conv$misc), "foo")
+  conv <- sheet2var(data, as = "bar")
+  expect_equal(unique(conv$bar), "foo")
+})

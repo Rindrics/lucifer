@@ -175,3 +175,63 @@ extract_blocks <- function(df, regex, col = NULL, row = NULL,
     stop("Unknown case")
   }
 }
+
+#' Gather month columns to rows
+#'
+#' @param df Data frame with month column
+#' @param varname Name of the new colname after gathering
+mcol2row <- function(df, varname) {
+  rtype <- attributes(df)$row.type
+  if (!is.null(rtype)) {
+    if (rtype == "jY") {
+      out <- df %>%
+        dplyr::mutate(year = jpyr2ad(year, "showa"))
+    } else if (rtype %in% c("fisY", "Y")){
+      out <- df
+    } else {
+      stop("Unknown row.type")
+    }
+  } else {
+    message("No row.type in df.")
+  }
+  out <- out %>%
+    dplyr::mutate(rowname = 1:nrow(df)) %>% #To re-sort after tidyr::gather()
+    tidyr::gather(key = month, value = !!varname,
+                  tidyselect::matches("^[0-9][0-9]?$")) %>%
+    dplyr::arrange(year) %>%
+    dplyr::mutate(month = as.integer(month)) %>%
+    dplyr::arrange(rowname) %>%
+    dplyr::select(-rowname)
+  if (rtype == "fisY") {
+    out %>%
+      dplyr::mutate(year = ifelse(dplyr::between(month, 1, 3),
+                                  year + 1,
+                                  year)) %>%
+      dplyr::arrange(year)
+  } else {
+    out
+  }
+}
+
+#' Gather year column to rows
+#'
+#' @inheritParams mcol2row
+ycol2row <- function(df, varname) {
+  df %>%
+    tidyr::gather(key = year, value = !!varname,
+                  tidyselect::matches("[0-9]{4}")) %>%
+    dplyr::select(year, month, tidyselect::everything()) %>%
+    dplyr::mutate(year = as.integer(year))
+}
+
+#' Convert sheetname to variable
+#'
+#' @inheritParams mcol2row
+#' @param as Name of the new column which contains sheetnames
+sheet2var <- function(df, as) {
+  sheetname <- attr(df, "sheetname")
+  out <- df %>%
+    dplyr::mutate(!! as := sheetname)
+}
+
+#' Merge data from different sheets into single df

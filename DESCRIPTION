@@ -26,4 +26,6 @@ Imports:
     dplyr,
     readxl,
     readr,
-    tidyr
+    tidyr,
+    tidyselect,
+    rlang
