@@ -4,7 +4,8 @@
 \alias{rebel}
 \title{Rebel against godly Excel workbook}
 \usage{
-rebel(path, sheet.regex, row_merged = 0, col_merged = 0)
+rebel(path, sheet.regex, row_merged = 0, col_merged = 0,
+  cluster = NULL)
 }
 \arguments{
 \item{path}{Path to the xls/xlsx file.}
@@ -14,6 +15,8 @@ rebel(path, sheet.regex, row_merged = 0, col_merged = 0)
 \item{row_merged}{Row position of merged colnames}
 
 \item{col_merged}{Column position of merged rownames}
+
+\item{cluster}{List of cluster, direction, pos}
 }
 \description{
 Rebel against godly Excel workbook

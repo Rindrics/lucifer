@@ -4,7 +4,8 @@
 \alias{rebel_sheet}
 \title{Rebel against godly Excel worksheet}
 \usage{
-rebel_sheet(sheet, path, row_merged, col_merged)
+rebel_sheet(sheet, path, row_merged = 0, col_merged = 0,
+  cluster = NULL)
 }
 \arguments{
 \item{sheet}{Sheet to read. Either a string (the name of a sheet), or an
@@ -17,6 +18,8 @@ sheet.}
 \item{row_merged}{Row position of merged colnames}
 
 \item{col_merged}{Column position of merged rownames}
+
+\item{cluster}{List of cluster, direction, pos}
 }
 \description{
 Rebel against godly Excel worksheet
