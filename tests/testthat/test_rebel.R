@@ -10,7 +10,7 @@ test_that("rebel_sheet() beat up file with merged header", {
                c("A2", paste0(LETTERS[c(1, 3:8)], 3)))
 })
 
-test_that("rebel_sheet() beat up file with blocked data", {
+test_that("rebel_sheet() beat up file with clustered data", {
   beaten <- rebel_sheet(path = "clustered.xlsx", sheet = "foo",
                         cluster = list(dir = "col",
                                        pos = 1,
@@ -40,9 +40,25 @@ test_that("rebel() beat up file with merged header", {
   beaten <- rebel(path = "merged.xlsx", sheet.regex = "Sheet.",
                         row_merged = 1, col_merged = 1) %>%
     as.data.frame()
-  beaten
   expect_equal(as.vector(beaten[, 1]),
                rep(c(rep("A2", 7), rep("A10", 6), rep("A16", 8)), 2))
   expect_equal(as.vector(unlist(beaten[1, ])),
               c("A2", paste0(LETTERS[c(1, 3:8)], 3)))
+})
+
+test_that("rebel() beat up file with clustered data", {
+  beaten <- rebel(path = "clustered.xlsx", sheet.regex = "[0-9]+",
+                  cluster = list(dir = "col",
+                                 pos = 1,
+                                 regex = "b..",
+                                 offset = c(1, 0),
+                                 dim = c(5, 4))) %>%
+    as.data.frame()
+  expect_equal(colnames(beaten), c("this", "is", "a", "test"))
+  expect_equal(as.numeric(dplyr::pull(beaten, 2)),
+               rep(c(12:15, 22:25, 32:35), 2))
+  expect_equal(as.numeric(dplyr::pull(beaten, 3)),
+               rep(c(12:15, 22:25, 32:35), 2) + 30)
+  expect_equal(as.numeric(dplyr::pull(beaten, 4)),
+               rep(c(12:15, 22:25, 32:35), 2) + 60)
 })
