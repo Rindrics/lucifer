@@ -29,4 +29,5 @@ Imports:
     tidyr,
     tidyselect,
     rlang,
-    tibble
+    tibble,
+    stats
