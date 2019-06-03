@@ -10,6 +10,7 @@
 - [[#リリース][リリース]]
 - [[#テスト][テスト]]
 - [[#関数][関数]]
+  - [[#戦う][戦う]]
   - [[#データ読み込み][データ読み込み]]
   - [[#filershapetoolsr][file:R/shapetools.R]]
   - [[#日付][日付]]
@@ -33,8 +34,11 @@
   usethis::use_package("Nippon")
   usethis::use_package("cellranger")
   usethis::use_package("readr")
+  usethis::use_package("rlang")
   usethis::use_package("tidyr")
   usethis::use_package("dplyr")
+  usethis::use_package("stats")
+  usethis::use_package("tibble")
   usethis::use_package("readxl")
   usethis::use_package("tidyselect")
 #+END_SRC
@@ -62,8 +66,8 @@
 #+BEGIN_SRC R :results output
   devtools::load_all()
   devtools::test()
-
   lintr::lint_package()
+
   devtools::document(roclets = c("rd", "collate", "namespace"))
   devtools::check(args = "--as-cran")
   covr::package_coverage()
@@ -143,6 +147,8 @@
 #+END_SRC
 
 * 関数
+
+** [[file:R/rebel.R][戦う]]
 ** [[file:R/load_data.R][データ読み込み]]
 ** file:R/shapetools.R
 ** [[file:R/numdate.R][日付]]

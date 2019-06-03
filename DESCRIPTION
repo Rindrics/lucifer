@@ -27,4 +27,7 @@ Imports:
     readxl,
     readr,
     tidyr,
-    tidyselect
+    tidyselect,
+    rlang,
+    tibble,
+    stats
