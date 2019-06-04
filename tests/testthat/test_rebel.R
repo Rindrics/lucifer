@@ -37,7 +37,7 @@ test_that("rebel_sheet() beat up file with clustered data", {
 })
 
 test_that("rebel() beat up file with merged header", {
-  beaten <- rebel(path = "merged.xlsx", sheet.regex = "Sheet.",
+  beaten <- rebel(path = "merged.xlsx", sheet_regex = "Sheet.",
                         row_merged = 1, col_merged = 1) %>%
     as.data.frame()
   expect_equal(as.vector(beaten[, 1]),
@@ -47,7 +47,7 @@ test_that("rebel() beat up file with merged header", {
 })
 
 test_that("rebel() beat up file with clustered data", {
-  beaten <- rebel(path = "clustered.xlsx", sheet.regex = "[0-9]+",
+  beaten <- rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
                   cluster = list(dir = "col",
                                  pos = 1,
                                  regex = "b..",
