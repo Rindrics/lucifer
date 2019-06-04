@@ -28,4 +28,6 @@ Imports:
     readr,
     tidyr,
     tidyselect,
-    rlang
+    rlang,
+    tibble,
+    stats

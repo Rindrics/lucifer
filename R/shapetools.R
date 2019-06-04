@@ -127,19 +127,19 @@ headerize <- function(df, row) {
   magrittr::set_colnames(body, head)
 }
 
-#' Extract a block from df using the keyword
+#' Extract a cluster from df using the keyword
 #'
-#' This function is the substancial function of \code{extract_blocks()}.
+#' This function is the substancial function of \code{extract_clusters()}.
 #' @inheritParams make_rect
-#' @param direction The direction to which data blocks distribute
+#' @param direction The direction to which data clusters distribute
 #' @param find_from The row or column position
-#'   which \code{excract_block()} search key
-#' @param pos.key Position where the \code{regex} of \code{extract_blocks()}
+#'   which \code{excract_cluster()} search key
+#' @param pos.key Position where the \code{regex} of \code{extract_clusters()}
 #'   matched the keyword
-#' @param offset The offset (\code{c(row, pos})) of the block topleft from
+#' @param offset The offset (\code{c(row, pos})) of the cluster topleft from
 #'   the coordination of keyword
-#' @param dim Dimension (\code{c(row, col)}) of the block
-extract_a_block <- function(pos.key, find_from, direction, df,
+#' @param dim Dimension (\code{c(row, col)}) of the cluster
+extract_a_cluster <- function(pos.key, find_from, direction, df,
                           offset = c(0, 0), dim) {
   rofst <- offset[1]
   cofst <- offset[2]
@@ -154,22 +154,24 @@ extract_a_block <- function(pos.key, find_from, direction, df,
   }
   df[row:(row + nrow - 1), col:(col + ncol - 1)]
 }
-#' Extract data blocks from data frame using the keyword
+
+#' Extract data clusters from data frame using the keyword
 #'
+#' This function extracts data clusters from single Excel sheet.
 #' @inheritParams make_rect
-#' @inheritParams extract_a_block
+#' @inheritParams extract_a_cluster
 #' @param regex Regular expression to match keywords
 #' @param col Column position from which the keyword to be searched
 #' @param row Row position from which the keyword to be searched
-extract_blocks <- function(df, regex, col = NULL, row = NULL,
+extract_clusters <- function(df, regex, col = NULL, row = NULL,
                            offset = c(0, 0), dim) {
   if (!is.null(row)) {
     pos <- locate_keys(df = df, row = row, regex = regex)
-    purrr::map(pos, extract_a_block, find_from = row,
+    purrr::map(pos, extract_a_cluster, find_from = row,
                direction = "col", df = df, offset = offset, dim = dim)
   } else if (!is.null(col)) {
     pos <- locate_keys(df = df, col = col, regex = regex)
-    purrr::map(pos, extract_a_block, find_from = col,
+    purrr::map(pos, extract_a_cluster, find_from = col,
                direction = "row", df = df, offset = offset, dim = dim)
   } else {
     stop("Unknown case")
