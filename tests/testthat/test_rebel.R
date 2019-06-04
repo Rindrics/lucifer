@@ -36,6 +36,21 @@ test_that("rebel_sheet() beat up file with clustered data", {
   expect_equal(as.numeric(dplyr::pull(beaten, 2)), c(72:75, 82:85, 92:95))
 })
 
+test_that("rebel_sheet() beat up file with YrowMcol data", {
+  beaten <- rebel_sheet(path = "YrowMcol.xlsx", sheet = "Sheet1",
+                        row_type = "Y",
+                        col_type = list(name = "given_varname"))
+  beaten
+  expect_equal(colnames(beaten), c("year", "month", "given_varname"))
+  beaten <- beaten %>%
+    dplyr::mutate(year = as.numeric(year),
+                  month = as.numeric(month),
+                  given_varname = as.numeric(given_varname))
+  expect_equal(unique(beaten$year), 1969:2000)
+  expect_equal(unique(beaten$month), 1:12)
+  expect_equal(unique(beaten$given_varname), 1:384)
+})
+
 test_that("rebel() beat up file with merged header", {
   beaten <- rebel(path = "merged.xlsx", sheet_regex = "Sheet.",
                         row_merged = 1, col_merged = 1) %>%
