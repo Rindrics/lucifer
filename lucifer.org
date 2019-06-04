@@ -10,9 +10,9 @@
 - [[#リリース][リリース]]
 - [[#テスト][テスト]]
 - [[#関数][関数]]
-  - [[#戦う][戦う]]
   - [[#データ読み込み][データ読み込み]]
-  - [[#filershapetoolsr][file:R/shapetools.R]]
+  - [[#道具箱][道具箱]]
+  - [[#戦う][戦う]]
   - [[#日付][日付]]
   - [[#パイプ][パイプ]]
 
@@ -148,8 +148,8 @@
 
 * 関数
 
-** [[file:R/rebel.R][戦う]]
 ** [[file:R/load_data.R][データ読み込み]]
-** file:R/shapetools.R
+** [[file:R/shapetools.R][道具箱]]
+** [[file:R/rebel.R][戦う]]
 ** [[file:R/numdate.R][日付]]
 ** [[file:R/util.R][パイプ]]
