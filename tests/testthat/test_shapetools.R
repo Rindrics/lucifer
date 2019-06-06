@@ -197,6 +197,13 @@ test_that("mcol2row() gather YrowMcol data", {
                data.frame(year = rep(2001:2019, each = 12),
                           month = rep(1:12, 19),
                           catch = 1:(19 * 12)))
+  df_error <- structure(df, row_type = "foo")
+  expect_error(mcol2row(df_error, varname = "catch"))
+
+  df_noattr <- data.frame(year = rep(2001:2019, each = 12),
+                   month = rep(1:12, 19), catch = 1:(19 * 12)) %>%
+    tidyr::spread(key = month, value = catch)
+  expect_error(mcol2row(df_noattr, varname = "catch"))
 })
 
 test_that("mcol2row() gather fisYrowMcol data", {

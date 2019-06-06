@@ -194,7 +194,7 @@ mcol2row <- function(df, varname) {
       stop("Unknown row_type")
     }
   } else {
-    message("No row_type in df.")
+    stop("No row_type in df.")
   }
   out <- out %>%
     dplyr::mutate(rowname = 1:nrow(df)) %>% #To re-sort after tidyr::gather()
