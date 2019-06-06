@@ -65,6 +65,20 @@ test_that("rebel_sheet() beat up file contaminated by summary column", {
   expect_equal(unique(beaten$C1), 32:60)
 })
 
+test_that("rebel_sheet() beat up file contaminated by summary row", {
+  beaten <- rebel_sheet(path = "sumrow_contami.xlsx", sheet = "Sheet1",
+                        row_omit = list(key = "sum",
+                                        colpos = 1,
+                                        regex = FALSE))
+  beaten
+  expect_equal(colnames(beaten), paste0(LETTERS[c(1:8)], 1))
+  beaten <- beaten %>%
+    dplyr::mutate(B1 = as.numeric(B1),
+                  C1 = as.numeric(C1))
+  expect_equal(unique(beaten$B1), c(2:10, 12:20, 22:30))
+  expect_equal(unique(beaten$C1), c(32:40, 42:50, 52:60))
+})
+
 test_that("rebel() beat up file with merged header", {
   beaten <- rebel(path = "merged.xlsx", sheet_regex = "Sheet.",
                         row_merged = 1, col_merged = 1) %>%
