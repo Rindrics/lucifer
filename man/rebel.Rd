@@ -4,19 +4,43 @@
 \alias{rebel}
 \title{Rebel against godly Excel workbook}
 \usage{
-rebel(path, sheet.regex, row_merged = 0, col_merged = 0,
-  cluster = NULL)
+rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
+  cluster = NULL, row_type = NULL, col_type = NULL)
 }
 \arguments{
 \item{path}{Path to the xls/xlsx file.}
 
-\item{sheet.regex}{Regular expression to match sheetname}
+\item{sheet_regex}{Regular expression to match sheetname}
 
 \item{row_merged}{Row position of merged colnames}
 
 \item{col_merged}{Column position of merged rownames}
 
-\item{cluster}{List of cluster, direction, pos}
+\item{cluster}{List of parameters to control \code{\link{extract_clusters}}.
+\describe{
+  \item{dir}{direction of the cluster evolution}
+  \item{pos}{row- or column- position of the key to locate the cluster}
+  \item{regex}{same as that of \code{\link{extract_clusters}}}
+  \item{offset}{same as that of \code{\link{extract_clusters}}}
+  \item{dim}{same as that of \code{\link{extract_clusters}}}
+}}
+
+\item{row_type}{Type of row one of
+\describe{
+ \item{Y}{year}
+ \item{YM}{year-month}
+ \item{jY}{Japanese year}
+ \item{jYM}{Japanese year-month}
+ \item{fisY}{fiscal year}
+ \item{fisYM}{fiscal year-month}
+ \item{fisjYM}{fiscal Japanese year-month}
+}}
+
+\item{col_type}{list of parameters to control \code{\link{mcol2row}}.
+\describe{
+ \item{varname}{new varname, same as \code{value} of
+                 \code{\link[tidyr]{gather}}}
+}}
 }
 \description{
 Rebel against godly Excel workbook

@@ -36,8 +36,23 @@ test_that("rebel_sheet() beat up file with clustered data", {
   expect_equal(as.numeric(dplyr::pull(beaten, 2)), c(72:75, 82:85, 92:95))
 })
 
+test_that("rebel_sheet() beat up file with YrowMcol data", {
+  beaten <- rebel_sheet(path = "YrowMcol.xlsx", sheet = "Sheet1",
+                        row_type = "Y",
+                        col_type = list(name = "given_varname"))
+  beaten
+  expect_equal(colnames(beaten), c("year", "month", "given_varname"))
+  beaten <- beaten %>%
+    dplyr::mutate(year = as.numeric(year),
+                  month = as.numeric(month),
+                  given_varname = as.numeric(given_varname))
+  expect_equal(unique(beaten$year), 1969:2000)
+  expect_equal(unique(beaten$month), 1:12)
+  expect_equal(unique(beaten$given_varname), 1:384)
+})
+
 test_that("rebel() beat up file with merged header", {
-  beaten <- rebel(path = "merged.xlsx", sheet.regex = "Sheet.",
+  beaten <- rebel(path = "merged.xlsx", sheet_regex = "Sheet.",
                         row_merged = 1, col_merged = 1) %>%
     as.data.frame()
   expect_equal(as.vector(beaten[, 1]),
@@ -47,7 +62,7 @@ test_that("rebel() beat up file with merged header", {
 })
 
 test_that("rebel() beat up file with clustered data", {
-  beaten <- rebel(path = "clustered.xlsx", sheet.regex = "[0-9]+",
+  beaten <- rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
                   cluster = list(dir = "col",
                                  pos = 1,
                                  regex = "b..",
@@ -61,4 +76,19 @@ test_that("rebel() beat up file with clustered data", {
                rep(c(12:15, 22:25, 32:35), 2) + 30)
   expect_equal(as.numeric(dplyr::pull(beaten, 4)),
                rep(c(12:15, 22:25, 32:35), 2) + 60)
+})
+
+test_that("rebel() beat up file with YrowMcol data", {
+  beaten <- rebel(path = "YrowMcol.xlsx", sheet_regex = "Sheet.",
+                        row_type = "Y",
+                        col_type = list(name = "given_varname"))
+  beaten
+  expect_equal(colnames(beaten), c("year", "month", "given_varname"))
+  beaten <- beaten %>%
+    dplyr::mutate(year = as.numeric(year),
+                  month = as.numeric(month),
+                  given_varname = as.numeric(given_varname))
+  expect_equal(unique(beaten$year), 1969:2000)
+  expect_equal(unique(beaten$month), 1:12)
+  expect_equal(unique(beaten$given_varname), c(1:384, 401:784))
 })
