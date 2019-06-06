@@ -87,13 +87,15 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @param sheet_regex Regular expression to match sheetname
 #' @export
 rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
-                  cluster = NULL) {
+                  cluster = NULL, row_type = NULL, col_type = NULL) {
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
   out <- purrr::map_df(sheets, rebel_sheet, path = path,
              row_merged = row_merged,
              col_merged = col_merged,
-             cluster = cluster)
+             cluster = cluster,
+             row_type = row_type,
+             col_type = col_type)
   out
   as.data.frame(out)
 }

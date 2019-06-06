@@ -77,3 +77,18 @@ test_that("rebel() beat up file with clustered data", {
   expect_equal(as.numeric(dplyr::pull(beaten, 4)),
                rep(c(12:15, 22:25, 32:35), 2) + 60)
 })
+
+test_that("rebel() beat up file with YrowMcol data", {
+  beaten <- rebel(path = "YrowMcol.xlsx", sheet_regex = "Sheet.",
+                        row_type = "Y",
+                        col_type = list(name = "given_varname"))
+  beaten
+  expect_equal(colnames(beaten), c("year", "month", "given_varname"))
+  beaten <- beaten %>%
+    dplyr::mutate(year = as.numeric(year),
+                  month = as.numeric(month),
+                  given_varname = as.numeric(given_varname))
+  expect_equal(unique(beaten$year), 1969:2000)
+  expect_equal(unique(beaten$month), 1:12)
+  expect_equal(unique(beaten$given_varname), c(1:384, 401:784))
+})
