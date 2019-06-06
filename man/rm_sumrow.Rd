@@ -4,14 +4,16 @@
 \alias{rm_sumrow}
 \title{Remove summary rows from df}
 \usage{
-rm_sumrow(df, key, colname)
+rm_sumrow(df, key, colpos, regex)
 }
 \arguments{
 \item{df}{Data frame to be processed}
 
 \item{key}{Regex to detect summary rows}
 
-\item{colname}{Name of the colmun contains key}
+\item{colpos}{Position of the colmun contains key}
+
+\item{regex}{If TRUE, \code{key} was recognized as regular expression}
 }
 \description{
 Remove summary rows from df
