@@ -5,7 +5,8 @@
 \title{Rebel against godly Excel worksheet}
 \usage{
 rebel_sheet(sheet, path, row_merged = 0, col_merged = 0,
-  cluster = NULL, row_type = NULL, col_type = NULL)
+  cluster = NULL, row_type = NULL, col_type = NULL,
+  col_omit = NULL)
 }
 \arguments{
 \item{sheet}{Sheet to read. Either a string (the name of a sheet), or an
@@ -44,6 +45,8 @@ sheet.}
  \item{varname}{new varname, same as \code{value} of
                  \code{\link[tidyr]{gather}}}
 }}
+
+\item{col_omit}{list of parameters to control \code{\link{rm_sumcol}}}
 }
 \description{
 Rebel against godly Excel worksheet
