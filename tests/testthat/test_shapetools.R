@@ -29,7 +29,7 @@ test_that("unmerge_vert() fill NAs of merged rows", {
 })
 
 test_that("rm_sumrow() remove summary rows from df", {
-  contami <- load_alldata("colsum_contami.xlsx", sheet = "Sheet1")
+  contami <- load_alldata("sumrow_contami.xlsx", sheet = "Sheet1")
   expect_equal(rm_sumrow(contami, key = "sum", colpos = 1, regex = FALSE) %>%
                  dplyr::pull(1),
                c(paste0("A", c(1:10, 12:20, 22:30))))
@@ -39,7 +39,7 @@ test_that("rm_sumrow() remove summary rows from df", {
 })
 
 test_that("rm_sumcol() remove summary cols from df", {
-  contami <- load_alldata("rowsum_contami.xlsx", sheet = "Sheet1")
+  contami <- load_alldata("sumcol_contami.xlsx", sheet = "Sheet1")
   expect_equal(rm_sumcol(contami, key = "sum", rowpos = 1, regex = FALSE) %>%
                  dplyr::slice(1) %>%
                  unlist() %>%

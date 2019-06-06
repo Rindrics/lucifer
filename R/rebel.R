@@ -26,16 +26,21 @@
 #'   \item{varname}{new varname, same as \code{value} of
 #'                   \code{\link[tidyr]{gather}}}
 #'  }
+#' @param col_omit list of parameters to control \code{\link{rm_sumcol}}
+#' @param row_omit list of parameters to control \code{\link{rm_sumrow}}
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
-                        cluster = NULL, row_type = NULL, col_type = NULL) {
+                        cluster = NULL, row_type = NULL, col_type = NULL,
+                        row_omit = NULL, col_omit = NULL) {
   path <- structure(path,
                     sheet = sheet,
                     row_merged = row_merged,
                     col_merged = col_merged,
                     cluster = cluster,
                     row_type = row_type,
-                    col_type = col_type)
+                    col_type = col_type,
+                    row_omit = row_omit,
+                    col_omit = col_omit)
   path
   attributes <- attributes(path)
 
@@ -56,7 +61,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     } else {
       stop("Unknown dir")
     }
-  out
+    out
   }
 
   if (attributes$row_merged > 0) {
@@ -67,6 +72,21 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     out <- unmerge_horiz(out, row = attributes$col_merged) %>%
       merge_colname(rows = 1:(attributes$col_merged + 1))
   }
+
+  if (!is.null(attributes$row_omit)) {
+    out <- rm_sumrow(out,
+                     key = attributes$row_omit$key,
+                     colpos = attributes$row_omit$colpos,
+                     regex = attributes$row_omit$regex)
+  }
+
+  if (!is.null(attributes$col_omit)) {
+    out <- rm_sumcol(out,
+                     key = attributes$col_omit$key,
+                     rowpos = attributes$col_omit$rowpos,
+                     regex = attributes$col_omit$regex)
+  }
+
   if (is.list(out) & is.null(dim(out))) {
     out <- out %>%
       lapply(headerize, row = 1) %>%
@@ -74,6 +94,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   } else {
     out <- headerize(as.data.frame(out), row = 1) %>% tibble::as_tibble()
   }
+
+
   if (!is.null(attributes$row_type)) {
     out <- mcol2row(structure(out, row_type = attributes$row_type),
                     varname = attributes$col_type$name)
@@ -87,7 +109,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @param sheet_regex Regular expression to match sheetname
 #' @export
 rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
-                  cluster = NULL, row_type = NULL, col_type = NULL) {
+                  cluster = NULL, row_type = NULL, col_type = NULL,
+                  row_omit = NULL, col_omit = NULL) {
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
   out <- purrr::map_df(sheets, rebel_sheet, path = path,
@@ -95,7 +118,8 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
              col_merged = col_merged,
              cluster = cluster,
              row_type = row_type,
-             col_type = col_type)
+             col_type = col_type,
+             row_omit = row_omit, col_omit = col_omit)
   out
   as.data.frame(out)
 }
