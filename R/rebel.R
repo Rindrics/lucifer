@@ -115,16 +115,17 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @export
 rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                   cluster = NULL, row_type = NULL, col_type = NULL,
-                  row_omit = NULL, col_omit = NULL) {
+                  row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
   out <- purrr::map_df(sheets, rebel_sheet, path = path,
-             row_merged = row_merged,
-             col_merged = col_merged,
-             cluster = cluster,
-             row_type = row_type,
-             col_type = col_type,
-             row_omit = row_omit, col_omit = col_omit)
+                       row_merged = row_merged,
+                       col_merged = col_merged,
+                       cluster = cluster,
+                       row_type = row_type,
+                       col_type = col_type,
+                       row_omit = row_omit, col_omit = col_omit,
+                       fullwidth = fullwidth)
   out
   as.data.frame(out)
 }

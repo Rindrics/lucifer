@@ -95,3 +95,30 @@ test_that("rebel() beat up file contaminated by summary column", {
     dplyr::arrange(B1)
   expect_equal(unique(beaten$B1), c(2:30, 212:240))
 })
+
+test_that("rebel() beat up file contaminated by full-width characters", {
+  beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
+                  fullwidth = list(colpos = 1,
+                                   numerize = TRUE))
+  expect_equal(dplyr::pull(beaten, 1), rep(1:5, 2))
+
+  beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
+                  fullwidth = list(colpos = 1,
+                                   numerize = FALSE))
+  expect_equal(dplyr::pull(beaten, 1), rep(as.character(1:5), 2))
+
+  beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
+                  fullwidth = list(colpos = 2,
+                                   numerize = TRUE))
+  expect_equal(dplyr::pull(beaten, 2), rep(11:15, 2))
+
+  beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
+                  fullwidth = list(colpos = 6,
+                                   numerize = TRUE))
+  expect_equal(dplyr::pull(beaten, 6), rep(1:5, 2))
+
+  beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
+                  fullwidth = list(colpos = 6,
+                                   numerize = FALSE))
+  expect_equal(dplyr::pull(beaten, 6), rep(paste0(1:5, "月"), 2))
+})
