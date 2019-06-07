@@ -21,17 +21,18 @@
 #'   \item{fisYM}{fiscal year-month}
 #'   \item{fisjYM}{fiscal Japanese year-month}
 #'  }
-#' @param col_type list of parameters to control \code{\link{mcol2row}}.
+#' @param col_type List of parameters to control \code{\link{mcol2row}}.
 #'  \describe{
 #'   \item{varname}{new varname, same as \code{value} of
 #'                   \code{\link[tidyr]{gather}}}
 #'  }
-#' @param col_omit list of parameters to control \code{\link{rm_sumcol}}
-#' @param row_omit list of parameters to control \code{\link{rm_sumrow}}
+#' @param col_omit List of parameters to control \code{\link{rm_sumcol}}
+#' @param row_omit List of parameters to control \code{\link{rm_sumrow}}
+#' @param fullwidth List of parameters to cotrol \code{\link{make_ascii}}
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                         cluster = NULL, row_type = NULL, col_type = NULL,
-                        row_omit = NULL, col_omit = NULL) {
+                        row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
   path <- structure(path,
                     sheet = sheet,
                     row_merged = row_merged,
@@ -45,6 +46,10 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   attributes <- attributes(path)
 
   out <- load_alldata(path, sheet = sheet)
+
+  if (!is.null(fullwidth)) {
+    out <- make_ascii(out, col = fullwidth$col, numerize = fullwidth$numerize)
+  }
 
   if (!is.null(cluster)) {
     dir    <- cluster$dir
@@ -110,16 +115,17 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @export
 rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                   cluster = NULL, row_type = NULL, col_type = NULL,
-                  row_omit = NULL, col_omit = NULL) {
+                  row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
   out <- purrr::map_df(sheets, rebel_sheet, path = path,
-             row_merged = row_merged,
-             col_merged = col_merged,
-             cluster = cluster,
-             row_type = row_type,
-             col_type = col_type,
-             row_omit = row_omit, col_omit = col_omit)
+                       row_merged = row_merged,
+                       col_merged = col_merged,
+                       cluster = cluster,
+                       row_type = row_type,
+                       col_type = col_type,
+                       row_omit = row_omit, col_omit = col_omit,
+                       fullwidth = fullwidth)
   out
   as.data.frame(out)
 }
