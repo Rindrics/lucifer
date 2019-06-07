@@ -51,32 +51,37 @@ unmerge_vert <- function(df, col, regex = ".+") {
 #' Remove summary rows from df
 #'
 #' @param key Regex to detect summary rows
-#' @param colname Name of the colmun contains key
+#' @param colpos Position of the colmun contains key
+#' @param regex If TRUE, \code{key} was recognized as regular expression
 #' @inheritParams make_rect
 #' @export
-rm_sumrow <- function(df, key, colname) {
-  colpos <- stringr::str_which(df[1, ], colname)
+rm_sumrow <- function(df, key, colpos, regex) {
   target <- dplyr::pull(df, colpos)
-  df[-stringr::str_which(target, key), ]
+  if (regex) {
+    df[-stringr::str_which(target, key), ]
+  } else {
+    key_noregex <- paste0("^", key, "$")
+    df[-stringr::str_which(target, key_noregex), ]
+  }
 }
 
 #' Remove summary cols from df
 #'
 #' @param key Regex to detect summary cols
-#' @param rowname Name of the row contains key
-#' @param regex If TRUE, rowname was recognized by regular expression
+#' @param rowpos Position of the row contains key
+#' @param regex If TRUE, \code{rowname} was recognized as regular expression
 #' @inheritParams make_rect
 #' @export
-rm_sumcol <- function(df, key, rowname, regex = FALSE) {
-  if (regex == TRUE) {
-    rowpos <- stringr::str_which(dplyr::pull(df, 1), rowname)
-  } else {
-    rowpos <- which(df[, 1] == rowname)
-  }
+rm_sumcol <- function(df, key, rowpos, regex) {
   target <- dplyr::slice(df, rowpos) %>%
     unlist() %>%
     as.vector()
-  df[, -stringr::str_which(target, key)]
+  if (regex) {
+    df[, -stringr::str_which(target, key)]
+  } else {
+    key_noregex <- paste0("^", key, "$")
+    df[, -stringr::str_which(target, pattern = key_noregex)]
+  }
 }
 
 #' Merge colnames of multiple rows
@@ -183,18 +188,18 @@ extract_clusters <- function(df, regex, col = NULL, row = NULL,
 #' @param df Data frame with month column
 #' @param varname Name of the new colname after gathering
 mcol2row <- function(df, varname) {
-  rtype <- attributes(df)$row.type
-  if (!is.null(rtype)) {
-    if (rtype == "jY") {
+  rowtype <- attributes(df)$row_type
+  if (!is.null(rowtype)) {
+    if (rowtype == "jY") {
       out <- df %>%
         dplyr::mutate(year = jpyr2ad(year, "showa"))
-    } else if (rtype %in% c("fisY", "Y")){
+    } else if (rowtype %in% c("fisY", "Y")){
       out <- df
     } else {
-      stop("Unknown row.type")
+      stop("Unknown row_type")
     }
   } else {
-    message("No row.type in df.")
+    stop("No row_type in df.")
   }
   out <- out %>%
     dplyr::mutate(rowname = 1:nrow(df)) %>% #To re-sort after tidyr::gather()
@@ -204,7 +209,7 @@ mcol2row <- function(df, varname) {
     dplyr::mutate(month = as.integer(month)) %>%
     dplyr::arrange(rowname) %>%
     dplyr::select(-rowname)
-  if (rtype == "fisY") {
+  if (rowtype == "fisY") {
     out %>%
       dplyr::mutate(year = ifelse(dplyr::between(month, 1, 3),
                                   year + 1,

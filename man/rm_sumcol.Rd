@@ -4,16 +4,16 @@
 \alias{rm_sumcol}
 \title{Remove summary cols from df}
 \usage{
-rm_sumcol(df, key, rowname, regex = FALSE)
+rm_sumcol(df, key, rowpos, regex)
 }
 \arguments{
 \item{df}{Data frame to be processed}
 
 \item{key}{Regex to detect summary cols}
 
-\item{rowname}{Name of the row contains key}
+\item{rowpos}{Position of the row contains key}
 
-\item{regex}{If TRUE, rowname was recognized by regular expression}
+\item{regex}{If TRUE, \code{rowname} was recognized as regular expression}
 }
 \description{
 Remove summary cols from df
