@@ -37,15 +37,15 @@ rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
  \item{fisjYM}{fiscal Japanese year-month}
 }}
 
-\item{col_type}{list of parameters to control \code{\link{mcol2row}}.
+\item{col_type}{List of parameters to control \code{\link{mcol2row}}.
 \describe{
  \item{varname}{new varname, same as \code{value} of
                  \code{\link[tidyr]{gather}}}
 }}
 
-\item{row_omit}{list of parameters to control \code{\link{rm_sumrow}}}
+\item{row_omit}{List of parameters to control \code{\link{rm_sumrow}}}
 
-\item{col_omit}{list of parameters to control \code{\link{rm_sumcol}}}
+\item{col_omit}{List of parameters to control \code{\link{rm_sumcol}}}
 }
 \description{
 Rebel against godly Excel workbook

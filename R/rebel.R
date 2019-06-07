@@ -21,13 +21,13 @@
 #'   \item{fisYM}{fiscal year-month}
 #'   \item{fisjYM}{fiscal Japanese year-month}
 #'  }
-#' @param col_type list of parameters to control \code{\link{mcol2row}}.
+#' @param col_type List of parameters to control \code{\link{mcol2row}}.
 #'  \describe{
 #'   \item{varname}{new varname, same as \code{value} of
 #'                   \code{\link[tidyr]{gather}}}
 #'  }
-#' @param col_omit list of parameters to control \code{\link{rm_sumcol}}
-#' @param row_omit list of parameters to control \code{\link{rm_sumrow}}
+#' @param col_omit List of parameters to control \code{\link{rm_sumcol}}
+#' @param row_omit List of parameters to control \code{\link{rm_sumrow}}
 #' @param fullwidth List of parameters to cotrol \code{\link{make_ascii}}
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
