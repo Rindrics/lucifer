@@ -49,6 +49,7 @@ sheet.}
 \item{row_omit}{list of parameters to control \code{\link{rm_sumrow}}}
 
 \item{col_omit}{list of parameters to control \code{\link{rm_sumcol}}}
+\item{fullwidth}{List of parameters to cotrol \code{\link{make_ascii}}}
 }
 \description{
 Rebel against godly Excel worksheet
