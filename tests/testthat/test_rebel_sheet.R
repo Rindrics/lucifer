@@ -78,13 +78,3 @@ test_that("rebel_sheet() beat up file contaminated by summary row", {
   expect_equal(unique(beaten$B1), c(2:10, 12:20, 22:30))
   expect_equal(unique(beaten$C1), c(32:40, 42:50, 52:60))
 })
-
-test_that("rebel() beat up file with merged header", {
-  beaten <- rebel(path = "merged.xlsx", sheet_regex = "Sheet.",
-                        row_merged = 1, col_merged = 1) %>%
-    as.data.frame()
-  expect_equal(as.vector(beaten[, 1]),
-               rep(c(rep("A2", 7), rep("A10", 6), rep("A16", 8)), 2))
-  expect_equal(as.vector(unlist(beaten[1, ])),
-              c("A2", paste0(LETTERS[c(1, 3:8)], 3)))
-})
