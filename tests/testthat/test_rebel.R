@@ -1,13 +1,17 @@
 context("Rebel against godly Excel workbook")
 
 test_that("rebel() beat up file with merged header", {
-  beaten <- rebel(path = "merged.xlsx", sheet_regex = "Sheet.",
+  fname <- "merged.xlsx"
+  beaten <- rebel(path = fname, sheet_regex = "Sheet.",
                         row_merged = 1, col_merged = 1) %>%
     as.data.frame()
+  beaten
   expect_equal(as.vector(beaten[, 1]),
                rep(c(rep("A2", 7), rep("A10", 6), rep("A16", 8)), 2))
   expect_equal(as.vector(unlist(beaten[1, ])),
-              c("A2", paste0(LETTERS[c(1, 3:8)], 3)))
+              c("A2", paste0(LETTERS[c(1, 3:8)], 3), fname, "Sheet1"))
+  expect_equal(as.vector(unlist(beaten[22, ])),
+              c("A2", paste0(LETTERS[c(1, 3:8)], 13), fname, "Sheet2"))
 })
 
 test_that("rebel() beat up file with clustered data", {
@@ -18,7 +22,8 @@ test_that("rebel() beat up file with clustered data", {
                                  offset = c(1, 0),
                                  dim = c(5, 4))) %>%
     as.data.frame()
-  expect_equal(colnames(beaten), c("this", "is", "a", "test"))
+  beaten
+  expect_equal(colnames(beaten), c("this", "is", "a", "test", "fname", "sheet"))
   expect_equal(as.numeric(dplyr::pull(beaten, 2)),
                rep(c(12:15, 22:25, 32:35), 2))
   expect_equal(as.numeric(dplyr::pull(beaten, 3)),
@@ -32,7 +37,8 @@ test_that("rebel() beat up file with YrowMcol data", {
                         row_type = "Y",
                         col_type = list(name = "given_varname"))
   beaten
-  expect_equal(colnames(beaten), c("year", "month", "given_varname"))
+  expect_equal(colnames(beaten),
+               c("year", "fname", "sheet", "month", "given_varname"))
   beaten <- beaten %>%
     dplyr::mutate(year = as.numeric(year),
                   month = as.numeric(month),
@@ -48,7 +54,7 @@ test_that("rebel() beat up file contaminated by summary row", {
                                   colpos = 1,
                                   regex = FALSE))
   beaten
-  expect_equal(colnames(beaten), paste0(LETTERS[1:8], 1))
+  expect_equal(colnames(beaten), c(paste0(LETTERS[1:8], 1), "fname", "sheet"))
   beaten <- beaten %>%
     dplyr::mutate(B1 = as.numeric(B1),
                   C1 = as.numeric(C1)) %>%
@@ -61,7 +67,7 @@ test_that("rebel() beat up file contaminated by summary row", {
                                   colpos = 1,
                                   regex = TRUE))
   beaten
-  expect_equal(colnames(beaten), paste0(LETTERS[1:8], 1))
+  expect_equal(colnames(beaten), c(paste0(LETTERS[1:8], 1), "fname", "sheet"))
   beaten <- beaten %>%
     dplyr::mutate(B1 = as.numeric(B1),
                   C1 = as.numeric(C1)) %>%
@@ -76,7 +82,8 @@ test_that("rebel() beat up file contaminated by summary column", {
                                   rowpos = 1,
                                   regex = FALSE))
   beaten
-  expect_equal(colnames(beaten), paste0(LETTERS[c(1:3, 5:6, 8)], 1))
+  expect_equal(colnames(beaten),
+               c(paste0(LETTERS[c(1:3, 5:6, 8)], 1), "fname", "sheet"))
   beaten <- beaten %>%
     dplyr::mutate(B1 = as.numeric(B1),
                   C1 = as.numeric(C1)) %>%
@@ -88,7 +95,8 @@ test_that("rebel() beat up file contaminated by summary column", {
                                   rowpos = 1,
                                   regex = TRUE))
   beaten
-  expect_equal(colnames(beaten), paste0(LETTERS[c(1:3, 5:6, 8)], 1))
+  expect_equal(colnames(beaten),
+               c(paste0(LETTERS[c(1:3, 5:6, 8)], 1), "fname", "sheet"))
   beaten <- beaten %>%
     dplyr::mutate(B1 = as.numeric(B1),
                   C1 = as.numeric(C1)) %>%
