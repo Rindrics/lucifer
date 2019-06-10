@@ -34,6 +34,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                         cluster = NULL, row_type = NULL, col_type = NULL,
                         row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
   path <- structure(path,
+                    fpath = path,
                     sheet = sheet,
                     row_merged = row_merged,
                     col_merged = col_merged,
@@ -95,10 +96,14 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   if (is.list(out) & is.null(dim(out))) {
     out <- out %>%
       lapply(headerize, row = 1) %>%
-      purrr::invoke(rbind, .)
+      purrr::invoke(rbind, .) %>%
+      add_reference(attributes$fpath, attributes$sheet)
   } else {
-    out <- headerize(as.data.frame(out), row = 1) %>% tibble::as_tibble()
+    out <- headerize(as.data.frame(out), row = 1) %>%
+      tibble::as_tibble() %>%
+      add_reference(attributes$fpath, attributes$sheet)
   }
+  out
 
 
   if (!is.null(attributes$row_type)) {
