@@ -1,3 +1,13 @@
+#' Vectorize a row
+#'
+#' @inheritParams make_rect
+#' @param row Position of row to be vectorized
+vectorize_row <- function(df, row) {
+  df[row, ] %>%
+    unlist() %>%
+    unname()
+}
+
 #' Replace NAs in given vector by the repetition of the prior value
 #'
 #' @param x Vector containing value and NA
@@ -73,9 +83,9 @@ locate_keys <- function(df, row = NULL, col = NULL, regex){
       (is.null(row) & is.null(col))) {
     stop("Give either 'row' or 'col'")
   } else if (!is.null(row)){
-    str <- df[row, ]
+    str <- vectorize_row(df, row)
   } else if (!is.null(col)){
-    str <- df[, col]
+    str <- dplyr::pull(df, col)
   } else {
     stop("Unknown case")
   }
