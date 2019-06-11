@@ -1,8 +1,17 @@
-context("Process vectors")
+context("Test component functions")
 
 test_that("rep_na_rep() replace NAs", {
   expect_equal(rep_na_rep(c(NA, 1, 2, rep(NA, 3))),
                c(NA, 1, rep(2, 4)))
+})
+
+test_that("list2df() expands list to data frame", {
+  list <- list(foo = 3, bar = TRUE, baz = "baz")
+  nrow <- 10
+  df    <- list2df(list, nrow)
+  expect_equal(df$foo, as.character(rep(3, nrow)))
+  expect_equal(df$bar, as.character(rep(TRUE, nrow)))
+  expect_equal(df$baz, as.character(rep("baz", nrow)))
 })
 
 test_that("paste_rows() pastes multiple cells on the given column", {

@@ -47,6 +47,21 @@ make_hougan <- function(str) {
   out
 }
 
+#' Expand single value list to data frame
+#'
+#' @param list List with `key = value` pairs
+#' @param nrow Nrows of df to be created
+list2df <- function(list, nrow) {
+  names <- names(list)
+  list %>%
+    unlist() %>%
+    unname() %>%
+    rep(nrow, each = nrow) %>%
+    matrix(ncol = length(list), nrow = nrow) %>%
+    data.frame(stringsAsFactors = FALSE) %>%
+    magrittr::set_colnames(names)
+}
+
 #' Locate keywords in row or column of the given data frame
 #'
 #' @inheritParams make_rect
