@@ -208,13 +208,26 @@ test_that("rm_nacol() remove na columns", {
   expect_equal(colnames(rm_nacols(df)), c("foo", "baz"))
 })
 
+test_that("gather_cols() gather YrowMcol data", {
   df <- data.frame(year = rep(2001:2019, each = 12),
                    month = rep(1:12, 19), catch = 1:(19 * 12)) %>%
     tidyr::spread(key = month, value = catch)
 
+  converted <- gather_cols(df, regex = "[1-2]?[0-9]",
+                          newname = "foo", varname = "bar")
+  expect_setequal(converted$year, rep(2001:2019, each = 12))
+  expect_setequal(converted$foo, as.character(rep(1:12, 19)))
+  expect_setequal(converted$bar, 1:(19 * 12))
 })
 
 
+test_that("gather_cols() gather ycol data correctly", {
+  df <- data.frame(month = 1:12, "2019" = 13:24, "2020" = 25:36) %>%
+    dplyr::rename(`2019` = X2019,
+                  `2020` = X2020)
+  converted <- gather_cols(df, regex = "[0-9]{4}",
+                          newname = "foo", varname = "bar")
+  expect_equal(converted$foo, as.character(rep(2019:2020, each = 12)))
 })
 
 

@@ -56,6 +56,19 @@ unmerge_vert <- function(df, col, regex = ".+") {
   out
 }
 
+#' Gather columns to variable
+#'
+#' @inheritParams make_rect
+#' @param regex Regex to match columns to be gathered
+#' @param newname New name for colnames to be gatherd
+#' @param varname New name for values to be gatherd
+gather_cols <- function(df, regex, newname, varname) {
+  cols2gather <- stringr::str_extract(colnames(df), regex) %>%
+    stats::na.omit()
+  df %>%
+    tidyr::gather_(cols2gather, key = newname, value = varname)
+}
+
 #' Remove summary rows from df
 #'
 #' @param key Regex to detect summary rows
