@@ -97,9 +97,11 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     out <- out %>%
       lapply(headerize, row = 1) %>%
       purrr::invoke(rbind, .) %>%
+      rm_nacols() %>%
       add_reference(attributes$fpath, attributes$sheet)
   } else {
     out <- headerize(as.data.frame(out), row = 1) %>%
+      rm_nacols() %>%
       tibble::as_tibble() %>%
       add_reference(attributes$fpath, attributes$sheet)
   }

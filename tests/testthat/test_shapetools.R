@@ -191,6 +191,12 @@ test_that("extract_clusters() return clusters in column direction", {
   expect_equal(data2[[2]]$c, 18:20)
 })
 
+test_that("rm_nacol() remove na columns", {
+  df <- data.frame(a = 1:10, b = 11:20, c = 21:30)
+  colnames(df) <- c("foo", NA, "baz")
+  expect_equal(colnames(rm_nacols(df)), c("foo", "baz"))
+})
+
   df <- data.frame(year = rep(2001:2019, each = 12),
                    month = rep(1:12, 19), catch = 1:(19 * 12)) %>%
     tidyr::spread(key = month, value = catch)

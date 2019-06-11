@@ -132,6 +132,15 @@ headerize <- function(df, row) {
   magrittr::set_colnames(body, head)
 }
 
+#' Remove column whose colname is NA
+#'
+#' @inheritParams make_rect
+#' @export
+rm_nacols <- function(df) {
+  napos <- !is.na(colnames(df))
+  df[, napos]
+}
+
 #' Extract a cluster from df using the keyword
 #'
 #' This function is the substancial function of \code{extract_clusters()}.
