@@ -28,6 +28,17 @@ test_that("unmerge_vert() fill NAs of merged rows", {
   expect_equal(newname, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
 })
 
+test_that("append_info() append information stored in a list to df as column", {
+  info  <- list(foo = 1, bar = 2, baz = 3)
+  df    <- data.frame(a = 1:10, b = 11:20)
+  newdf <- append_info(df = df, info = info)
+  expect_equal(newdf$a, 1:10)
+  expect_equal(newdf$b, 11:20)
+  expect_equal(newdf$foo, rep(1, nrow(df)))
+  expect_equal(newdf$bar, rep(2, nrow(df)))
+  expect_equal(newdf$baz, rep(3, nrow(df)))
+})
+
 test_that("rm_sumrow() remove summary rows from df", {
   contami <- load_alldata("sumrow_contami.xlsx", sheet = "Sheet1")
   expect_equal(rm_sumrow(contami, key = "sum", colpos = 1, regex = FALSE) %>%

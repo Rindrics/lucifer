@@ -18,6 +18,14 @@ make_rect <- function(df, range) {
   df[t:b, l:r]
 }
 
+#' Append information stored in list to data frame
+#'
+#' @param info List conposed of `key = value` pairs
+#' @inheritParams make_rect
+append_info <- function(info, df) {
+  cbind(df, list2df(info, nrow = nrow(df)))
+}
+
 #' Fill NAs of merged columns by 'varname'
 #'
 #' @param row Row position of the cells to be filled by 'varname'
