@@ -9,6 +9,7 @@
 - [[#再ロードしてテストを実行][再ロードしてテストを実行]]
 - [[#リリース][リリース]]
 - [[#テスト][テスト]]
+  - [[#fileteststestthattest_aomorir][file:tests/testthat/test_aomori.R]]
 - [[#関数][関数]]
   - [[#データ読み込み][データ読み込み]]
   - [[#道具箱][道具箱]]
@@ -145,6 +146,7 @@
     expect_setequal(date2julian(c("H.29.8.22", "H29-08-23")), c(42969, 42970))
   })
 #+END_SRC
+** file:tests/testthat/test_aomori.R
 
 * 関数
 
