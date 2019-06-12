@@ -27,6 +27,17 @@ test_that("unmerge_vert() fill NAs of merged rows", {
     as.vector()
   expect_equal(newname, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
 })
+test_that("append_info() append information stored in a list to df as column", {
+
+  info  <- list(foo = 1, bar = 2, baz = 3)
+  df    <- data.frame(a = 1:10, b = 11:20)
+  newdf <- append_info(df = df, info = info, headerized = TRUE)
+  expect_equal(newdf$a, 1:10)
+  expect_equal(newdf$b, 11:20)
+  expect_equal(newdf$foo, rep(1, nrow(df)))
+  expect_equal(newdf$bar, rep(2, nrow(df)))
+  expect_equal(newdf$baz, rep(3, nrow(df)))
+})
 
 test_that("rm_sumrow() remove summary rows from df", {
   contami <- load_alldata("sumrow_contami.xlsx", sheet = "Sheet1")
@@ -153,6 +164,21 @@ test_that("extract_a_cluster() returns clusters in row direction", {
   expect_equal(data2$X4, c(24, 34))
 })
 
+test_that("extract_cluster() get additional info", {
+  data  <- load_alldata("cluster_info.xlsx", sheet = "Sheet1")
+  data
+  data2 <- extract_a_cluster(pos.key = 5, find_from = 1, direction = "row",
+                             df = data, offset = c(0, 0), dim = c(6, 2),
+                             info = list(offset = c(-4, 0),
+                                         dim = c(4, 2)))
+  head(data2)
+  expect_equal(data2[-1, 1], as.character(1:5))
+  expect_equal(data2[-1, 2], as.character(16:20))
+  expect_equal(vectorize_row(data2, 1),
+               c("foo", "bar", "this", "is", "a", "test"))
+  expect_equal(vectorize_row(data2, 2), c("1", "16", "1", "2", "3", "4"))
+})
+
 test_that("extract_clusters() return clusters in column direction", {
   data  <- data.frame(rbind(rep(c("foo", "bar", "baz", "bum", "bup"), 2),
                             1:10, 11:20, 21:30, 31:40),
@@ -191,45 +217,32 @@ test_that("extract_clusters() return clusters in column direction", {
   expect_equal(data2[[2]]$c, 18:20)
 })
 
-test_that("mcol2row() gather YrowMcol data", {
+test_that("rm_nacol() remove na columns", {
+  df <- data.frame(a = 1:10, b = 11:20, c = 21:30)
+  colnames(df) <- c("foo", NA, "baz")
+  expect_equal(colnames(rm_nacols(df)), c("foo", "baz"))
+})
+
+test_that("gather_cols() gather YrowMcol data", {
   df <- data.frame(year = rep(2001:2019, each = 12),
                    month = rep(1:12, 19), catch = 1:(19 * 12)) %>%
     tidyr::spread(key = month, value = catch)
-  df <- structure(df, row_type = "Y")
-  expect_equal(mcol2row(df, varname = "catch"),
-               data.frame(year = rep(2001:2019, each = 12),
-                          month = rep(1:12, 19),
-                          catch = 1:(19 * 12)))
-  df_error <- structure(df, row_type = "foo")
-  expect_error(mcol2row(df_error, varname = "catch"))
 
-  df_noattr <- data.frame(year = rep(2001:2019, each = 12),
-                   month = rep(1:12, 19), catch = 1:(19 * 12)) %>%
-    tidyr::spread(key = month, value = catch)
-  expect_error(mcol2row(df_noattr, varname = "catch"))
+  converted <- gather_cols(df, regex = "[1-2]?[0-9]",
+                          newname = "foo", varname = "bar")
+  expect_setequal(converted$year, rep(2001:2019, each = 12))
+  expect_setequal(converted$foo, as.character(rep(1:12, 19)))
+  expect_setequal(converted$bar, 1:(19 * 12))
 })
 
-test_that("mcol2row() gather fisYrowMcol data", {
-  df_fisy <- data.frame(year = rep(2001:2019, each = 12),
-                        month = rep(c(4:12, 1:3), 19), catch = 1:(19 * 12)) %>%
-    tidyr::spread(key = month, value = catch) %>%
-    dplyr::select("year", as.character(4:12), as.character(1:3))
-  df_fisy <- structure(df_fisy, row_type = "fisY")
 
-  converted <- mcol2row(df_fisy, varname = "catch")
-  expect_equal(converted$month, rep(c(4:12, 1:3), 19))
-  expect_equal(converted$catch, 1:(19 * 12))
-})
-
-test_that("mcol2row() gather jYrowMcol data", {
-  df <- data.frame(cbind(year = c(60:63, 1:15),
-                         matrix(1:228, nrow = 19, ncol = 12, byrow = TRUE)))
-  colnames(df) <- c("year", as.character(1:12))
-  df <- structure(df, row_type = "jY")
-
-  converted <- mcol2row(df, varname = "catch")
-  expect_equal(converted$year, rep(1985:2003, each = 12))
-  expect_equal(converted$month, rep(1:12, 19))
+test_that("gather_cols() gather ycol data correctly", {
+  df <- data.frame(month = 1:12, "2019" = 13:24, "2020" = 25:36) %>%
+    dplyr::rename(`2019` = X2019,
+                  `2020` = X2020)
+  converted <- gather_cols(df, regex = "[0-9]{4}",
+                          newname = "foo", varname = "bar")
+  expect_equal(converted$foo, as.character(rep(2019:2020, each = 12)))
 })
 
 

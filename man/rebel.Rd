@@ -24,6 +24,7 @@ rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
   \item{regex}{same as that of \code{\link{extract_clusters}}}
   \item{offset}{same as that of \code{\link{extract_clusters}}}
   \item{dim}{same as that of \code{\link{extract_clusters}}}
+  \item{info}{same as that of \code{\link{extract_clusters}}}
 }}
 
 \item{row_type}{Type of row one of
@@ -37,11 +38,7 @@ rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
  \item{fisjYM}{fiscal Japanese year-month}
 }}
 
-\item{col_type}{List of parameters to control \code{\link{mcol2row}}.
-\describe{
- \item{varname}{new varname, same as \code{value} of
-                 \code{\link[tidyr]{gather}}}
-}}
+\item{col_type}{List of parameters to control \code{\link{gather_cols}}.}
 
 \item{row_omit}{List of parameters to control \code{\link{rm_sumrow}}}
 
