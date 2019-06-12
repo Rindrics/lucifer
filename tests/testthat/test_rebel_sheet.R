@@ -42,17 +42,14 @@ test_that("rebel_sheet() beat up file with clustered data", {
 test_that("rebel_sheet() beat up file with YrowMcol data", {
   beaten <- rebel_sheet(path = "YrowMcol.xlsx", sheet = "Sheet1",
                         row_type = "Y",
-                        col_type = list(name = "given_varname"))
-  beaten
+                        col_type = list(regex = "^1?[0-9]月?",
+                                        newname = "month",
+                                        varname = "given_varname"))
   expect_equal(colnames(beaten),
                c("year", "fname", "sheet", "month", "given_varname"))
-  beaten <- beaten %>%
-    dplyr::mutate(year = as.numeric(year),
-                  month = as.numeric(month),
-                  given_varname = as.numeric(given_varname))
-  expect_equal(unique(beaten$year), 1969:2000)
-  expect_equal(unique(beaten$month), 1:12)
-  expect_equal(unique(beaten$given_varname), 1:384)
+  expect_equal(unique(beaten$year), as.character(1969:2000))
+  expect_equal(unique(beaten$month), as.character(1:12))
+  expect_setequal(unique(beaten$given_varname), as.character(1:384))
 })
 
 test_that("rebel_sheet() beat up file contaminated by summary column", {

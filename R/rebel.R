@@ -22,11 +22,7 @@
 #'   \item{fisYM}{fiscal year-month}
 #'   \item{fisjYM}{fiscal Japanese year-month}
 #'  }
-#' @param col_type List of parameters to control \code{\link{mcol2row}}.
-#'  \describe{
-#'   \item{varname}{new varname, same as \code{value} of
-#'                   \code{\link[tidyr]{gather}}}
-#'  }
+#' @param col_type List of parameters to control \code{\link{gather_cols}}.
 #' @param col_omit List of parameters to control \code{\link{rm_sumcol}}
 #' @param row_omit List of parameters to control \code{\link{rm_sumrow}}
 #' @param fullwidth List of parameters to cotrol \code{\link{make_ascii}}
@@ -111,8 +107,10 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 
 
   if (!is.null(attributes$row_type)) {
-    out <- mcol2row(structure(out, row_type = attributes$row_type),
-                    varname = attributes$col_type$name)
+    out <- gather_cols(df = out,
+                       regex = col_type$regex,
+                       newname = col_type$newname,
+                       varname = attributes$col_type$varname)
   }
   out
 }
