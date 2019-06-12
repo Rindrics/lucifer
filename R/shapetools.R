@@ -21,9 +21,17 @@ make_rect <- function(df, range) {
 #' Append information stored in list to data frame
 #'
 #' @param info List conposed of `key = value` pairs
+#' @param headerized If FALSE, allow appending to data frame with
+#'   tentative colnames
 #' @inheritParams make_rect
-append_info <- function(info, df) {
-  cbind(df, list2df(info, nrow = nrow(df)))
+append_info <- function(info, df, headerized = FALSE) {
+  df_info <- list2df(info, nrow = nrow(df))
+  if (headerized == FALSE) {
+    df_info[1, ] <- names(info)
+    tentative_name <- as.character(seq(ncol(df) + 1, ncol(df) + length(info)))
+    colnames(df_info) <- tentative_name
+  }
+  cbind(df, df_info)
 }
 
 #' Fill NAs of merged columns by 'varname'
@@ -174,8 +182,9 @@ rm_nacols <- function(df) {
 #' @param offset The offset (\code{c(row, pos})) of the cluster topleft from
 #'   the coordination of keyword
 #' @param dim Dimension (\code{c(row, col)}) of the cluster
+#' @param info Parameters to control \code{link{append_info}}
 extract_a_cluster <- function(pos.key, find_from, direction, df,
-                          offset = c(0, 0), dim) {
+                          offset = c(0, 0), dim, info = NULL) {
   rofst <- offset[1]
   cofst <- offset[2]
   nrow  <- dim[1]
@@ -187,7 +196,18 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
     row <- find_from + rofst
     col <- pos.key + cofst
   }
-  df[row:(row + nrow - 1), col:(col + ncol - 1)]
+  out <- df[row:(row + nrow - 1), col:(col + ncol - 1)]
+  if (!is.null(info)) {
+    row_info  <- row + info$offset[1]
+    col_info  <- col + info$offset[2]
+    nrow_info <- info$dim[1]
+    ncol_info <- info$dim[2]
+    infos     <- df[row_info:(row_info + nrow_info - 1),
+                    col_info:(col_info + ncol_info - 1)]
+    info_list <- as.list(stats::setNames(infos[[2]], infos[[1]]))
+    out       <- append_info(info = info_list, df = out, headerized = FALSE)
+  }
+  out
 }
 
 #' Extract data clusters from data frame using the keyword
@@ -199,15 +219,17 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
 #' @param col Column position from which the keyword to be searched
 #' @param row Row position from which the keyword to be searched
 extract_clusters <- function(df, regex, col = NULL, row = NULL,
-                           offset = c(0, 0), dim) {
+                           offset = c(0, 0), dim, info = NULL) {
   if (!is.null(row)) {
     pos <- locate_keys(df = df, row = row, regex = regex)
     purrr::map(pos, extract_a_cluster, find_from = row,
-               direction = "col", df = df, offset = offset, dim = dim)
+               direction = "col", df = df,
+               offset = offset, dim = dim, info = info)
   } else if (!is.null(col)) {
     pos <- locate_keys(df = df, col = col, regex = regex)
     purrr::map(pos, extract_a_cluster, find_from = col,
-               direction = "row", df = df, offset = offset, dim = dim)
+               direction = "row", df = df,
+               offset = offset, dim = dim, info = info)
   } else {
     stop("Unknown case")
   }

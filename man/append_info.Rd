@@ -4,12 +4,15 @@
 \alias{append_info}
 \title{Append information stored in list to data frame}
 \usage{
-append_info(info, df)
+append_info(info, df, headerized = FALSE)
 }
 \arguments{
 \item{info}{List conposed of `key = value` pairs}
 
 \item{df}{Data frame to be processed}
+
+\item{headerized}{If FALSE, allow appending to data frame with
+tentative colnames}
 }
 \description{
 Append information stored in list to data frame

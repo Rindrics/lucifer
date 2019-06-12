@@ -27,11 +27,11 @@ test_that("unmerge_vert() fill NAs of merged rows", {
     as.vector()
   expect_equal(newname, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
 })
-
 test_that("append_info() append information stored in a list to df as column", {
+
   info  <- list(foo = 1, bar = 2, baz = 3)
   df    <- data.frame(a = 1:10, b = 11:20)
-  newdf <- append_info(df = df, info = info)
+  newdf <- append_info(df = df, info = info, headerized = TRUE)
   expect_equal(newdf$a, 1:10)
   expect_equal(newdf$b, 11:20)
   expect_equal(newdf$foo, rep(1, nrow(df)))
@@ -162,6 +162,21 @@ test_that("extract_a_cluster() returns clusters in row direction", {
   expect_equal(data2$X2, c(22, 32))
   expect_equal(data2$X3, c(23, 33))
   expect_equal(data2$X4, c(24, 34))
+})
+
+test_that("extract_cluster() get additional info", {
+  data  <- load_alldata("cluster_info.xlsx", sheet = "Sheet1")
+  data
+  data2 <- extract_a_cluster(pos.key = 5, find_from = 1, direction = "row",
+                             df = data, offset = c(0, 0), dim = c(6, 2),
+                             info = list(offset = c(-4, 0),
+                                         dim = c(4, 2)))
+  head(data2)
+  expect_equal(data2[-1, 1], as.character(1:5))
+  expect_equal(data2[-1, 2], as.character(16:20))
+  expect_equal(vectorize_row(data2, 1),
+               c("foo", "bar", "this", "is", "a", "test"))
+  expect_equal(vectorize_row(data2, 2), c("1", "16", "1", "2", "3", "4"))
 })
 
 test_that("extract_clusters() return clusters in column direction", {

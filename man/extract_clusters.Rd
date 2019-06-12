@@ -5,7 +5,7 @@
 \title{Extract data clusters from data frame using the keyword}
 \usage{
 extract_clusters(df, regex, col = NULL, row = NULL, offset = c(0, 0),
-  dim)
+  dim, info = NULL)
 }
 \arguments{
 \item{df}{Data frame to be processed}
@@ -20,6 +20,8 @@ extract_clusters(df, regex, col = NULL, row = NULL, offset = c(0, 0),
 the coordination of keyword}
 
 \item{dim}{Dimension (\code{c(row, col)}) of the cluster}
+
+\item{info}{Parameters to control \code{link{append_info}}}
 }
 \description{
 This function extracts data clusters from single Excel sheet.
