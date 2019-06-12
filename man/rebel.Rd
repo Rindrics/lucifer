@@ -24,6 +24,7 @@ rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
   \item{regex}{same as that of \code{\link{extract_clusters}}}
   \item{offset}{same as that of \code{\link{extract_clusters}}}
   \item{dim}{same as that of \code{\link{extract_clusters}}}
+  \item{info}{same as that of \code{\link{extract_clusters}}}
 }}
 
 \item{row_type}{Type of row one of

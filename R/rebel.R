@@ -10,6 +10,7 @@
 #'    \item{regex}{same as that of \code{\link{extract_clusters}}}
 #'    \item{offset}{same as that of \code{\link{extract_clusters}}}
 #'    \item{dim}{same as that of \code{\link{extract_clusters}}}
+#'    \item{info}{same as that of \code{\link{extract_clusters}}}
 #'  }
 #' @param row_type Type of row one of
 #'  \describe{
@@ -58,12 +59,13 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     regex  <- cluster$regex
     offset <- cluster$offset
     dim    <- cluster$dim
+    info   <- cluster$info
     if (dir == "row") {
       out <- extract_clusters(df = out, regex = regex, col = pos,
-                            offset = offset, dim = dim)
+                              offset = offset, dim = dim, info = info)
     } else if (dir == "col") {
       out <- extract_clusters(df = out, regex = regex, row = pos,
-                            offset = offset, dim = dim)
+                              offset = offset, dim = dim, info = info)
     } else {
       stop("Unknown dir")
     }
