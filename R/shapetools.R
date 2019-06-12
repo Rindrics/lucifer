@@ -213,46 +213,9 @@ extract_clusters <- function(df, regex, col = NULL, row = NULL,
   }
 }
 
-#' Gather month columns to rows
-#'
-#' @param df Data frame with month column
-#' @param varname Name of the new colname after gathering
-mcol2row <- function(df, varname) {
-  rowtype <- attributes(df)$row_type
-  if (!is.null(rowtype)) {
-    if (rowtype == "jY") {
-      out <- df %>%
-        dplyr::mutate(year = jpyr2ad(year, "showa"))
-    } else if (rowtype %in% c("fisY", "Y")){
-      out <- df
-    } else {
-      stop("Unknown row_type")
-    }
-  } else {
-    stop("No row_type in df.")
-  }
-  out <- out %>%
-    dplyr::mutate(rowname = 1:nrow(df)) %>% #To re-sort after tidyr::gather()
-    tidyr::gather(key = month, value = !!varname,
-                  tidyselect::matches("^[0-9][0-9]?$")) %>%
-    dplyr::arrange(year) %>%
-    dplyr::mutate(month = as.integer(month)) %>%
-    dplyr::arrange(rowname) %>%
-    dplyr::select(-rowname)
-  if (rowtype == "fisY") {
-    out %>%
-      dplyr::mutate(year = ifelse(dplyr::between(month, 1, 3),
-                                  year + 1,
-                                  year)) %>%
-      dplyr::arrange(year)
-  } else {
-    out
-  }
-}
-
 #' Gather year column to rows
 #'
-#' @inheritParams mcol2row
+#' @inheritParams make_rect
 ycol2row <- function(df, varname) {
   df %>%
     tidyr::gather(key = year, value = !!varname,
@@ -263,7 +226,7 @@ ycol2row <- function(df, varname) {
 
 #' Convert sheetname to variable
 #'
-#' @inheritParams mcol2row
+#' @inheritParams make_rect
 #' @param as Name of the new column which contains sheetnames
 sheet2var <- function(df, as) {
   sheetname <- attr(df, "sheetname")
