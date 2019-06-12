@@ -7,7 +7,7 @@
 sheet2var(df, as)
 }
 \arguments{
-\item{df}{Data frame with month column}
+\item{df}{Data frame to be processed}
 
 \item{as}{Name of the new column which contains sheetnames}
 }

@@ -238,6 +238,7 @@ extract_clusters <- function(df, regex, col = NULL, row = NULL,
 #' Gather year column to rows
 #'
 #' @inheritParams make_rect
+#' @param varname New name for values, same as \code{\link[dplyr]{mutate}}
 ycol2row <- function(df, varname) {
   df %>%
     tidyr::gather(key = year, value = !!varname,

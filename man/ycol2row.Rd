@@ -7,9 +7,9 @@
 ycol2row(df, varname)
 }
 \arguments{
-\item{df}{Data frame with month column}
+\item{df}{Data frame to be processed}
 
-\item{varname}{Name of the new colname after gathering}
+\item{varname}{New name for values, same as \code{\link[dplyr]{mutate}}}
 }
 \description{
 Gather year column to rows
