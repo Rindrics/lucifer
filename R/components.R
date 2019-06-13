@@ -1,3 +1,13 @@
+#' Vectorize a row
+#'
+#' @inheritParams make_rect
+#' @param row Position of row to be vectorized
+vectorize_row <- function(df, row) {
+  df[row, ] %>%
+    unlist() %>%
+    unname()
+}
+
 #' Replace NAs in given vector by the repetition of the prior value
 #'
 #' @param x Vector containing value and NA
@@ -47,6 +57,21 @@ make_hougan <- function(str) {
   out
 }
 
+#' Expand single value list to data frame
+#'
+#' @param list List with `key = value` pairs
+#' @param nrow Nrows of df to be created
+list2df <- function(list, nrow) {
+  names <- names(list)
+  list %>%
+    unlist() %>%
+    unname() %>%
+    rep(nrow, each = nrow) %>%
+    matrix(ncol = length(list), nrow = nrow) %>%
+    data.frame(stringsAsFactors = FALSE) %>%
+    magrittr::set_colnames(names)
+}
+
 #' Locate keywords in row or column of the given data frame
 #'
 #' @inheritParams make_rect
@@ -58,9 +83,9 @@ locate_keys <- function(df, row = NULL, col = NULL, regex){
       (is.null(row) & is.null(col))) {
     stop("Give either 'row' or 'col'")
   } else if (!is.null(row)){
-    str <- df[row, ]
+    str <- vectorize_row(df, row)
   } else if (!is.null(col)){
-    str <- df[, col]
+    str <- dplyr::pull(df, col)
   } else {
     stop("Unknown case")
   }

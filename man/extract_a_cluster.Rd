@@ -5,7 +5,7 @@
 \title{Extract a cluster from df using the keyword}
 \usage{
 extract_a_cluster(pos.key, find_from, direction, df, offset = c(0, 0),
-  dim)
+  dim, info = NULL)
 }
 \arguments{
 \item{pos.key}{Position where the \code{regex} of \code{extract_clusters()}
@@ -22,6 +22,8 @@ which \code{excract_cluster()} search key}
 the coordination of keyword}
 
 \item{dim}{Dimension (\code{c(row, col)}) of the cluster}
+
+\item{info}{Parameters to control \code{link{append_info}}}
 }
 \description{
 This function is the substancial function of \code{extract_clusters()}.

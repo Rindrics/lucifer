@@ -10,6 +10,7 @@
 #'    \item{regex}{same as that of \code{\link{extract_clusters}}}
 #'    \item{offset}{same as that of \code{\link{extract_clusters}}}
 #'    \item{dim}{same as that of \code{\link{extract_clusters}}}
+#'    \item{info}{same as that of \code{\link{extract_clusters}}}
 #'  }
 #' @param row_type Type of row one of
 #'  \describe{
@@ -21,19 +22,16 @@
 #'   \item{fisYM}{fiscal year-month}
 #'   \item{fisjYM}{fiscal Japanese year-month}
 #'  }
-#' @param col_type List of parameters to control \code{\link{mcol2row}}.
-#'  \describe{
-#'   \item{varname}{new varname, same as \code{value} of
-#'                   \code{\link[tidyr]{gather}}}
-#'  }
-#' @param col_omit List of parameters to control \code{\link{rm_sumcol}}
-#' @param row_omit List of parameters to control \code{\link{rm_sumrow}}
+#' @param col_type List of parameters to control \code{\link{gather_cols}}.
+#' @param col_omit List of parameters to control \code{\link{rm_matchcol}}
+#' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
 #' @param fullwidth List of parameters to cotrol \code{\link{make_ascii}}
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                         cluster = NULL, row_type = NULL, col_type = NULL,
                         row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
   path <- structure(path,
+                    fpath = path,
                     sheet = sheet,
                     row_merged = row_merged,
                     col_merged = col_merged,
@@ -57,12 +55,13 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     regex  <- cluster$regex
     offset <- cluster$offset
     dim    <- cluster$dim
+    info   <- cluster$info
     if (dir == "row") {
       out <- extract_clusters(df = out, regex = regex, col = pos,
-                            offset = offset, dim = dim)
+                              offset = offset, dim = dim, info = info)
     } else if (dir == "col") {
       out <- extract_clusters(df = out, regex = regex, row = pos,
-                            offset = offset, dim = dim)
+                              offset = offset, dim = dim, info = info)
     } else {
       stop("Unknown dir")
     }
@@ -79,14 +78,14 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   }
 
   if (!is.null(attributes$row_omit)) {
-    out <- rm_sumrow(out,
+    out <- rm_matchrow(out,
                      key = attributes$row_omit$key,
                      colpos = attributes$row_omit$colpos,
                      regex = attributes$row_omit$regex)
   }
 
   if (!is.null(attributes$col_omit)) {
-    out <- rm_sumcol(out,
+    out <- rm_matchcol(out,
                      key = attributes$col_omit$key,
                      rowpos = attributes$col_omit$rowpos,
                      regex = attributes$col_omit$regex)
@@ -95,15 +94,23 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   if (is.list(out) & is.null(dim(out))) {
     out <- out %>%
       lapply(headerize, row = 1) %>%
-      purrr::invoke(rbind, .)
+      purrr::invoke(rbind, .) %>%
+      rm_nacols() %>%
+      add_reference(attributes$fpath, attributes$sheet)
   } else {
-    out <- headerize(as.data.frame(out), row = 1) %>% tibble::as_tibble()
+    out <- headerize(as.data.frame(out), row = 1) %>%
+      rm_nacols() %>%
+      tibble::as_tibble() %>%
+      add_reference(attributes$fpath, attributes$sheet)
   }
+  out
 
 
   if (!is.null(attributes$row_type)) {
-    out <- mcol2row(structure(out, row_type = attributes$row_type),
-                    varname = attributes$col_type$name)
+    out <- gather_cols(df = out,
+                       regex = col_type$regex,
+                       newname = col_type$newname,
+                       varname = attributes$col_type$varname)
   }
   out
 }
