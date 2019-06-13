@@ -127,6 +127,7 @@ make_ascii <- function(df, col, numerize = FALSE) {
 #' @param row Position of the row to make df header
 #' @export
 headerize <- function(df, row) {
+  df <- as.data.frame(df)
   body <- df[-row, ]
   head <- df[row, ]
   magrittr::set_colnames(body, head)
