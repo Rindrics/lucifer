@@ -54,14 +54,14 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     pos    <- cluster$pos
     regex  <- cluster$regex
     offset <- cluster$offset
-    dim    <- cluster$dim
+    ends   <- cluster$ends
     info   <- cluster$info
     if (dir == "row") {
       out <- extract_clusters(df = out, regex = regex, col = pos,
-                              offset = offset, dim = dim, info = info)
+                              offset = offset, ends = ends, info = info)
     } else if (dir == "col") {
       out <- extract_clusters(df = out, regex = regex, row = pos,
-                              offset = offset, dim = dim, info = info)
+                              offset = offset, ends = ends, info = info)
     } else {
       stop("Unknown dir")
     }

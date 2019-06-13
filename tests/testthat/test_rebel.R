@@ -20,9 +20,8 @@ test_that("rebel() beat up file with clustered data", {
                                  pos = 1,
                                  regex = "b..",
                                  offset = c(1, 0),
-                                 dim = c(5, 4))) %>%
+                                 ends = list(row = "A5", col = "test"))) %>%
     as.data.frame()
-  beaten
   expect_equal(colnames(beaten), c("this", "is", "a", "test", "fname", "sheet"))
   expect_equal(as.numeric(dplyr::pull(beaten, 2)),
                rep(c(12:15, 22:25, 32:35), 2))
