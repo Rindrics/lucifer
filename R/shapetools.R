@@ -77,14 +77,14 @@ gather_cols <- function(df, regex, newname, varname) {
     tidyr::gather_(cols2gather, key = newname, value = varname)
 }
 
-#' Remove summary rows from df
+#' Remove rows matched to key
 #'
-#' @param key Regex to detect summary rows
+#' @param key Name of rows to be removed
 #' @param colpos Position of the colmun contains key
 #' @param regex If TRUE, \code{key} was recognized as regular expression
 #' @inheritParams make_rect
 #' @export
-rm_sumrow <- function(df, key, colpos, regex) {
+rm_matchrow <- function(df, key, colpos, regex) {
   target <- dplyr::pull(df, colpos)
   if (regex) {
     df[-stringr::str_which(target, key), ]
@@ -94,14 +94,14 @@ rm_sumrow <- function(df, key, colpos, regex) {
   }
 }
 
-#' Remove summary cols from df
+#' Remove columns matched to key
 #'
-#' @param key Regex to detect summary cols
-#' @param rowpos Position of the row contains key
-#' @param regex If TRUE, \code{rowname} was recognized as regular expression
+#' @param key Name of columns to be removed
+#' @param rowpos Position of the row contains \code{key}
+#' @param regex If TRUE, \code{key} was recognized as regular expression
 #' @inheritParams make_rect
 #' @export
-rm_sumcol <- function(df, key, rowpos, regex) {
+rm_matchcol <- function(df, key, rowpos, regex) {
   target <- dplyr::slice(df, rowpos) %>%
     unlist() %>%
     as.vector()
