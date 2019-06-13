@@ -235,18 +235,6 @@ extract_clusters <- function(df, regex, col = NULL, row = NULL,
   }
 }
 
-#' Gather year column to rows
-#'
-#' @inheritParams make_rect
-#' @param varname New name for values, same as \code{\link[dplyr]{mutate}}
-ycol2row <- function(df, varname) {
-  df %>%
-    tidyr::gather(key = year, value = !!varname,
-                  tidyselect::matches("[0-9]{4}")) %>%
-    dplyr::select(year, month, tidyselect::everything()) %>%
-    dplyr::mutate(year = as.integer(year))
-}
-
 #' Convert sheetname to variable
 #'
 #' @inheritParams make_rect
