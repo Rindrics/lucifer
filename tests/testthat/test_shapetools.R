@@ -39,25 +39,25 @@ test_that("append_info() append information stored in a list to df as column", {
   expect_equal(newdf$baz, rep(3, nrow(df)))
 })
 
-test_that("rm_sumrow() remove summary rows from df", {
+test_that("rm_matchrow() remove summary rows from df", {
   contami <- load_alldata("sumrow_contami.xlsx", sheet = "Sheet1")
-  expect_equal(rm_sumrow(contami, key = "sum", colpos = 1, regex = FALSE) %>%
+  expect_equal(rm_matchrow(contami, key = "sum", colpos = 1, regex = FALSE) %>%
                  dplyr::pull(1),
                c(paste0("A", c(1:10, 12:20, 22:30))))
-  expect_equal(rm_sumrow(contami, key = "s.m", colpos = 1, regex = TRUE) %>%
+  expect_equal(rm_matchrow(contami, key = "s.m", colpos = 1, regex = TRUE) %>%
                  dplyr::pull(1),
                c(paste0("A", c(1:10, 12:20, 22:30))))
 })
 
-test_that("rm_sumcol() remove summary cols from df", {
+test_that("rm_matchcol() remove summary cols from df", {
   contami <- load_alldata("sumcol_contami.xlsx", sheet = "Sheet1")
-  expect_equal(rm_sumcol(contami, key = "sum", rowpos = 1, regex = FALSE) %>%
+  expect_equal(rm_matchcol(contami, key = "sum", rowpos = 1, regex = FALSE) %>%
                  dplyr::slice(1) %>%
                  unlist() %>%
                  as.vector(),
                c(paste0(LETTERS[1:8][c(-4, -7)], 1)))
 
-  expect_equal(rm_sumcol(contami, key = "su.",
+  expect_equal(rm_matchcol(contami, key = "su.",
                          rowpos = 1, regex = TRUE) %>%
                  dplyr::slice(1) %>%
                  unlist() %>%
@@ -227,7 +227,6 @@ test_that("gather_cols() gather YrowMcol data", {
   df <- data.frame(year = rep(2001:2019, each = 12),
                    month = rep(1:12, 19), catch = 1:(19 * 12)) %>%
     tidyr::spread(key = month, value = catch)
-
   converted <- gather_cols(df, regex = "[1-2]?[0-9]",
                           newname = "foo", varname = "bar")
   expect_setequal(converted$year, rep(2001:2019, each = 12))
@@ -243,15 +242,6 @@ test_that("gather_cols() gather ycol data correctly", {
   converted <- gather_cols(df, regex = "[0-9]{4}",
                           newname = "foo", varname = "bar")
   expect_equal(converted$foo, as.character(rep(2019:2020, each = 12)))
-})
-
-
-test_that("ycol2row() gather ycol data", {
-  df <- data.frame(month = 1:12, "2019" = 13:24, "2020" = 25:36) %>%
-    dplyr::rename(`2019` = X2019,
-                  `2020` = X2020)
-  converted <- ycol2row(df, varname = "catch")
-  expect_equal(converted$year, rep(2019:2020, each = 12))
 })
 
 test_that("sheet2var() convert sheetname to variable", {

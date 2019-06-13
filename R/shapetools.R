@@ -77,14 +77,14 @@ gather_cols <- function(df, regex, newname, varname) {
     tidyr::gather_(cols2gather, key = newname, value = varname)
 }
 
-#' Remove summary rows from df
+#' Remove rows matched to key
 #'
-#' @param key Regex to detect summary rows
+#' @param key Name of rows to be removed
 #' @param colpos Position of the colmun contains key
 #' @param regex If TRUE, \code{key} was recognized as regular expression
 #' @inheritParams make_rect
 #' @export
-rm_sumrow <- function(df, key, colpos, regex) {
+rm_matchrow <- function(df, key, colpos, regex) {
   target <- dplyr::pull(df, colpos)
   if (regex) {
     df[-stringr::str_which(target, key), ]
@@ -94,14 +94,14 @@ rm_sumrow <- function(df, key, colpos, regex) {
   }
 }
 
-#' Remove summary cols from df
+#' Remove columns matched to key
 #'
-#' @param key Regex to detect summary cols
-#' @param rowpos Position of the row contains key
-#' @param regex If TRUE, \code{rowname} was recognized as regular expression
+#' @param key Name of columns to be removed
+#' @param rowpos Position of the row contains \code{key}
+#' @param regex If TRUE, \code{key} was recognized as regular expression
 #' @inheritParams make_rect
 #' @export
-rm_sumcol <- function(df, key, rowpos, regex) {
+rm_matchcol <- function(df, key, rowpos, regex) {
   target <- dplyr::slice(df, rowpos) %>%
     unlist() %>%
     as.vector()
@@ -156,6 +156,7 @@ make_ascii <- function(df, col, numerize = FALSE) {
 #' @param row Position of the row to make df header
 #' @export
 headerize <- function(df, row) {
+  df <- as.data.frame(df)
   body <- df[-row, ]
   head <- df[row, ]
   magrittr::set_colnames(body, head)
@@ -233,18 +234,6 @@ extract_clusters <- function(df, regex, col = NULL, row = NULL,
   } else {
     stop("Unknown case")
   }
-}
-
-#' Gather year column to rows
-#'
-#' @inheritParams make_rect
-#' @param varname New name for values, same as \code{\link[dplyr]{mutate}}
-ycol2row <- function(df, varname) {
-  df %>%
-    tidyr::gather(key = year, value = !!varname,
-                  tidyselect::matches("[0-9]{4}")) %>%
-    dplyr::select(year, month, tidyselect::everything()) %>%
-    dplyr::mutate(year = as.integer(year))
 }
 
 #' Convert sheetname to variable

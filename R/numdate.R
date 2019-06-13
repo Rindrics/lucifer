@@ -1,7 +1,3 @@
-# This file is tangled from tinyplyr.org.
-# (https://github.com/smxshxishxad/tinyplyr/tinyplyr.org)
-# Edit that file.
-
 num2datei <- function(x) {
   jday_march01 <- 60
   x            <- as.numeric(x)
