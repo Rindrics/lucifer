@@ -182,20 +182,42 @@ rm_nacols <- function(df) {
 #'   matched the keyword
 #' @param offset The offset (\code{c(row, pos})) of the cluster topleft from
 #'   the coordination of keyword
-#' @param dim Dimension (\code{c(row, col)}) of the cluster
+#' @param ends List of regex to locate row- and column- ends of each cluster
+#'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}
 #' @param info Parameters to control \code{link{append_info}}
 extract_a_cluster <- function(pos.key, find_from, direction, df,
-                          offset = c(0, 0), dim, info = NULL) {
+                          offset = c(0, 0), ends, info = NULL) {
   rofst <- offset[1]
   cofst <- offset[2]
-  nrow  <- dim[1]
-  ncol  <- dim[2]
+
   if (direction == "row") {
     row <- pos.key + rofst
     col <- find_from + cofst
+    maxrow <- locate_matchend(dplyr::pull(df, col)[row:nrow(df)],
+                              ends[["row"]]) + row - 1
+    maxcol <- locate_matchend(vectorize_row(df, row), ends[["col"]])
+    nrow <- maxrow - pos.key - rofst + 1
+    ncol <- maxcol - cofst
+    nrow
+    ncol
   } else {
     row <- find_from + rofst
     col <- pos.key + cofst
+    maxrow <- locate_matchend(dplyr::pull(df, col), ends[["row"]])
+    maxcol <- locate_matchend(vectorize_row(df, row)[col:ncol(df)],
+                              ends[["col"]]) + col - 1
+    nrow <- maxrow - rofst
+    ncol <- maxcol - pos.key - cofst + 1
+  }
+  if (is.infinite(maxrow + maxcol)) {
+    rlang::abort(message = "Too much match. Please re-consider regex.",
+                 .subclass = "extract_a_cluster_error",
+                 ends = ends)
+  }
+  if (length(maxrow) == 0 | length(maxcol) == 0) {
+    rlang::abort(message = "No match. Please re-consider regex.",
+                 .subclass = "extract_a_cluster_error",
+                 ends = ends)
   }
   out <- df[row:(row + nrow - 1), col:(col + ncol - 1)]
   if (!is.null(info)) {
@@ -220,17 +242,17 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
 #' @param col Column position from which the keyword to be searched
 #' @param row Row position from which the keyword to be searched
 extract_clusters <- function(df, regex, col = NULL, row = NULL,
-                           offset = c(0, 0), dim, info = NULL) {
+                             offset = c(0, 0), ends, info = NULL) {
   if (!is.null(row)) {
     pos <- locate_keys(df = df, row = row, regex = regex)
     purrr::map(pos, extract_a_cluster, find_from = row,
                direction = "col", df = df,
-               offset = offset, dim = dim, info = info)
+               offset = offset, ends = ends, info = info)
   } else if (!is.null(col)) {
     pos <- locate_keys(df = df, col = col, regex = regex)
     purrr::map(pos, extract_a_cluster, find_from = col,
                direction = "row", df = df,
-               offset = offset, dim = dim, info = info)
+               offset = offset, ends = ends, info = info)
   } else {
     stop("Unknown case")
   }
