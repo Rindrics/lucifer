@@ -23,8 +23,8 @@
 #'   \item{fisjYM}{fiscal Japanese year-month}
 #'  }
 #' @param col_type List of parameters to control \code{\link{gather_cols}}.
-#' @param col_omit List of parameters to control \code{\link{rm_sumcol}}
-#' @param row_omit List of parameters to control \code{\link{rm_sumrow}}
+#' @param col_omit List of parameters to control \code{\link{rm_matchcol}}
+#' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
 #' @param fullwidth List of parameters to cotrol \code{\link{make_ascii}}
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
@@ -78,14 +78,14 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   }
 
   if (!is.null(attributes$row_omit)) {
-    out <- rm_sumrow(out,
+    out <- rm_matchrow(out,
                      key = attributes$row_omit$key,
                      colpos = attributes$row_omit$colpos,
                      regex = attributes$row_omit$regex)
   }
 
   if (!is.null(attributes$col_omit)) {
-    out <- rm_sumcol(out,
+    out <- rm_matchcol(out,
                      key = attributes$col_omit$key,
                      rowpos = attributes$col_omit$rowpos,
                      regex = attributes$col_omit$regex)

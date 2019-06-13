@@ -43,9 +43,9 @@ sheet.}
 
 \item{col_type}{List of parameters to control \code{\link{gather_cols}}.}
 
-\item{row_omit}{List of parameters to control \code{\link{rm_sumrow}}}
+\item{row_omit}{List of parameters to control \code{\link{rm_matchrow}}}
 
-\item{col_omit}{List of parameters to control \code{\link{rm_sumcol}}}
+\item{col_omit}{List of parameters to control \code{\link{rm_matchcol}}}
 
 \item{fullwidth}{List of parameters to cotrol \code{\link{make_ascii}}}
 }
