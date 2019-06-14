@@ -126,6 +126,14 @@ test_that("make_ascii() convert full-width numbers into ASCII numbers", {
                c("ton", paste0(1:5, "トン")))
 })
 
+test_that("make_ascii() handle headerized df", {
+  zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1") %>%
+    headerize(1)
+  expect_equal(make_ascii(zenkaku, row = 1, headerized = TRUE) %>%
+               vectorize_row(1),
+               c("1", "11", "21", "311", "11", "1月", "1トン"))
+})
+
 
 test_that("headerize() change specific row into df header", {
   df <- data.frame(a = 1:10, b = 11:20, c = 21:30)
