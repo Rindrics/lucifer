@@ -136,18 +136,29 @@ merge_colname <- function(df, rows, cols = NULL) {
 #' @param col Number of the target column
 #' @param numerize If TRUE, remove characters convert column to numeric
 #' @export
-make_ascii <- function(df, col, numerize = FALSE) {
-  ascii <- df %>%
-    dplyr::pull(col) %>%
-    purrr::map_chr(Nippon::zen2han)
-  if (numerize) {
-    df[, col] <- ascii %>%
-      stringr::str_remove_all("\\D") %>%
-      readr::parse_number()
+make_ascii <- function(df, col = NULL, row = NULL, numerize = FALSE) {
+  if (is.null(col) & is.null(row)) {
+    rlang::abort(message = "Give me at least 'col' or 'row'.",
+                 .subclass = "make_ascii_error")
   } else {
-    df[, col] <- ascii
+    edit_row <- !is.null(row)
+    edit_col <- !is.null(col)
+
+    if (edit_col) s <- dplyr::pull(df, col)
+    else if (edit_row) s <- vectorize_row(df, row)
+
+    ascii <- purrr::map_chr(s, Nippon::zen2han)
+
+    if (numerize) {
+      ascii <- ascii %>%
+        stringr::str_remove_all("\\D")
+    }
+
+    if (edit_col) df[, col] <- ascii
+    if (edit_row) df[row, ] <- ascii
+
+    df
   }
-  df
 }
 
 #' Change specific row into df header
