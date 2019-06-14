@@ -14,6 +14,14 @@ test_that("rebel() beat up file with merged header", {
               c("A2", paste0(LETTERS[c(1, 3:8)], 13), fname, "Sheet2"))
 })
 
+test_that("rebel() throws an error", {
+  expect_error(rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
+                     cluster = list(dir = "foo",
+                                    pos = 1, regex = "b..",
+                                    offset = c(1, 0),
+                                    ends = list(row = "A5", col = "test"))))
+})
+
 test_that("rebel() beat up file with clustered data", {
   beaten <- rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
                   cluster = list(dir = "col",

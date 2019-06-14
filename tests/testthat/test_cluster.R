@@ -6,7 +6,6 @@ test_that("clusters distributed in row direction can be extracted", {
   data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "row",
                              df = data, offset = c(0, 0),
                              ends = list(row = "bar", col = "21"))
-  data2
   expect_equal(vectorize_row(data2, 1), c("foo", 1, 11, 21))
   expect_equal(data2$a, c("foo", "bar"))
   expect_equal(data2$b, 1:2)
@@ -71,7 +70,6 @@ test_that("clusters distributed in column direction can be extracted", {
   data  <- data.frame(rbind(rep(c("foo", "bar", "baz", "bum", "bup"), 2),
                             1:10, 11:20, 21:30, 31:40),
                       stringsAsFactors = FALSE)
-  head(data, 12)
   data2 <- extract_clusters(data, "foo", row = 1,
                             ends = list(row = "^1$|^6$", col = "bar"))
   expect_equal(data2[[1]][, 1], c("foo", 1))
@@ -114,8 +112,6 @@ test_that("'dim' can be controled by variable", {
   year <- 2019
   col2search <- 1
   data <- load_alldata("clustered.xlsx", sheet = "repeated")
-  data
-  locate_matchend(dplyr::pull(data, 1), "2018")
   data2 <- extract_clusters(data, regex = "year", col = col2search,
                             offset = c(0, 0),
                             ends = list(row = as.character(year), col = "baz"),
@@ -128,4 +124,24 @@ test_that("'dim' can be controled by variable", {
                as.character(c(2017, 1, 1:3, 1:4)))
   expect_equal(vectorize_row(data2[[2]], 2),
                as.character(c(2017, 1, 109:111, 5:8)))
+})
+
+test_that("extract_culsters() throws an error", {
+  col2search <- 1
+  data <- load_alldata("clustered.xlsx", sheet = "repeated")
+  expect_error(extract_clusters(data, regex = "year", col = col2search,
+                   offset = c(0, 0),
+                   ends = list(row =  " ", col = "baz"),
+                   info = list(offset = c(-4, 0),
+                               dim = c(4, 2))))
+  expect_error(extract_clusters(data, regex = "year", col = col2search,
+                   offset = c(0, 0),
+                   ends = list(row = "ABCDEFG", col = "baz"),
+                   info = list(offset = c(-4, 0),
+                               dim = c(4, 2))))
+  expect_error(extract_clusters(data, regex = "year",
+                   offset = c(0, 0),
+                   ends = list(row =  "2019", col = "baz"),
+                   info = list(offset = c(-4, 0),
+                               dim = c(4, 2))))
 })
