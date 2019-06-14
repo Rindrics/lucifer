@@ -4,14 +4,19 @@
 \alias{make_ascii}
 \title{Convert full-width numbers in df into ASCII numbers}
 \usage{
-make_ascii(df, col, numerize = FALSE)
+make_ascii(df, col = NULL, row = NULL, numerize = FALSE,
+  headerized = FALSE)
 }
 \arguments{
 \item{df}{Data frame to be processed}
 
 \item{col}{Number of the target column}
 
+\item{row}{Number of the target row}
+
 \item{numerize}{If TRUE, remove characters convert column to numeric}
+
+\item{headerized}{If FALSE (default), allow df with tentative colnames}
 }
 \description{
 Convert full-width numbers in df into ASCII numbers
