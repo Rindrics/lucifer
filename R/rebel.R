@@ -63,7 +63,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     info   <- cluster$info
     if (dir == "row") {
       out <- extract_clusters(df = out, regex = regex, col = pos,
-                              offset = offset, ends = ends, info = info)
+                              offset = offset, ends = ends, info = info)  %>%
+        lapply(make_ascii, row = pos)
     } else if (dir == "col") {
       out <- extract_clusters(df = out, regex = regex, row = pos,
                               offset = offset, ends = ends, info = info)
@@ -110,14 +111,24 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   }
   out
 
-
   if (!is.null(attributes$row_type)) {
+    if (attributes$row_type == "Y") {
+      colnames(out)[1] <- "year"
+      out <- dplyr::mutate(out, year = as.integer(year))
+    }
+  }
+
+  if (!is.null(attributes$col_type)) {
     out <- gather_cols(df = out,
                        regex = col_type$regex,
                        newname = col_type$newname,
                        varname = attributes$col_type$varname)
+    if (attributes$col_type$newname == "month") {
+      out <- dplyr::mutate(out, month = stringr::str_remove(month, "\\D") %>%
+                             as.integer())
+    }
   }
-  out
+  tibble::as_tibble(out)
 }
 
 #' Rebel against godly Excel workbook

@@ -208,8 +208,22 @@ headerize <- function(df, row) {
 #' @inheritParams make_rect
 #' @export
 rm_nacols <- function(df) {
-  napos <- !is.na(colnames(df))
-  df[, napos]
+  df_leftmost <- df[, 1]
+  df_right    <- df[, -1]
+  name_left   <- colnames(df)[1]
+  name_right  <- colnames(df)[-1]
+  not_na <- !stringr::str_detect(colnames(df_right), "^NA(.[1-9]+)?$")
+  if (length(not_na) == 0) {
+    df
+  } else {
+    not_na <- tidyr::replace_na(not_na, FALSE)
+    not_na
+    out <- cbind(df_leftmost, df_right[, not_na]) %>%
+      data.frame(stringsAsFactors = FALSE)
+    colnames(out) <- c(name_left, name_right[not_na])
+    out[, 1] <- as.character(out[, 1])
+    out
+  }
 }
 
 #' Extract a cluster from df using the keyword
@@ -227,7 +241,7 @@ rm_nacols <- function(df) {
 #'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}
 #' @param info Parameters to control \code{link{append_info}}
 extract_a_cluster <- function(pos.key, find_from, direction, df,
-                          offset = c(0, 0), ends, info = NULL) {
+                              offset = c(0, 0), ends, info = NULL) {
   rofst <- offset[1]
   cofst <- offset[2]
 
