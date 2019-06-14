@@ -19,6 +19,11 @@ test_that("rebel_sheet() beat aomori data up", {
                         col_type = list(regex = "^1?[0-9]月?",
                                         newname = "month",
                                         varname = "catch"))
+  expect_equal(dplyr::filter(maiwashi, year == 1997, month == 6,
+                             漁法 == "定置網漁業（底建網含む）") %>%
+               dplyr::select(catch) %>%
+               vectorize_row(1),
+               "666")
   expect_setequal(maiwashi$catch, as.character(1:936))
   expect_equal(unique(maiwashi$month), 1:12)
   expect_equal(unique(maiwashi$year), 1981:2019)
