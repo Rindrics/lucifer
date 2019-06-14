@@ -63,7 +63,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     info   <- cluster$info
     if (dir == "row") {
       out <- extract_clusters(df = out, regex = regex, col = pos,
-                              offset = offset, ends = ends, info = info)
+                              offset = offset, ends = ends, info = info)  %>%
+        lapply(make_ascii, row = pos)
     } else if (dir == "col") {
       out <- extract_clusters(df = out, regex = regex, row = pos,
                               offset = offset, ends = ends, info = info)
