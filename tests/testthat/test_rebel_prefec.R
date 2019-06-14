@@ -53,3 +53,26 @@ test_that("rebel_sheet() beat aomori data up", {
   expect_equal(unique(katakuchi$fname), fname)
   expect_equal(unique(katakuchi$sheet), sheet)
 })
+
+test_that("rebel_sheet() beat iwate data up", {
+  fname <- "iwate.xls"
+  sheet <- "マイワシ"
+  year  <- 2018
+  row_regex <- paste0("^", 2018)
+
+  maiwashi <- rebel_sheet(path = fname, sheet = sheet,
+                          cluster = list(dir = "row",
+                                         pos = 1,
+                                         regex = ".+によるマイワシ.+",
+                                         offset = c(2, 0),
+                                         ends = list(row = row_regex,
+                                                     col = "(1|１)(2|２)月")),
+                          row_type = "Y",
+                          col_type = list(regex = "^1?[0-9]月",
+                                          newname = "month",
+                                          varname = "catch"))
+
+  expect_equal(unique(maiwashi$year), 1968:2018)
+  expect_equal(unique(maiwashi$month), 1:12)
+  expect_setequal(unique(maiwashi$catch), as.character(1:1224))
+})
