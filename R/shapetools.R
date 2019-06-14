@@ -241,7 +241,7 @@ rm_nacols <- function(df) {
 #'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}
 #' @param info Parameters to control \code{link{append_info}}
 extract_a_cluster <- function(pos.key, find_from, direction, df,
-                          offset = c(0, 0), ends, info = NULL) {
+                              offset = c(0, 0), ends, info = NULL) {
   rofst <- offset[1]
   cofst <- offset[2]
 
