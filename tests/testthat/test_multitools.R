@@ -1,6 +1,6 @@
 context("Fights using multitools")
 
-test_that("Fight with maiwashi sheet of aomori data using multitools", {
+test_that("Fight with maiwashi sheet of aomori data", {
   df <- load_alldata("aomori.xlsx", sheet = "マイワシ")
   converted <- df %>%
     extract_clusters(regex = "^年", col = 1,
@@ -18,7 +18,7 @@ test_that("Fight with maiwashi sheet of aomori data using multitools", {
   expect_setequal(converted$catch, as.character(seq(1, 39 * 24)))
 })
 
-test_that("Fight with katakuchi sheet of aomori data using multitools", {
+test_that("Fight with katakuchi sheet of aomori data", {
   df <- load_alldata("aomori.xlsx", sheet = "カタクチ")
   converted <- df %>%
     extract_clusters(regex = "^年", col = 1,
@@ -36,7 +36,7 @@ test_that("Fight with katakuchi sheet of aomori data using multitools", {
   expect_setequal(converted$catch, as.character(seq(1, 39 * 24)))
 })
 
-test_that("Fight with 'masabahi' sheet of aomori data using multitools", {
+test_that("Fight with 'masabahi' sheet of aomori data", {
   df <- load_alldata("aomori.xlsx", sheet = "マサバ比  ")
   hachinohe <- df %>%
     extract_clusters(regex = "八戸", col = 1,
@@ -60,4 +60,28 @@ test_that("Fight with 'masabahi' sheet of aomori data using multitools", {
   expect_equal(dplyr::pull(tairadate, 1), as.character(c(1:12, 1, 2)))
   expect_equal(dplyr::pull(tairadate, 2), as.character(1:14))
   expect_equal(dplyr::pull(tairadate, 3), as.character(99:86))
+})
+
+test_that("Fight with 'maiwashi' sheet of iwate data", {
+  year <- 2018
+  row_regex <- paste0("^", year)
+  df <- load_alldata("iwate.xls", sheet = "マイワシ")
+
+  maiwashi <- df %>%
+    extract_clusters(regex = ".+によるマイワシ.+",
+                     col = 1,
+                     offset = c(2, 0),
+                     ends = list(row = row_regex, col = "(1|１)(2|２)月")) %>%
+    lapply(make_ascii, row = 1) %>%
+    lapply(headerize, row = 1) %>%
+    purrr::invoke(rbind, .) %>%
+    gather_cols(regex = "1?[0-9]月",
+                newname = "month", varname = "catch") %>%
+    dplyr::rename(year = `NA`)
+  head(maiwashi)
+
+  expect_equal(unique(maiwashi$year), as.character(1968:2018))
+  expect_equal(unique(maiwashi$month), paste0(1:12, "月"))
+  expect_setequal(unique(maiwashi$catch), as.character(1:1224))
+
 })
