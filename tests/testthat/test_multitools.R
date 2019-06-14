@@ -4,7 +4,7 @@ test_that("Fight with maiwashi sheet of aomori data using multitools", {
   df <- load_alldata("aomori.xlsx", sheet = "マイワシ")
   converted <- df %>%
     extract_clusters(regex = "^年", col = 1,
-                     offset = c(0, 0), ends = list(row = "2019", col = "12月"),
+                     offset = c(0, 0), ends = list(row = "^2019", col = "12月"),
                      info = list(offset = c(-2, 0),
                                  dim = c(1, 2))) %>%
     lapply(headerize, row = 1) %>%
@@ -22,7 +22,7 @@ test_that("Fight with katakuchi sheet of aomori data using multitools", {
   df <- load_alldata("aomori.xlsx", sheet = "カタクチ")
   converted <- df %>%
     extract_clusters(regex = "^年", col = 1,
-                     offset = c(0, 0), ends = list(row = "2019", col = "12月"),
+                     offset = c(0, 0), ends = list(row = "^2019", col = "12月"),
                      info = list(offset = c(-2, 0),
                                  dim = c(1, 2))) %>%
     lapply(headerize, row = 1) %>%
@@ -43,7 +43,6 @@ test_that("Fight with 'masabahi' sheet of aomori data using multitools", {
                      offset = c(1, 1),
                      ends = list(row = "[0-9]", col = "ゴマサバ")) %>%
     headerize(1)
-  hachinohe
   expect_equal(colnames(hachinohe), c("年月日", "マサバ", "ゴマサバ"))
   expect_equal(dplyr::pull(hachinohe, 1),
                as.character(c(43305, 43315, 43334, 43343,
