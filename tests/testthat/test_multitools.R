@@ -10,7 +10,7 @@ test_that("Fight with maiwashi sheet of aomori data", {
     lapply(headerize, row = 1) %>%
     purrr::invoke(rbind, .) %>%
     rm_nacols() %>%
-    gather_cols(regex = "(1|2)?[0-9]月",
+    gather_cols(regex = "1?[0-9]月",
                 newname = "month", varname = "catch")
   expect_equal(colnames(converted), c("年／月", "漁法", "month", "catch"))
   expect_equal(unique(converted$漁法), c("まき網漁業", "定置網漁業（底建網含む）"))
