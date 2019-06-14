@@ -20,8 +20,8 @@ test_that("rebel_sheet() beat aomori data up", {
                                         newname = "month",
                                         varname = "catch"))
   expect_setequal(maiwashi$catch, as.character(1:936))
-  expect_equal(unique(maiwashi$month), paste0(1:12, "月"))
-  expect_equal(unique(maiwashi$`年／月`), as.character(1981:2019))
+  expect_equal(unique(maiwashi$month), 1:12)
+  expect_equal(unique(maiwashi$year), 1981:2019)
   expect_equal(unique(maiwashi$漁法), c("まき網漁業", "定置網漁業（底建網含む）"))
   expect_equal(unique(maiwashi$fname), fname)
   expect_equal(unique(maiwashi$sheet), sheet)
@@ -42,8 +42,8 @@ test_that("rebel_sheet() beat aomori data up", {
                                         newname = "month",
                                         varname = "catch"))
   expect_setequal(katakuchi$catch, as.character(1:936))
-  expect_equal(unique(katakuchi$month), paste0(1:12, "月"))
-  expect_equal(unique(katakuchi$`年／月`), as.character(1981:2019))
+  expect_equal(unique(katakuchi$month), 1:12)
+  expect_equal(unique(katakuchi$year), 1981:2019)
   expect_equal(unique(katakuchi$漁法), c("まき網漁業", "定置網漁業（底建網含む）"))
   expect_equal(unique(katakuchi$fname), fname)
   expect_equal(unique(katakuchi$sheet), sheet)

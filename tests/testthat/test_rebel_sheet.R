@@ -46,8 +46,8 @@ test_that("rebel_sheet() beat up file with YrowMcol data", {
                                         varname = "given_varname"))
   expect_equal(colnames(beaten),
                c("year", "fname", "sheet", "month", "given_varname"))
-  expect_equal(unique(beaten$year), as.character(1969:2000))
-  expect_equal(unique(beaten$month), as.character(1:12))
+  expect_equal(unique(beaten$year), 1969:2000)
+  expect_equal(unique(beaten$month), 1:12)
   expect_setequal(unique(beaten$given_varname), as.character(1:384))
 })
 
