@@ -140,3 +140,25 @@ jpyr2ad <- function(x, start) {
   alert_skip(ad)
   ad
 }
+
+#' Locate the end of repeated match
+#'
+#' This function locates the end of the repeated matchs in string.
+#' The first end of repeated match will be returned if there are
+#'   multiple repeted match.
+#' @param str String to be searched
+#' @param regex Regex for search
+locate_matchend <- function(str, regex) {
+  matched        <- stringr::str_which(str, regex)
+  multiple_match <- length(matched) > 1
+  if (multiple_match) {
+    if (all(diff(matched) == 1)) {
+      out <- length(matched) + min(matched) - 1
+    } else {
+      out <- min(which(diff(matched) != 1)) + min(matched) - 1
+    }
+  } else {
+    out <- matched
+  }
+  out
+}

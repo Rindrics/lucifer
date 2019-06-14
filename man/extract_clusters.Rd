@@ -5,7 +5,7 @@
 \title{Extract data clusters from data frame using the keyword}
 \usage{
 extract_clusters(df, regex, col = NULL, row = NULL, offset = c(0, 0),
-  dim, info = NULL)
+  ends, info = NULL)
 }
 \arguments{
 \item{df}{Data frame to be processed}
@@ -19,7 +19,8 @@ extract_clusters(df, regex, col = NULL, row = NULL, offset = c(0, 0),
 \item{offset}{The offset (\code{c(row, pos})) of the cluster topleft from
 the coordination of keyword}
 
-\item{dim}{Dimension (\code{c(row, col)}) of the cluster}
+\item{ends}{List of regex to locate row- and column- ends of each cluster
+Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}}
 
 \item{info}{Parameters to control \code{link{append_info}}}
 }

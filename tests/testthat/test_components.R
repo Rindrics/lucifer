@@ -90,3 +90,13 @@ test_that("jpyr2ad() convert jpyear to A.D.", {
   expect_error(jpyr2ad(c(60:62, 1), "showa"))
   expect_equal(jpyr2ad(c(60:63, 1), "showa"), c(1985:1989))
 })
+
+test_that("locate_matchend() locates end of the repeted match", {
+  str <- c("foo", rep("bar", 10), rep("baz", 10))
+  regex <- "baz"
+  expect_equal(locate_matchend(str, "bar"), 11)
+
+  str <- rep(c("foo", "bar", "baz"), 5)
+  regex <- "bar"
+  expect_equal(locate_matchend(str, regex), 2)
+})

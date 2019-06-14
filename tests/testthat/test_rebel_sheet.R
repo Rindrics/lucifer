@@ -19,7 +19,8 @@ test_that("rebel_sheet() beat up file with clustered data", {
                                        pos = 1,
                                        regex = "...",
                                        offset = c(1, 0),
-                                       dim = c(3, 4)))
+                                       ends = list(row = "A3", col = "test")))
+  beaten
   expect_equal(colnames(beaten), c("this", "is", "a", "test", "fname", "sheet"))
   expect_equal(dplyr::pull(beaten, 1),
                rep(c("A2", "A3"), 4))
@@ -33,7 +34,7 @@ test_that("rebel_sheet() beat up file with clustered data", {
                                  pos = 1,
                                  regex = "b..",
                                  offset = c(1, 2),
-                                 dim = c(5, 2)))
+                                 ends = list(row = "^.5", col = "test")))
   expect_equal(colnames(beaten), c("a", "test", "fname", "sheet"))
   expect_equal(as.numeric(dplyr::pull(beaten, 1)), c(42:45, 52:55, 62:65))
   expect_equal(as.numeric(dplyr::pull(beaten, 2)), c(72:75, 82:85, 92:95))
