@@ -39,14 +39,19 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                     row_type = row_type,
                     col_type = col_type,
                     row_omit = row_omit,
-                    col_omit = col_omit)
+                    col_omit = col_omit,
+                    fullwidth = fullwidth)
   path
   attributes <- attributes(path)
 
   out <- load_alldata(path, sheet = sheet)
 
   if (!is.null(fullwidth)) {
-    out <- make_ascii(out, col = fullwidth$col, numerize = fullwidth$numerize)
+    out
+    out <- make_ascii(out,
+                      col = fullwidth$col,
+                      row = fullwidth$row,
+                      numerize = fullwidth$numerize)
   }
 
   if (!is.null(cluster)) {
