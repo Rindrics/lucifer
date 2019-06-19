@@ -1,6 +1,6 @@
 context("Fights using multitools")
 
-test_that("Fight with maiwashi sheet of aomori data using multitools", {
+test_that("Fight with maiwashi sheet of aomori catch data", {
   df <- load_alldata("aomori.xlsx", sheet = "マイワシ")
   converted <- df %>%
     extract_clusters(regex = "^年", col = 1,
@@ -18,7 +18,7 @@ test_that("Fight with maiwashi sheet of aomori data using multitools", {
   expect_setequal(converted$catch, as.character(seq(1, 39 * 24)))
 })
 
-test_that("Fight with katakuchi sheet of aomori data using multitools", {
+test_that("Fight with katakuchi sheet of aomori catch data", {
   df <- load_alldata("aomori.xlsx", sheet = "カタクチ")
   converted <- df %>%
     extract_clusters(regex = "^年", col = 1,
@@ -36,7 +36,7 @@ test_that("Fight with katakuchi sheet of aomori data using multitools", {
   expect_setequal(converted$catch, as.character(seq(1, 39 * 24)))
 })
 
-test_that("Fight with 'masabahi' sheet of aomori data using multitools", {
+test_that("Fight with 'masabahi' sheet of aomori catch data", {
   df <- load_alldata("aomori.xlsx", sheet = "マサバ比  ")
   hachinohe <- df %>%
     extract_clusters(regex = "八戸", col = 1,
