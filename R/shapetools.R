@@ -264,16 +264,7 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
     nrow <- maxrow - rofst
     ncol <- maxcol - pos.key - cofst + 1
   }
-  if (is.infinite(maxrow + maxcol)) {
-    rlang::abort(message = "Too much match. Please re-consider regex.",
-                 .subclass = "extract_a_cluster_error",
-                 ends = ends)
-  }
-  if (length(maxrow) == 0 | length(maxcol) == 0) {
-    rlang::abort(message = "No match. Please re-consider regex.",
-                 .subclass = "extract_a_cluster_error",
-                 ends = ends)
-  }
+
   out <- df[row:(row + nrow - 1), col:(col + ncol - 1)]
   if (!is.null(info)) {
     row_info  <- row + info$offset[1]

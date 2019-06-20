@@ -59,10 +59,11 @@ test_that("locate_keys() locate positions of keys
   expect_equal(locate_keys(df = data, regex = "ba", col = 1), c(2, 3))
   expect_equal(locate_keys(df = data, regex = "foo", row = 1), 1)
   expect_equal(locate_keys(df = data, regex = "a", row = 3), c(1, 3))
-  expect_error(locate_keys(df = data, regex = "a"),
-               "Give either 'row' or 'col'")
-  expect_error(locate_keys(df = data, regex = "a", row = 1, col = 1),
-               "Give either 'row' or 'col'")
+  expect_success(expect_error(locate_keys(df = data, regex = "a"),
+                              "Give either 'row' or 'col'"))
+  expect_success(expect_error(locate_keys(df = data, regex = "a",
+                                          row = 1, col = 1),
+                              "Give either 'row' or 'col'"))
 })
 
 test_that("which_decrease() detect decrease in num vector", {
@@ -88,7 +89,10 @@ test_that("Stop if alert_skip() detect skip in num vector", {
 test_that("jpyr2ad() convert jpyear to A.D.", {
   expect_equal(jpyr2ad(1:10, "showa"), 1926:1935)
   expect_error(jpyr2ad(c(60:62, 1), "showa"))
+  expect_success(expect_error(jpyr2ad(c(60:62, 1), "showa"),
+                              "There is a skip in given vector"))
   expect_equal(jpyr2ad(c(60:63, 1), "showa"), c(1985:1989))
+  expect_success(expect_error(jpyr2ad(c(60:62, 1), "reiwa"), "Unknown era"))
 })
 
 test_that("locate_matchend() locates end of the repeted match", {
@@ -99,4 +103,7 @@ test_that("locate_matchend() locates end of the repeted match", {
   str <- rep(c("foo", "bar", "baz"), 5)
   regex <- "bar"
   expect_equal(locate_matchend(str, regex), 2)
+
+  expect_success(expect_error(locate_matchend(letters, regex = "123456"),
+                              "Match failed. Please re-consider regex"))
 })
