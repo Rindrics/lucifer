@@ -88,30 +88,65 @@ test_that("merge_colname() concatenates colnames in multiple rows", {
                  "D1_D2", "E1_E2", "F2_F2"))
 })
 
-# test_that("make_ascii() convert full-width numbers into ASCII numbers", {
-#   zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1")
-#   expect_equal(make_ascii(zenkaku, 1) %>% dplyr::pull(1),
-#                as.character(c("full", 1:5)))
-#   expect_equal(make_ascii(zenkaku[-1, ], 1, numerize = TRUE) %>% dplyr::pull(1),
-#                1:5)
-#   expect_equal(make_ascii(zenkaku[-1, ], 2, numerize = TRUE) %>% dplyr::pull(2),
-#                11:15)
-#   expect_equal(make_ascii(zenkaku[-1, ], 3, numerize = TRUE) %>% dplyr::pull(3),
-#                21:25)
-#   expect_equal(make_ascii(zenkaku[-1, ], 4, numerize = TRUE) %>% dplyr::pull(4),
-#                311:315)
-#   expect_equal(make_ascii(zenkaku[-1, ], 5, numerize = TRUE) %>% dplyr::pull(5),
-#                11:15)
-#   expect_equal(make_ascii(zenkaku[-1, ], 6, numerize = TRUE) %>% dplyr::pull(6),
-#                1:5)
-#   expect_equal(make_ascii(zenkaku[-1, ], 7, numerize = TRUE) %>% dplyr::pull(7),
-#                1:5)
-#   expect_equal(make_ascii(zenkaku[-1, ], 6, numerize = FALSE) %>% dplyr::pull(6),
-#                paste0(1:5, "月"))
-#   expect_equal(make_ascii(zenkaku[-1, ], 7, numerize = FALSE) %>% dplyr::pull(7),
-#                paste0(1:5, "トン"))
-# })
+test_that("make_ascii() convert full-width numbers into ASCII numbers", {
+  zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1")
+  expect_equal(make_ascii(zenkaku, row = 2) %>% vectorize_row(2),
+               c("1", "11", "21", "311", "11", "1月", "1トン"))
+  expect_equal(make_ascii(zenkaku, row = 2, numerize = TRUE) %>%
+                 vectorize_row(2),
+               c("1", "11", "21", "311", "11", "1", "1"))
+  expect_equal(make_ascii(zenkaku, col = 1) %>% dplyr::pull(1),
+               as.character(c("full", 1:5)))
+  expect_equal(make_ascii(zenkaku, col = 1, numerize = TRUE) %>%
+                 dplyr::pull(1),
+               c("full", as.character(1:5)))
+  expect_equal(make_ascii(zenkaku, col = 2, numerize = TRUE) %>%
+                 dplyr::pull(2),
+               c("full  half", as.character(11:15)))
+  expect_equal(make_ascii(zenkaku, col = 3, numerize = TRUE) %>%
+                 dplyr::pull(3),
+               c("half  full", as.character(21:25)))
+  expect_equal(make_ascii(zenkaku, col = 4, numerize = TRUE) %>%
+                 dplyr::pull(4),
+               c("full-half-full", as.character(311:315)))
+  expect_equal(make_ascii(zenkaku, col = 5, numerize = TRUE) %>%
+                 dplyr::pull(5),
+               c("full-full", as.character(11:15)))
+  expect_equal(make_ascii(zenkaku, col = 6, numerize = TRUE) %>%
+                 dplyr::pull(6),
+               c("month", as.character(1:5)))
+  expect_equal(make_ascii(zenkaku, col = 7, numerize = TRUE) %>%
+                 dplyr::pull(7),
+               c("ton", as.character(1:5)))
+  expect_equal(make_ascii(zenkaku, col = 6, numerize = FALSE) %>%
+                 dplyr::pull(6),
+               c("month", paste0(1:5, "月")))
+  expect_equal(make_ascii(zenkaku, col = 7, numerize = FALSE) %>%
+                 dplyr::pull(7),
+               c("ton", paste0(1:5, "トン")))
+})
 
+test_that("make_ascii() handle df with NA", {
+  zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1")
+  zenkaku[1, 1] <- NA
+  expect_equal(make_ascii(zenkaku, row = 1, headerized = FALSE) %>%
+               vectorize_row(1),
+               c("NA", "full  half", "half  full",
+                 "full-half-full", "full-full", "month", "ton"))
+})
+
+test_that("make_ascii() handle headerized df", {
+  zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1") %>%
+    headerize(1)
+  expect_equal(make_ascii(zenkaku, row = 1, headerized = TRUE) %>%
+                 vectorize_row(1),
+               c("1", "11", "21", "311", "11", "1月", "1トン"))
+})
+
+test_that("make_ascii() throws an error", {
+  data  <- data.frame(a = 1:3, b = 4:6)
+  expect_error(make_ascii(data, headerized = TRUE))
+})
 
 test_that("headerize() change specific row into df header", {
   df <- data.frame(a = 1:10, b = 11:20, c = 21:30)
@@ -120,102 +155,6 @@ test_that("headerize() change specific row into df header", {
   expect_equal(colnames(headerize(df, 3)), c("3", "13", "23"))
 })
 
-test_that("extract_a_cluster() returns clusters in row direction", {
-  data  <- data.frame(a = rep(c("foo", "bar", "baz", "bum"), 4),
-                     b = 1:16, c = 11:26, d = 21:36, stringsAsFactors = FALSE)
-  data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "row",
-                           df = data, offset = c(0, 0), dim = c(2, 2))
-  expect_equal(data2$a, c("foo", "bar"))
-  expect_equal(data2$b, 1:2)
-
-  data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "row",
-                           df = data, offset = c(1, 1), dim = c(2, 2))
-  expect_equal(data2$b, 2:3)
-  expect_equal(data2$c, 12:13)
-
-  data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "row",
-                           df = data, offset = c(1, 1), dim = c(3, 3))
-  expect_equal(data2$b, 2:4)
-  expect_equal(data2$c, 12:14)
-  expect_equal(data2$d, 22:24)
-
-  data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "row",
-                           df = data, offset = c(2, 1), dim = c(2, 3))
-  expect_equal(data2$b, 3:4)
-  expect_equal(data2$c, 13:14)
-  expect_equal(data2$d, 23:24)
-
-  data  <- data.frame(rbind(1:10, 11:20, 21:30, 31:40))
-  data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "col",
-                           df = data, offset = c(0, 0), dim = c(2, 2))
-  expect_equal(data2$X1, c(1, 11))
-  expect_equal(data2$X2, c(2, 12))
-
-  data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "col",
-                           df = data, offset = c(1, 1), dim = c(3, 3))
-  expect_equal(data2$X2, c(12, 22, 32))
-  expect_equal(data2$X3, c(13, 23, 33))
-  expect_equal(data2$X4, c(14, 24, 34))
-
-  data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "col",
-                           df = data, offset = c(2, 1), dim = c(2, 3))
-  expect_equal(data2$X2, c(22, 32))
-  expect_equal(data2$X3, c(23, 33))
-  expect_equal(data2$X4, c(24, 34))
-})
-
-test_that("extract_cluster() get additional info", {
-  data  <- load_alldata("cluster_info.xlsx", sheet = "Sheet1")
-  data
-  data2 <- extract_a_cluster(pos.key = 5, find_from = 1, direction = "row",
-                             df = data, offset = c(0, 0), dim = c(6, 2),
-                             info = list(offset = c(-4, 0),
-                                         dim = c(4, 2)))
-  head(data2)
-  expect_equal(data2[-1, 1], as.character(1:5))
-  expect_equal(data2[-1, 2], as.character(16:20))
-  expect_equal(vectorize_row(data2, 1),
-               c("foo", "bar", "this", "is", "a", "test"))
-  expect_equal(vectorize_row(data2, 2), c("1", "16", "1", "2", "3", "4"))
-})
-
-test_that("extract_clusters() return clusters in column direction", {
-  data  <- data.frame(rbind(rep(c("foo", "bar", "baz", "bum", "bup"), 2),
-                            1:10, 11:20, 21:30, 31:40),
-                      stringsAsFactors = FALSE)
-  data2 <- extract_clusters(data, "foo", row = 1, dim = c(2, 2))
-  expect_equal(data2[[1]][, 1], c("foo", 1))
-  expect_equal(data2[[1]][, 2], c("bar", 2))
-  expect_equal(data2[[2]][, 1], c("foo", 6))
-  expect_equal(data2[[2]][, 2], c("bar", 7))
-
-  data2 <- extract_clusters(data, "foo", row = 1,
-                        offset = c(1, 1), dim = c(4, 3))
-  expect_equal(data2[[1]][1, ] %>% as.numeric(), 2:4)
-  expect_equal(data2[[1]][2, ] %>% as.numeric(), 12:14)
-  expect_equal(data2[[2]][1, ] %>% as.numeric(), 7:9)
-  expect_equal(data2[[2]][2, ] %>% as.numeric(), 17:19)
-
-
-  data <- data.frame(a = rep(c("foo", "bar", "baz", "bum", "bup"), 2),
-                     b = 1:10, c = 11:20,
-                     stringsAsFactors = FALSE)
-
-  data2 <- extract_clusters(data, "foo", col = 1, dim = c(3, 3))
-  expect_equal(data2[[1]]$a, c("foo", "bar", "baz"))
-  expect_equal(data2[[1]]$b, 1:3)
-  expect_equal(data2[[1]]$c, 11:13)
-  expect_equal(data2[[2]]$a, c("foo", "bar", "baz"))
-  expect_equal(data2[[2]]$b, 6:8)
-  expect_equal(data2[[2]]$c, 16:18)
-
-  data2 <- extract_clusters(data, "foo", col = 1,
-                            offset = c(2, 1), dim = c(3, 2))
-  expect_equal(data2[[1]]$b, 3:5)
-  expect_equal(data2[[1]]$c, 13:15)
-  expect_equal(data2[[2]]$b, 8:10)
-  expect_equal(data2[[2]]$c, 18:20)
-})
 
 test_that("rm_nacol() remove na columns", {
   df <- data.frame(a = 1:10, b = 11:20, c = 21:30)

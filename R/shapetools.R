@@ -134,20 +134,61 @@ merge_colname <- function(df, rows, cols = NULL) {
 #'
 #' @inheritParams make_rect
 #' @param col Number of the target column
+#' @param row Number of the target row
 #' @param numerize If TRUE, remove characters convert column to numeric
+#' @param headerized If FALSE (default), allow df with tentative colnames
 #' @export
-make_ascii <- function(df, col, numerize = FALSE) {
-  ascii <- df %>%
-    dplyr::pull(col) %>%
-    purrr::map_chr(Nippon::zen2han)
-  if (numerize) {
-    df[, col] <- ascii %>%
-      stringr::str_remove_all("\\D") %>%
-      readr::parse_number()
+make_ascii <- function(df, col = NULL, row = NULL,
+                       numerize = FALSE, headerized = FALSE) {
+  row_offset <- 0
+
+  if (headerized) {
+    header <- colnames(df)
+    body   <- df
   } else {
-    df[, col] <- ascii
+    header     <- vectorize_row(df, 1)
+    body       <- df[-1, ]
+    row_offset <- -1
   }
-  df
+
+  if (is.null(col) & is.null(row)) {
+    rlang::abort(message = "Give me at least 'col' or 'row'.",
+                 .subclass = "make_ascii_error")
+  } else {
+    edit_row    <- !is.null(row) && (row > 1 | headerized == TRUE)
+    edit_col    <- !is.null(col)
+    edit_header <- !is.null(row) && row == 1 && headerized == FALSE
+
+    if (edit_col) {
+      string <- dplyr::pull(body, col)
+    } else if (edit_header) {
+      string <- header
+    } else if (edit_row) {
+      string <- vectorize_row(body, row + row_offset)
+    }
+
+    ascii <- purrr::map_chr(string, Nippon::zen2han)
+
+    if (numerize) {
+      ascii <- ascii %>%
+        stringr::str_remove_all("\\D")
+    }
+
+    if (edit_col) {
+      body[, col] <- ascii
+    } else if (edit_header) {
+      header <- ascii
+    } else if (edit_row) {
+      body[row + row_offset, ] <- ascii
+    }
+    if (headerized) {
+      colnames(body) <- header
+      out <- body
+    } else {
+      out <- rbind(header, body)
+    }
+    out
+  }
 }
 
 #' Change specific row into df header
@@ -167,8 +208,22 @@ headerize <- function(df, row) {
 #' @inheritParams make_rect
 #' @export
 rm_nacols <- function(df) {
-  napos <- !is.na(colnames(df))
-  df[, napos]
+  df_leftmost <- df[, 1]
+  df_right    <- df[, -1]
+  name_left   <- colnames(df)[1]
+  name_right  <- colnames(df)[-1]
+  not_na <- !stringr::str_detect(colnames(df_right), "^NA(.[1-9]+)?$")
+  if (length(not_na) == 0) {
+    df
+  } else {
+    not_na <- tidyr::replace_na(not_na, FALSE)
+    not_na
+    out <- cbind(df_leftmost, df_right[, not_na]) %>%
+      data.frame(stringsAsFactors = FALSE)
+    colnames(out) <- c(name_left, name_right[not_na])
+    out[, 1] <- as.character(out[, 1])
+    out
+  }
 }
 
 #' Extract a cluster from df using the keyword
@@ -182,21 +237,34 @@ rm_nacols <- function(df) {
 #'   matched the keyword
 #' @param offset The offset (\code{c(row, pos})) of the cluster topleft from
 #'   the coordination of keyword
-#' @param dim Dimension (\code{c(row, col)}) of the cluster
+#' @param ends List of regex to locate row- and column- ends of each cluster
+#'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}
 #' @param info Parameters to control \code{link{append_info}}
 extract_a_cluster <- function(pos.key, find_from, direction, df,
-                          offset = c(0, 0), dim, info = NULL) {
+                              offset = c(0, 0), ends, info = NULL) {
   rofst <- offset[1]
   cofst <- offset[2]
-  nrow  <- dim[1]
-  ncol  <- dim[2]
+
   if (direction == "row") {
     row <- pos.key + rofst
     col <- find_from + cofst
+    maxrow <- locate_matchend(dplyr::pull(df, col)[row:nrow(df)],
+                              ends[["row"]]) + row - 1
+    maxcol <- locate_matchend(vectorize_row(df, row), ends[["col"]])
+    nrow <- maxrow - pos.key - rofst + 1
+    ncol <- maxcol - cofst
+    nrow
+    ncol
   } else {
     row <- find_from + rofst
     col <- pos.key + cofst
+    maxrow <- locate_matchend(dplyr::pull(df, col), ends[["row"]])
+    maxcol <- locate_matchend(vectorize_row(df, row)[col:ncol(df)],
+                              ends[["col"]]) + col - 1
+    nrow <- maxrow - rofst
+    ncol <- maxcol - pos.key - cofst + 1
   }
+
   out <- df[row:(row + nrow - 1), col:(col + ncol - 1)]
   if (!is.null(info)) {
     row_info  <- row + info$offset[1]
@@ -220,17 +288,17 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
 #' @param col Column position from which the keyword to be searched
 #' @param row Row position from which the keyword to be searched
 extract_clusters <- function(df, regex, col = NULL, row = NULL,
-                           offset = c(0, 0), dim, info = NULL) {
+                             offset = c(0, 0), ends, info = NULL) {
   if (!is.null(row)) {
     pos <- locate_keys(df = df, row = row, regex = regex)
     purrr::map(pos, extract_a_cluster, find_from = row,
                direction = "col", df = df,
-               offset = offset, dim = dim, info = info)
+               offset = offset, ends = ends, info = info)
   } else if (!is.null(col)) {
     pos <- locate_keys(df = df, col = col, regex = regex)
     purrr::map(pos, extract_a_cluster, find_from = col,
                direction = "row", df = df,
-               offset = offset, dim = dim, info = info)
+               offset = offset, ends = ends, info = info)
   } else {
     stop("Unknown case")
   }

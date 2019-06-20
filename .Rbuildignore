@@ -2,3 +2,5 @@
 ^codecov\.yml$
 ^\.travis\.yml$
 .+\.org$
+^.*\.Rproj$
+^\.Rproj\.user$

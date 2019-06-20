@@ -86,8 +86,6 @@ locate_keys <- function(df, row = NULL, col = NULL, regex){
     str <- vectorize_row(df, row)
   } else if (!is.null(col)){
     str <- dplyr::pull(df, col)
-  } else {
-    stop("Unknown case")
   }
   stringr::str_which(str, regex)
 }
@@ -134,9 +132,38 @@ jpyr2ad <- function(x, start) {
     }
     conv[1:pos_lastyr] <- 1925
   } else {
-    stop("jpyr2ad")
+    rlang::abort(message = "Unknown era.",
+                 .subclass = "jpyr2ad_error",
+                 x = x, start = start)
   }
   ad <- x + conv[1:length(x)]
   alert_skip(ad)
   ad
+}
+
+#' Locate the end of repeated match
+#'
+#' This function locates the end of the repeated matchs in string.
+#' The first end of repeated match will be returned if there are
+#'   multiple repeted match.
+#' @param str String to be searched
+#' @param regex Regex for search
+locate_matchend <- function(str, regex) {
+  matched        <- stringr::str_which(str, regex)
+  if (length(matched) == 0) {
+    rlang::abort(message = "Match failed. Please re-consider regex.",
+                 .subclass = "locate_matchend_error",
+                 regex = regex, str = str)
+  }
+  multiple_match <- length(matched) > 1
+  if (multiple_match) {
+    if (all(diff(matched) == 1)) {
+      out <- length(matched) + min(matched) - 1
+    } else {
+      out <- min(which(diff(matched) != 1)) + min(matched) - 1
+    }
+  } else {
+    out <- matched
+  }
+  out
 }
