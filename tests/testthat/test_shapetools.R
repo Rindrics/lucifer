@@ -143,6 +143,10 @@ test_that("make_ascii() handle headerized df", {
                c("1", "11", "21", "311", "11", "1月", "1トン"))
 })
 
+test_that("make_ascii() throws an error", {
+  data  <- data.frame(a = 1:3, b = 4:6)
+  expect_error(make_ascii(data, headerized = TRUE))
+})
 
 test_that("headerize() change specific row into df header", {
   df <- data.frame(a = 1:10, b = 11:20, c = 21:30)
