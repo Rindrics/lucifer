@@ -47,8 +47,8 @@ test_that("rebel() beat up file with YrowMcol data", {
                                         varname = "given_varname"))
   expect_equal(colnames(beaten),
                c("year", "fname", "sheet", "month", "given_varname"))
-  expect_equal(unique(beaten$year), as.character(1969:2000))
-  expect_equal(unique(beaten$month), as.character(1:12))
+  expect_equal(unique(beaten$year), 1969:2000)
+  expect_equal(unique(beaten$month), 1:12)
   expect_setequal(unique(beaten$given_varname), as.character(c(1:384, 401:784)))
 })
 
@@ -111,22 +111,23 @@ test_that("rebel() beat up file contaminated by full-width characters", {
   beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
                   fullwidth = list(colpos = 1,
                                    numerize = TRUE))
-  expect_equal(dplyr::pull(beaten, 1), rep(1:5, 2))
+  beaten
+  expect_equal(dplyr::pull(beaten, 1), as.character(rep(1:5, 2)))
 
   beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
                   fullwidth = list(colpos = 1,
                                    numerize = FALSE))
-  expect_equal(dplyr::pull(beaten, 1), rep(as.character(1:5), 2))
+  expect_equal(dplyr::pull(beaten, 1), as.character(rep(as.character(1:5), 2)))
 
   beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
                   fullwidth = list(colpos = 2,
                                    numerize = TRUE))
-  expect_equal(dplyr::pull(beaten, 2), rep(11:15, 2))
+  expect_equal(dplyr::pull(beaten, 2), as.character(rep(11:15, 2)))
 
   beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
                   fullwidth = list(colpos = 6,
                                    numerize = TRUE))
-  expect_equal(dplyr::pull(beaten, 6), rep(1:5, 2))
+  expect_equal(dplyr::pull(beaten, 6), as.character(rep(1:5, 2)))
 
   beaten <- rebel(path = "fullwidth.xlsx", sheet_regex = "Sheet.",
                   fullwidth = list(colpos = 6,

@@ -1,5 +1,6 @@
 context("Fights using multitools")
 
+
 test_that("Fight with maiwashi sheet of aomori catch data", {
   df <- load_alldata("aomori.xlsx", sheet = "マイワシ")
   converted <- df %>%
@@ -10,7 +11,7 @@ test_that("Fight with maiwashi sheet of aomori catch data", {
     lapply(headerize, row = 1) %>%
     purrr::invoke(rbind, .) %>%
     rm_nacols() %>%
-    gather_cols(regex = "(1|2)?[0-9]月",
+    gather_cols(regex = "1?[0-9]月",
                 newname = "month", varname = "catch")
   expect_equal(colnames(converted), c("年／月", "漁法", "month", "catch"))
   expect_equal(unique(converted$漁法), c("まき網漁業", "定置網漁業（底建網含む）"))
@@ -35,6 +36,7 @@ test_that("Fight with katakuchi sheet of aomori catch data", {
   expect_equal(unique(converted$month), paste0(1:12, "月"))
   expect_setequal(converted$catch, as.character(seq(1, 39 * 24)))
 })
+
 
 test_that("Fight with 'masabahi' sheet of aomori catch data", {
   df <- load_alldata("aomori.xlsx", sheet = "マサバ比  ")
@@ -62,6 +64,7 @@ test_that("Fight with 'masabahi' sheet of aomori catch data", {
   expect_equal(dplyr::pull(tairadate, 3), as.character(99:86))
 })
 
+
 test_that("Fight with data from hachinohe ichiba", {
   fname <- "hachinohe_ichiba.xls"
   data <- load_alldata(fname, sheet = "0613") %>%
@@ -76,4 +79,27 @@ test_that("Fight with data from hachinohe ichiba", {
   expect_equal(vectorize_row(data, 1),
                c("1", "sex1", "-1", "bl1", "bw1", "gw1",
                  "-1", "-1", "-1", NA, NA))
+
+test_that("Fight with 'maiwashi' sheet of iwate data", {
+  year <- 2018
+  row_regex <- paste0("^", year)
+  df <- load_alldata("iwate.xls", sheet = "マイワシ")
+
+  maiwashi <- df %>%
+    extract_clusters(regex = ".+によるマイワシ.+",
+                     col = 1,
+                     offset = c(2, 0),
+                     ends = list(row = row_regex, col = "(1|１)(2|２)月")) %>%
+    lapply(make_ascii, row = 1) %>%
+    lapply(headerize, row = 1) %>%
+    purrr::invoke(rbind, .) %>%
+    gather_cols(regex = "1?[0-9]月",
+                newname = "month", varname = "catch") %>%
+    dplyr::rename(year = `NA`)
+  head(maiwashi)
+
+  expect_equal(unique(maiwashi$year), as.character(1968:2018))
+  expect_equal(unique(maiwashi$month), paste0(1:12, "月"))
+  expect_setequal(unique(maiwashi$catch), as.character(1:1224))
+
 })
