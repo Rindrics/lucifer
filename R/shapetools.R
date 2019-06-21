@@ -185,6 +185,7 @@ rm_nacols <- function(df) {
 #' @param ends List of regex to locate row- and column- ends of each cluster
 #'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}
 #' @param info Parameters to control \code{link{append_info}}
+#' @export
 extract_a_cluster <- function(pos.key, find_from, direction, df,
                           offset = c(0, 0), ends, info = NULL) {
   rofst <- offset[1]
@@ -241,6 +242,7 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
 #' @param regex Regular expression to match keywords
 #' @param col Column position from which the keyword to be searched
 #' @param row Row position from which the keyword to be searched
+#' @export
 extract_clusters <- function(df, regex, col = NULL, row = NULL,
                              offset = c(0, 0), ends, info = NULL) {
   if (!is.null(row)) {
