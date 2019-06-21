@@ -112,7 +112,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                        newname = col_type$newname,
                        varname = attributes$col_type$varname)
   }
-  out
+  tibble::as_tibble(out)
 }
 
 #' Rebel against godly Excel workbook
