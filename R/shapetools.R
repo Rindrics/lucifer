@@ -188,7 +188,7 @@ rm_nacols <- function(df) {
 #' @param info Parameters to control \code{link{append_info}}
 #' @export
 extract_a_cluster <- function(pos.key, find_from, direction, df,
-                          offset = c(0, 0), ends, info = NULL) {
+                              offset = c(0, 0), ends, info = NULL) {
   rofst <- offset[1]
   cofst <- offset[2]
 

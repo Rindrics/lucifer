@@ -2,7 +2,7 @@ context("Test extracting clustered data")
 
 test_that("clusters distributed in row direction can be extracted", {
   data  <- data.frame(a = rep(c("foo", "bar", "baz", "bum"), 4),
-                     b = 1:16, c = 11:26, d = 21:36, stringsAsFactors = FALSE)
+                      b = 1:16, c = 11:26, d = 21:36, stringsAsFactors = FALSE)
   data2 <- extract_a_cluster(pos.key = 1, find_from = 1, direction = "row",
                              df = data, offset = c(0, 0),
                              ends = list(row = "bar", col = "21"))
