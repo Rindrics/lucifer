@@ -85,6 +85,7 @@ gather_cols <- function(df, regex, newname, varname) {
 #' @inheritParams make_rect
 #' @export
 rm_matchrow <- function(df, key, colpos, regex) {
+  df <- as.data.frame(df)
   target <- dplyr::pull(df, colpos)
   if (regex) {
     df[-stringr::str_which(target, key), ]
