@@ -61,3 +61,19 @@ test_that("Fight with 'masabahi' sheet of aomori catch data", {
   expect_equal(dplyr::pull(tairadate, 2), as.character(1:14))
   expect_equal(dplyr::pull(tairadate, 3), as.character(99:86))
 })
+
+test_that("Fight with data from hachinohe ichiba", {
+  fname <- "hachinohe_ichiba.xls"
+  data <- load_alldata(fname, sheet = "0613") %>%
+    extract_clusters(regex = "標本番号", col = 1,
+                     offset = c(-1, 0),
+                     ends = list(row = "[0-9]+", col = "採鱗")) %>%
+    headerize(1) %>%
+    data.frame()
+
+  expect_equal(colnames(data)[1:5],
+               c("標本番号", "性別", "年齢", "体長.mm.", "体重.g."))
+  expect_equal(vectorize_row(data, 1),
+               c("1", "sex1", "-1", "bl1", "bw1", "gw1",
+                 "-1", "-1", "-1", NA, NA))
+})
