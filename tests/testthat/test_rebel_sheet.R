@@ -6,7 +6,6 @@ test_that("rebel_sheet() beat up file with merged header", {
   beaten <- rebel_sheet(path = fname, sheet = sheet,
                         row_merged = 1, col_merged = 1) %>%
     as.data.frame()
-  beaten
   expect_equal(as.vector(beaten[, 1]),
                c(rep("A2", 7), rep("A10", 6), rep("A16", 8)))
   expect_equal(as.vector(unlist(beaten[1, ])),
@@ -20,7 +19,6 @@ test_that("rebel_sheet() beat up file with clustered data", {
                                        regex = "...",
                                        offset = c(1, 0),
                                        ends = list(row = "A3", col = "test")))
-  beaten
   expect_equal(colnames(beaten), c("this", "is", "a", "test", "fname", "sheet"))
   expect_equal(dplyr::pull(beaten, 1),
                rep(c("A2", "A3"), 4))
@@ -30,11 +28,11 @@ test_that("rebel_sheet() beat up file with clustered data", {
                as.character(c(62, 63, 72, 73, 82, 83, 92, 93)))
 
   beaten <- rebel_sheet(path = "clustered.xlsx", sheet = "foo",
-                  cluster = list(dir = "col",
-                                 pos = 1,
-                                 regex = "b..",
-                                 offset = c(1, 2),
-                                 ends = list(row = "^.5", col = "test")))
+                        cluster = list(dir = "col",
+                                       pos = 1,
+                                       regex = "b..",
+                                       offset = c(1, 2),
+                                       ends = list(row = "^.5", col = "test")))
   expect_equal(colnames(beaten), c("a", "test", "fname", "sheet"))
   expect_equal(as.numeric(dplyr::pull(beaten, 1)), c(42:45, 52:55, 62:65))
   expect_equal(as.numeric(dplyr::pull(beaten, 2)), c(72:75, 82:85, 92:95))
@@ -48,8 +46,8 @@ test_that("rebel_sheet() beat up file with YrowMcol data", {
                                         varname = "given_varname"))
   expect_equal(colnames(beaten),
                c("year", "fname", "sheet", "month", "given_varname"))
-  expect_equal(unique(beaten$year), as.character(1969:2000))
-  expect_equal(unique(beaten$month), as.character(1:12))
+  expect_equal(unique(beaten$year), 1969:2000)
+  expect_equal(unique(beaten$month), 1:12)
   expect_setequal(unique(beaten$given_varname), as.character(1:384))
 })
 
@@ -58,7 +56,6 @@ test_that("rebel_sheet() beat up file contaminated by summary column", {
                         col_omit = list(key = "sum",
                                         rowpos = 1,
                                         regex = FALSE))
-  beaten
   expect_equal(colnames(beaten),
                c(paste0(LETTERS[c(1:3, 5:6, 8)], 1), "fname", "sheet"))
   beaten <- beaten %>%
@@ -73,7 +70,6 @@ test_that("rebel_sheet() beat up file contaminated by summary row", {
                         row_omit = list(key = "sum",
                                         colpos = 1,
                                         regex = FALSE))
-  beaten
   expect_equal(colnames(beaten),
                c(paste0(LETTERS[c(1:8)], 1), "fname", "sheet"))
   beaten <- beaten %>%
@@ -85,9 +81,9 @@ test_that("rebel_sheet() beat up file contaminated by summary row", {
 
 test_that("rebel_sheet() beat up file contaminated by full-width characters", {
   beaten <- rebel_sheet(path = "fullwidth.xlsx", sheet = "Sheet1",
-                        fullwidth = list(colpos = 1,
+                        fullwidth = list(col = 1,
                                          numerize = TRUE))
-  expect_equal(dplyr::pull(beaten, 1), 1:5)
+  expect_equal(dplyr::pull(beaten, 1), as.character(1:5))
 
   beaten <- rebel_sheet(path = "fullwidth.xlsx", sheet = "Sheet1",
                         fullwidth = list(colpos = 1,
@@ -96,12 +92,12 @@ test_that("rebel_sheet() beat up file contaminated by full-width characters", {
   beaten <- rebel_sheet(path = "fullwidth.xlsx", sheet = "Sheet1",
                         fullwidth = list(colpos = 2,
                                          numerize = TRUE))
-  expect_equal(dplyr::pull(beaten, 2), 11:15)
+  expect_equal(dplyr::pull(beaten, 2), as.character(11:15))
 
   beaten <- rebel_sheet(path = "fullwidth.xlsx", sheet = "Sheet1",
                         fullwidth = list(colpos = 6,
                                          numerize = TRUE))
-  expect_equal(dplyr::pull(beaten, 6), 1:5)
+  expect_equal(dplyr::pull(beaten, 6), as.character(1:5))
 
   beaten <- rebel_sheet(path = "fullwidth.xlsx", sheet = "Sheet1",
                         fullwidth = list(colpos = 6,

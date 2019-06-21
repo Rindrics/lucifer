@@ -135,20 +135,61 @@ merge_colname <- function(df, rows, cols = NULL) {
 #'
 #' @inheritParams make_rect
 #' @param col Number of the target column
+#' @param row Number of the target row
 #' @param numerize If TRUE, remove characters convert column to numeric
+#' @param headerized If FALSE (default), allow df with tentative colnames
 #' @export
-make_ascii <- function(df, col, numerize = FALSE) {
-  ascii <- df %>%
-    dplyr::pull(col) %>%
-    purrr::map_chr(Nippon::zen2han)
-  if (numerize) {
-    df[, col] <- ascii %>%
-      stringr::str_remove_all("\\D") %>%
-      readr::parse_number()
+make_ascii <- function(df, col = NULL, row = NULL,
+                       numerize = FALSE, headerized = FALSE) {
+  row_offset <- 0
+
+  if (headerized) {
+    header <- colnames(df)
+    body   <- df
   } else {
-    df[, col] <- ascii
+    header     <- vectorize_row(df, 1)
+    body       <- df[-1, ]
+    row_offset <- -1
   }
-  df
+
+  if (is.null(col) & is.null(row)) {
+    rlang::abort(message = "Give me at least 'col' or 'row'.",
+                 .subclass = "make_ascii_error")
+  } else {
+    edit_row    <- !is.null(row) && (row > 1 | headerized == TRUE)
+    edit_col    <- !is.null(col)
+    edit_header <- !is.null(row) && row == 1 && headerized == FALSE
+
+    if (edit_col) {
+      string <- dplyr::pull(body, col)
+    } else if (edit_header) {
+      string <- header
+    } else if (edit_row) {
+      string <- vectorize_row(body, row + row_offset)
+    }
+
+    ascii <- purrr::map_chr(string, Nippon::zen2han)
+
+    if (numerize) {
+      ascii <- ascii %>%
+        stringr::str_remove_all("\\D")
+    }
+
+    if (edit_col) {
+      body[, col] <- ascii
+    } else if (edit_header) {
+      header <- ascii
+    } else if (edit_row) {
+      body[row + row_offset, ] <- ascii
+    }
+    if (headerized) {
+      colnames(body) <- header
+      out <- body
+    } else {
+      out <- rbind(header, body)
+    }
+    out
+  }
 }
 
 #' Change specific row into df header
@@ -168,8 +209,22 @@ headerize <- function(df, row) {
 #' @inheritParams make_rect
 #' @export
 rm_nacols <- function(df) {
-  napos <- !is.na(colnames(df))
-  df[, napos]
+  df_leftmost <- df[, 1]
+  df_right    <- df[, -1]
+  name_left   <- colnames(df)[1]
+  name_right  <- colnames(df)[-1]
+  not_na <- !stringr::str_detect(colnames(df_right), "^NA(.[1-9]+)?$")
+  if (length(not_na) == 0) {
+    df
+  } else {
+    not_na <- tidyr::replace_na(not_na, FALSE)
+    not_na
+    out <- cbind(df_leftmost, df_right[, not_na]) %>%
+      data.frame(stringsAsFactors = FALSE)
+    colnames(out) <- c(name_left, name_right[not_na])
+    out[, 1] <- as.character(out[, 1])
+    out
+  }
 }
 
 #' Extract a cluster from df using the keyword
@@ -211,16 +266,7 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
     nrow <- maxrow - rofst
     ncol <- maxcol - pos.key - cofst + 1
   }
-  if (is.infinite(maxrow + maxcol)) {
-    rlang::abort(message = "Too much match. Please re-consider regex.",
-                 .subclass = "extract_a_cluster_error",
-                 ends = ends)
-  }
-  if (length(maxrow) == 0 | length(maxcol) == 0) {
-    rlang::abort(message = "No match. Please re-consider regex.",
-                 .subclass = "extract_a_cluster_error",
-                 ends = ends)
-  }
+
   out <- df[row:(row + nrow - 1), col:(col + ncol - 1)]
 
   if (offset[1] == -1 && offset[2] == 0) {
