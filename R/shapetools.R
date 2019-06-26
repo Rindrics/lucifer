@@ -186,6 +186,7 @@ rm_nacols <- function(df) {
 #'   the coordination of keyword
 #' @param dim Dimension (\code{c(row, col)}) of the cluster
 #' @param info Parameters to control \code{link{append_info}}
+#' @export
 extract_a_cluster <- function(pos.key, find_from, direction, df,
                           offset = c(0, 0), dim, info = NULL) {
   rofst <- offset[1]
@@ -221,6 +222,7 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
 #' @param regex Regular expression to match keywords
 #' @param col Column position from which the keyword to be searched
 #' @param row Row position from which the keyword to be searched
+#' @export
 extract_clusters <- function(df, regex, col = NULL, row = NULL,
                            offset = c(0, 0), dim, info = NULL) {
   if (!is.null(row)) {
