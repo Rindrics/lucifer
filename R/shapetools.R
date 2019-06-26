@@ -24,6 +24,7 @@ make_rect <- function(df, range) {
 #' @param headerized If FALSE, allow appending to data frame with
 #'   tentative colnames
 #' @inheritParams make_rect
+#' @export
 append_info <- function(info, df, headerized = FALSE) {
   df_info <- list2df(info, nrow = nrow(df))
   if (headerized == FALSE) {
@@ -70,6 +71,7 @@ unmerge_vert <- function(df, col, regex = ".+") {
 #' @param regex Regex to match columns to be gathered
 #' @param newname New name for colnames to be gatherd
 #' @param varname New name for values to be gatherd
+#' @export
 gather_cols <- function(df, regex, newname, varname) {
   cols2gather <- stringr::str_extract(colnames(df), regex) %>%
     stats::na.omit()
