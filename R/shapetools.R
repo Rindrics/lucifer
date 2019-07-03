@@ -133,33 +133,35 @@ merge_colname <- function(df, rows, cols = NULL) {
 
 #' Convert full-width numbers in df into ASCII numbers
 #'
-#' @inheritParams make_rect
+#' @param x Data frame or vector to be processed
 #' @param col Number of the target column
 #' @param row Number of the target row
 #' @param numerize If TRUE, remove characters convert column to numeric
 #' @param headerized If FALSE (default), allow df with tentative colnames
 #' @export
-make_ascii <- function(df, col = NULL, row = NULL,
+make_ascii <- function(x, col = NULL, row = NULL,
                        numerize = FALSE, headerized = FALSE) {
-  row_offset <- 0
-
-  if (headerized) {
-    header <- colnames(df)
-    body   <- df
+  if (!is.data.frame(x) & !is.list(x)) {
+    string <- x
   } else {
-    header     <- vectorize_row(df, 1)
-    body       <- df[-1, ]
-    row_offset <- -1
-  }
-
-  if (is.null(col) & is.null(row)) {
-    rlang::abort(message = "Give me at least 'col' or 'row'.",
-                 .subclass = "make_ascii_error")
-  } else {
-    edit_row    <- !is.null(row) && (row > 1 | headerized == TRUE)
-    edit_col    <- !is.null(col)
-    edit_header <- !is.null(row) && row == 1 && headerized == FALSE
-
+    row_offset <- 0
+    x <- as.data.frame(x)
+    if (headerized) {
+      header <- colnames(x)
+      body   <- x
+    } else {
+      header     <- vectorize_row(x, 1)
+      body       <- x[-1, ]
+      row_offset <- -1
+    }
+    if (is.null(col) & is.null(row)) {
+      rlang::abort(message = "Give me at least 'col' or 'row'.",
+                   .subclass = "make_ascii_error")
+    } else {
+      edit_row    <- !is.null(row) && (row > 1 | headerized == TRUE)
+      edit_col    <- !is.null(col)
+      edit_header <- !is.null(row) && row == 1 && headerized == FALSE
+    }
     if (edit_col) {
       string <- dplyr::pull(body, col)
     } else if (edit_header) {
@@ -167,29 +169,31 @@ make_ascii <- function(df, col = NULL, row = NULL,
     } else if (edit_row) {
       string <- vectorize_row(body, row + row_offset)
     }
-
-    ascii <- purrr::map_chr(string, Nippon::zen2han)
-
-    if (numerize) {
-      ascii <- ascii %>%
-        stringr::str_remove_all("\\D")
-    }
-
-    if (edit_col) {
-      body[, col] <- ascii
-    } else if (edit_header) {
-      header <- ascii
-    } else if (edit_row) {
-      body[row + row_offset, ] <- ascii
-    }
-    if (headerized) {
-      colnames(body) <- header
-      out <- body
-    } else {
-      out <- rbind(header, body)
-    }
-    out
   }
+
+  ascii <- purrr::map_chr(string, Nippon::zen2han)
+
+  if (numerize) {
+    ascii <- ascii %>%
+      stringr::str_remove_all("\\D")
+  }
+
+  if (is.vector(x)) return(ascii)
+
+  if (edit_col) {
+    body[, col] <- ascii
+  } else if (edit_header) {
+    header <- ascii
+  } else if (edit_row) {
+    body[row + row_offset, ] <- ascii
+  }
+  if (headerized) {
+    colnames(body) <- header
+    out <- body
+  } else {
+    out <- rbind(header, body)
+  }
+  out
 }
 
 #' Change specific row into df header

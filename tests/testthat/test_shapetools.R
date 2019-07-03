@@ -148,6 +148,14 @@ test_that("make_ascii() throws an error", {
   expect_error(make_ascii(data, headerized = TRUE))
 })
 
+test_that("make_ascii() handlez vector", {
+  vec  <- c("１", "２", "３")
+  expect_equal(make_ascii(vec), as.character(1:3))
+  expect_equal(make_ascii(paste0(vec, "a")), paste0(1:3, "a"))
+  expect_equal(make_ascii(paste0(vec, "a"), numerize = TRUE),
+               as.character(1:3))
+})
+
 test_that("headerize() change specific row into df header", {
   df <- data.frame(a = 1:10, b = 11:20, c = 21:30)
   expect_equal(colnames(headerize(df, 1)), c("1", "11", "21"))
