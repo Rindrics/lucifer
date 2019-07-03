@@ -278,7 +278,6 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
   if (offset[1] == -1 && offset[2] == 0) {
     out[1, 1] <- out[2, 1]
     out <- out[-2, ]
-    head(out)
   }
   if (!is.null(info)) {
     row_info  <- row + info$offset[1]
