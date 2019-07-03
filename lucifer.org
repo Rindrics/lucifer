@@ -65,8 +65,7 @@
 	#+end_src
 * 再ロードしてテストを実行
 #+BEGIN_SRC R :results output
-  devtools::load_all(); devtools::test()
-  lintr::lint_package()
+  devtools::load_all(); devtools::test(); lintr::lint_package()
 
   devtools::document(roclets = c("rd", "collate", "namespace"))
   devtools::check(args = "--as-cran")
