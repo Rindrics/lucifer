@@ -31,3 +31,5 @@ Imports:
     rlang,
     tibble,
     stats
+Remotes:  
+    cran/Nippon
