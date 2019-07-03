@@ -167,27 +167,3 @@ locate_matchend <- function(str, regex) {
   }
   out
 }
-
-#' Convert fiscal year to true year
-#'
-#' @param fisyr Fiscal year
-#' @param month Month at \code{fisyr}
-#' @param month_start Month where fiscal year starts
-#' @param rule Rules to get true year.
-#'   Give \code{head} if true2019Oct is called fiscal2020Oct as in U.S.
-#'   Give \code{tail} if true2020Mar is called fiscal2019Mar as in Japan.
-unfiscal_vec <- function(fisyr, month, month_start, rule) {
-  if (rule == "head") {
-    if (month < month_start) {
-      as.integer(fisyr)
-    } else {
-      as.integer(fisyr - 1)
-    }
-  } else if (rule == "tail") {
-    if (month < month_start) {
-      as.integer(fisyr + 1)
-    } else {
-      as.integer(fisyr)
-    }
-  }
-}
