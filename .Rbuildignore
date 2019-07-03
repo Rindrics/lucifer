@@ -4,4 +4,3 @@
 .+\.org$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^Rprof.out$
