@@ -32,7 +32,7 @@
   usethis::use_package("lubridate")
   usethis::use_package("stringr")
   usethis::use_package("purrr")
-  usethis::use_package("Nippon")
+  usethis::use_dev_package("Nippon")
   usethis::use_package("cellranger")
   usethis::use_package("readr")
   usethis::use_package("rlang")
