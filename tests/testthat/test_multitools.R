@@ -100,3 +100,19 @@ test_that("Fight with 'maiwashi' sheet of iwate data", {
   expect_equal(unique(maiwashi$month), paste0(1:12, "月"))
   expect_setequal(unique(maiwashi$catch), as.character(1:1224))
 })
+
+test_that("Fight with duplicated column and fiscal year", {
+  saga <- load_alldata("saga.xls", sheet = "Sheet1") %>%
+    extract_clusters(regex = "年度", col = 1, offset = c(0, 0),
+                     ends = list(row = "2016", col = "３月")) %>%
+    make_ascii(row = 1) %>%
+    headerize(1) %>%
+    gather_cols(".+月", newname = "month", varname = "catch") %>%
+    dplyr::mutate(年度 = as.integer(年度),
+                  month = make_ascii(month, numerize = TRUE)) %>%
+    unfiscal(ycol = 1, mcol = 3, month_start = 4, rule = "tail")
+  expect_setequal(subset(saga, year == 1975)$month, c(4:12))
+  expect_setequal(subset(saga, year == 1976)$month, c(1:12))
+  expect_setequal(subset(saga, year == 2016)$month, c(1:12))
+  expect_setequal(subset(saga, year == 2017)$month, c(1:3))
+})
