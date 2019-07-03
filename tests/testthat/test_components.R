@@ -107,3 +107,79 @@ test_that("locate_matchend() locates end of the repeted match", {
   expect_success(expect_error(locate_matchend(letters, regex = "123456"),
                               "Match failed. Please re-consider regex"))
 })
+
+test_that("unfiscal_vec() convert fistal year df to true year", {
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 1, month_start = 4, rule = "tail"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 2, month_start = 4, rule = "tail"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 3, month_start = 4, rule = "tail"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 4, month_start = 4, rule = "tail"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 5, month_start = 4, rule = "tail"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 6, month_start = 4, rule = "tail"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 7, month_start = 4, rule = "tail"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 8, month_start = 4, rule = "tail"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 9, month_start = 4, rule = "tail"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 10, month_start = 4, rule = "tail"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 11, month_start = 4, rule = "tail"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2019, month = 12, month_start = 4, rule = "tail"),
+    2019)
+
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 1, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 2, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 3, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 4, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 5, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 6, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 7, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 8, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 9, month_start = 10, rule = "head"),
+    2020)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 10, month_start = 10, rule = "head"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 11, month_start = 10, rule = "head"),
+    2019)
+  expect_equal(
+    unfiscal_vec(fisyr = 2020, month = 12, month_start = 10, rule = "head"),
+    2019)
+})

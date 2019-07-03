@@ -329,4 +329,26 @@ sheet2var <- function(df, as) {
     dplyr::mutate(!! as := sheetname)
 }
 
-#' Merge data from different sheets into single df
+#' Convert fiscal year column into true year
+#'
+#' @inheritParams make_rect
+#' @inheritParams unfiscal_vec
+#' @param ycol Position of fiscal year column
+#' @param mcol Position of month column
+#' @export
+unfiscal <- function(df, ycol, mcol, month_start, rule) {
+  df         <- as.data.frame(df)
+  df[, ycol] <- as.integer(df[, ycol])
+  df[, mcol] <- as.integer(df[, mcol])
+  plist <- list(fisyr = df[, ycol],
+                month = df[, mcol],
+                month_start = month_start,
+                rule = rule)
+  trueyr <- purrr::pmap_int(plist, unfiscal_vec)
+  if (any(stringr::str_detect(colnames(df), "year"))) {
+    df$trueyr <- trueyr
+  } else {
+    df$year   <- trueyr
+  }
+  tibble::as_tibble(df)
+}
