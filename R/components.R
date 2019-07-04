@@ -176,7 +176,7 @@ locate_matchend <- function(str, regex) {
 #' @param rule Rules to get true year.
 #'   Give \code{head} if true2019Oct is called fiscal2020Oct as in U.S.
 #'   Give \code{tail} if true2020Mar is called fiscal2019Mar as in Japan.
-unfiscal_vec <- function(fisyr, month, month_start, rule) {
+unfiscalize_vec <- function(fisyr, month, month_start, rule) {
   if (rule == "head") {
     if (month < month_start) {
       as.integer(fisyr)

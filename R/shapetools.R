@@ -24,6 +24,7 @@ make_rect <- function(df, range) {
 #' @param headerized If FALSE, allow appending to data frame with
 #'   tentative colnames
 #' @inheritParams make_rect
+#' @export
 append_info <- function(info, df, headerized = FALSE) {
   df_info <- list2df(info, nrow = nrow(df))
   if (headerized == FALSE) {
@@ -70,6 +71,7 @@ unmerge_vert <- function(df, col, regex = ".+") {
 #' @param regex Regex to match columns to be gathered
 #' @param newname New name for colnames to be gatherd
 #' @param varname New name for values to be gatherd
+#' @export
 gather_cols <- function(df, regex, newname, varname) {
   cols2gather <- stringr::str_extract(colnames(df), regex) %>%
     stats::na.omit()
@@ -331,11 +333,11 @@ sheet2var <- function(df, as) {
 #' Convert fiscal year column into true year
 #'
 #' @inheritParams make_rect
-#' @inheritParams unfiscal_vec
+#' @inheritParams unfiscalize_vec
 #' @param ycol Position of fiscal year column
 #' @param mcol Position of month column
 #' @export
-unfiscal <- function(df, ycol, mcol, month_start, rule) {
+unfiscalize <- function(df, ycol, mcol, month_start, rule) {
   df         <- as.data.frame(df)
   df[, ycol] <- as.integer(df[, ycol])
   df[, mcol] <- as.integer(df[, mcol])
@@ -343,7 +345,7 @@ unfiscal <- function(df, ycol, mcol, month_start, rule) {
                 month = df[, mcol],
                 month_start = month_start,
                 rule = rule)
-  trueyr <- purrr::pmap_int(plist, unfiscal_vec)
+  trueyr <- purrr::pmap_int(plist, unfiscalize_vec)
   if (any(stringr::str_detect(colnames(df), "year"))) {
     df$trueyr <- trueyr
   } else {

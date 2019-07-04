@@ -21,7 +21,7 @@ Imports:
     stringr,
     purrr,
     lubridate,
-    Nippon,
+    Nippon (>= 0.7.1),
     cellranger,
     dplyr,
     readxl,
@@ -31,3 +31,5 @@ Imports:
     rlang,
     tibble,
     stats
+Remotes:  
+    cran/Nippon
