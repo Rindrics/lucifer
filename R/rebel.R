@@ -44,13 +44,10 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                     row_omit = row_omit,
                     col_omit = col_omit,
                     fullwidth = fullwidth)
-  path
   attributes <- attributes(path)
-
   out <- load_alldata(path, sheet = sheet)
 
   if (!is.null(fullwidth)) {
-    out
     out <- make_ascii(out,
                       col = fullwidth$col,
                       row = fullwidth$row,
@@ -75,7 +72,6 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
       stop("Unknown direction was given to 'extract_clusters()'.
  Give me either of 'h' (horizontal) or 'v' (vertical).")
     }
-    out
   }
 
   if (attributes$row_merged > 0) {
@@ -113,7 +109,6 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
       tibble::as_tibble() %>%
       add_reference(attributes$fpath, attributes$sheet)
   }
-  out
 
   if (!is.null(attributes$col_type)) {
     out <- gather_cols(df = out,
