@@ -36,7 +36,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   out <- load_alldata(path, sheet = sheet)
 
   if (!is.null(cluster)) {
-    out <- unclusterize(df = out, regex = cluster$regex, direction = cluster$dir,
+    out <- unclusterize(df = out, regex = cluster$regex,
+                        direction = cluster$dir,
                         pos = cluster$pos, offset = cluster$offset,
                         ends = cluster$ends, info = cluster$info)
     if (cluster$dir == "v") {
@@ -123,7 +124,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @export
 rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                   cluster = NULL, row_type = NULL, col_type = NULL,
-                  row_omit = NULL, col_omit = NULL, 
+                  row_omit = NULL, col_omit = NULL,
                   unfiscalize = c(month_start = NULL, rule = NULL)) {
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()

@@ -8,7 +8,7 @@ extract_a_cluster(pos_key, find_from, direction, df, offset = c(0, 0),
   ends, info = NULL)
 }
 \arguments{
-\item{pos_key}{Position where the \code{regex} of \code{extract_clusters()}
+\item{pos_key}{Position where the \code{regex} of \code{unclusterize}
 matched the keyword}
 
 \item{find_from}{The row or column position
@@ -27,5 +27,5 @@ Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}}
 \item{info}{Parameters to control \code{link{append_info}}}
 }
 \description{
-This function is the substancial function of \code{extract_clusters()}.
+This function is the substancial function of \code{unclusterize}.
 }
