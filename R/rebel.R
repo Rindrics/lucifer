@@ -128,8 +128,11 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     }
     if (attributes$row_type == "fisY") {
       colnames(out)[1] <- "fisy"
-      if (is.null(unfiscalize["month_start"]) || is.null(unfiscalize["month"])) {
-        message("Give me 'unfilcalize = c(month_start = , month = )'. See help(unfiscalize)")
+      if (is.null(unfiscalize["month_start"]) ||
+          is.null(unfiscalize["month"])) {
+        rlang::abort(message = "Use 'unfiscalize = c(month_start =, rule =)'",
+                     .subclass = "rebel_error",
+                     unfiscalize = unfiscalize)
       } else {
         pos_monthcol <- stringr::str_which(colnames(out), "month")
         out <- unfiscalize(out, ycol = 1, mcol = pos_monthcol,

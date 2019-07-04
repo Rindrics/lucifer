@@ -101,4 +101,19 @@ test_that("duplicated column and fisY", {
                c("fisy", "年度.1", "fname", "sheet", "month", "catch", "year"))
   expect_setequal(subset(saga, year == 1976)$catch,
                   as.character(c(10:21, 514:525)))
+
+  expect_success(
+    expect_error(fname %>%
+                   rebel(sheet_regex = "Sheet.",
+                         row_type = "fisY",
+                         col_type = list(regex = ".+月",
+                                         newname = "month",
+                                         varname = "catch"),
+                         cluster = list(dir = "v",
+                                        pos = 1,
+                                        regex = "年度",
+                                        offset = c(0, 0),
+                                        ends = list(row = as.character(year),
+                                                    col = "３月"))),
+                 "Use 'unfiscalize = c(month_start =, rule =)'", fixed = TRUE))
 })
