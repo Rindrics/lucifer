@@ -6,7 +6,8 @@
 \usage{
 rebel_sheet(sheet, path, row_merged = 0, col_merged = 0,
   cluster = NULL, row_type = NULL, col_type = NULL,
-  row_omit = NULL, col_omit = NULL, fullwidth = NULL)
+  row_omit = NULL, col_omit = NULL, fullwidth = NULL,
+  unfiscalize = c(month_start = NULL, rule = NULL))
 }
 \arguments{
 \item{sheet}{Sheet to read. Either a string (the name of a sheet), or an
@@ -42,13 +43,15 @@ sheet.}
  \item{fisjYM}{fiscal Japanese year-month}
 }}
 
-\item{col_type}{List of parameters to control \code{\link{gather_cols}}.}
+\item{col_type}{List of parameters to control \code{\link{gather_cols}}}
 
 \item{row_omit}{List of parameters to control \code{\link{rm_matchrow}}}
 
 \item{col_omit}{List of parameters to control \code{\link{rm_matchcol}}}
 
 \item{fullwidth}{List of parameters to cotrol \code{\link{make_ascii}}}
+
+\item{unfiscalize}{List of parameters to control \code{\link{unfiscalize}}}
 }
 \description{
 Rebel against godly Excel worksheet

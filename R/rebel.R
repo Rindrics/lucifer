@@ -23,10 +23,11 @@
 #'   \item{fisYM}{fiscal year-month}
 #'   \item{fisjYM}{fiscal Japanese year-month}
 #'  }
-#' @param col_type List of parameters to control \code{\link{gather_cols}}.
+#' @param col_type List of parameters to control \code{\link{gather_cols}}
 #' @param col_omit List of parameters to control \code{\link{rm_matchcol}}
 #' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
 #' @param fullwidth List of parameters to cotrol \code{\link{make_ascii}}
+#' @param unfiscalize List of parameters to control \code{\link{unfiscalize}}
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                         cluster = NULL, row_type = NULL, col_type = NULL,
