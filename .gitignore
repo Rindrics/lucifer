@@ -6,3 +6,4 @@
 data.git/
 output.git/
 *Rprof.out
+.history
