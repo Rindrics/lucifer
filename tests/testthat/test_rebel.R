@@ -15,11 +15,13 @@ test_that("rebel() beat up file with merged header", {
 })
 
 test_that("rebel() throws an error", {
-  expect_error(rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
-                     cluster = list(dir = "foo",
+    expect_success(
+      expect_warning(rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
+                     cluster = list(direction = "foo",
                                     pos = 1, regex = "b..",
                                     offset = c(1, 0),
-                                    ends = list(row = "A5", col = "test"))))
+                                    ends = list(row = "A5", col = "test"))),
+                     "Set 'direction' correctly"))
 })
 
 test_that("rebel() beat up file with clustered data", {

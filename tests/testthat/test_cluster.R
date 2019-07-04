@@ -133,19 +133,19 @@ test_that("'dim' can be controled by variable", {
 test_that("extract_culsters() throws an error", {
   col2search <- 1
   data <- load_alldata("clustered.xlsx", sheet = "repeated")
-  expect_error(extract_clusters(data, regex = "year", col = col2search,
-                   offset = c(0, 0),
-                   ends = list(row =  " ", col = "baz"),
-                   info = list(offset = c(-4, 0),
-                               dim = c(4, 2))))
-  expect_error(extract_clusters(data, regex = "year", col = col2search,
-                   offset = c(0, 0),
-                   ends = list(row = "ABCDEFG", col = "baz"),
-                   info = list(offset = c(-4, 0),
-                               dim = c(4, 2))))
-  expect_error(extract_clusters(data, regex = "year",
-                   offset = c(0, 0),
-                   ends = list(row =  "2019", col = "baz"),
-                   info = list(offset = c(-4, 0),
-                               dim = c(4, 2))))
+  expect_success(
+    expect_error(unclusterize(data, regex = "year", direction = "v",
+                              pos = col2search,
+                 offset = c(0, 0),
+                 ends = list(row =  " ", col = "baz"),
+                 info = list(offset = c(-4, 0),
+                             dim = c(4, 2))),
+                 "Match failed. Re-consider regex"))
+  expect_success(expect_error(
+    unclusterize(data, regex = "year", regex = "year",
+                 pos = col2search,
+                 offset = c(0, 0),
+                 ends = list(row = "ABCDEFG", col = "baz"),
+                 info = list(offset = c(-4, 0),
+                             dim = c(4, 2)))))
 })
