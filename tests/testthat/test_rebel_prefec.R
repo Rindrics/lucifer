@@ -76,3 +76,29 @@ test_that("rebel_sheet() beat iwate data up", {
   expect_equal(unique(maiwashi$month), 1:12)
   expect_setequal(unique(maiwashi$catch), as.character(1:1224))
 })
+
+test_that("duplicated column and fisY", {
+  fname <- "saga.xls"
+  year  <- 2016
+  saga  <- fname %>%
+    rebel(sheet_regex = "Sheet.",
+          row_type = "fisY",
+          col_type = list(regex = ".+月",
+                          newname = "month",
+                          varname = "catch"),
+          cluster = list(dir = "v",
+                         pos = 1,
+                         regex = "年度",
+                         offset = c(0, 0),
+                         ends = list(row = as.character(year),
+                                     col = "３月")),
+          unfiscalize = c(month_start = 4,
+                          rule = "tail")
+          )
+  expect_equal(colnames(saga),
+               c("fisy", "年度.1", "fname", "sheet", "month", "catch", "year"))
+  expect_equal(colnames(saga),
+               c("fisy", "年度.1", "fname", "sheet", "month", "catch", "year"))
+  expect_setequal(subset(saga, year == 1976)$catch,
+                  as.character(c(10:21, 514:525)))
+})

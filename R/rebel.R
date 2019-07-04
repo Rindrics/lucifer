@@ -30,7 +30,8 @@
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                         cluster = NULL, row_type = NULL, col_type = NULL,
-                        row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
+                        row_omit = NULL, col_omit = NULL, fullwidth = NULL,
+                        unfiscalize = c(month_start = NULL, rule = NULL)) {
   path <- structure(path,
                     fpath = path,
                     sheet = sheet,
@@ -70,7 +71,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
       out <- extract_clusters(df = out, regex = regex, row = pos,
                               offset = offset, ends = ends, info = info)
     } else {
-      stop("Unknown dir")
+      stop("Unknown direction was given to 'extract_clusters()'.
+ Give me either of 'h' (horizontal) or 'v' (vertical).")
     }
     out
   }
@@ -112,13 +114,6 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   }
   out
 
-  if (!is.null(attributes$row_type)) {
-    if (attributes$row_type == "Y") {
-      colnames(out)[1] <- "year"
-      out <- dplyr::mutate(out, year = as.integer(year))
-    }
-  }
-
   if (!is.null(attributes$col_type)) {
     out <- gather_cols(df = out,
                        regex = col_type$regex,
@@ -127,6 +122,24 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     if (attributes$col_type$newname == "month") {
       out <- dplyr::mutate(out, month = stringr::str_remove(month, "\\D") %>%
                              as.integer())
+    }
+  }
+
+  if (!is.null(attributes$row_type)) {
+    if (attributes$row_type == "Y") {
+      colnames(out)[1] <- "year"
+      out <- dplyr::mutate(out, year = as.integer(year))
+    }
+    if (attributes$row_type == "fisY") {
+      colnames(out)[1] <- "fisy"
+      if (is.null(unfiscalize["month_start"]) || is.null(unfiscalize["month"])) {
+        message("Give me 'unfilcalize = c(month_start = , month = )'. See help(unfiscalize)")
+      } else {
+        pos_monthcol <- stringr::str_which(colnames(out), "month")
+        out <- unfiscalize(out, ycol = 1, mcol = pos_monthcol,
+                           month_start = as.integer(unfiscalize["month_start"]),
+                           rule = unfiscalize["rule"])
+      }
     }
   }
   tibble::as_tibble(out)
@@ -139,7 +152,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @export
 rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                   cluster = NULL, row_type = NULL, col_type = NULL,
-                  row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
+                  row_omit = NULL, col_omit = NULL, fullwidth = NULL,
+                  unfiscalize = c(month_start = NULL, rule = NULL)) {
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
   out <- purrr::map_df(sheets, rebel_sheet, path = path,
@@ -149,7 +163,7 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                        row_type = row_type,
                        col_type = col_type,
                        row_omit = row_omit, col_omit = col_omit,
-                       fullwidth = fullwidth)
-  out
-  as.data.frame(out)
+                       fullwidth = fullwidth,
+                       unfiscalize)
+  tibble::as_tibble(out)
 }
