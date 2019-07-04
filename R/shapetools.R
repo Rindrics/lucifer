@@ -135,33 +135,35 @@ merge_colname <- function(df, rows, cols = NULL) {
 
 #' Convert full-width numbers in df into ASCII numbers
 #'
-#' @inheritParams make_rect
+#' @param x Data frame or vector to be processed
 #' @param col Number of the target column
 #' @param row Number of the target row
 #' @param numerize If TRUE, remove characters convert column to numeric
 #' @param headerized If FALSE (default), allow df with tentative colnames
 #' @export
-make_ascii <- function(df, col = NULL, row = NULL,
+make_ascii <- function(x, col = NULL, row = NULL,
                        numerize = FALSE, headerized = FALSE) {
-  row_offset <- 0
-
-  if (headerized) {
-    header <- colnames(df)
-    body   <- df
+  if (!is.data.frame(x) & !is.list(x)) {
+    string <- x
   } else {
-    header     <- vectorize_row(df, 1)
-    body       <- df[-1, ]
-    row_offset <- -1
-  }
-
-  if (is.null(col) & is.null(row)) {
-    rlang::abort(message = "Give me at least 'col' or 'row'.",
-                 .subclass = "make_ascii_error")
-  } else {
-    edit_row    <- !is.null(row) && (row > 1 | headerized == TRUE)
-    edit_col    <- !is.null(col)
-    edit_header <- !is.null(row) && row == 1 && headerized == FALSE
-
+    row_offset <- 0
+    x <- as.data.frame(x)
+    if (headerized) {
+      header <- colnames(x)
+      body   <- x
+    } else {
+      header     <- vectorize_row(x, 1)
+      body       <- x[-1, ]
+      row_offset <- -1
+    }
+    if (is.null(col) & is.null(row)) {
+      rlang::abort(message = "Give me at least 'col' or 'row'.",
+                   .subclass = "make_ascii_error")
+    } else {
+      edit_row    <- !is.null(row) && (row > 1 | headerized == TRUE)
+      edit_col    <- !is.null(col)
+      edit_header <- !is.null(row) && row == 1 && headerized == FALSE
+    }
     if (edit_col) {
       string <- dplyr::pull(body, col)
     } else if (edit_header) {
@@ -169,29 +171,31 @@ make_ascii <- function(df, col = NULL, row = NULL,
     } else if (edit_row) {
       string <- vectorize_row(body, row + row_offset)
     }
-
-    ascii <- purrr::map_chr(string, Nippon::zen2han)
-
-    if (numerize) {
-      ascii <- ascii %>%
-        stringr::str_remove_all("\\D")
-    }
-
-    if (edit_col) {
-      body[, col] <- ascii
-    } else if (edit_header) {
-      header <- ascii
-    } else if (edit_row) {
-      body[row + row_offset, ] <- ascii
-    }
-    if (headerized) {
-      colnames(body) <- header
-      out <- body
-    } else {
-      out <- rbind(header, body)
-    }
-    out
   }
+
+  ascii <- purrr::map_chr(string, Nippon::zen2han)
+
+  if (numerize) {
+    ascii <- ascii %>%
+      stringr::str_remove_all("\\D")
+  }
+
+  if (is.vector(x)) return(ascii)
+
+  if (edit_col) {
+    body[, col] <- ascii
+  } else if (edit_header) {
+    header <- ascii
+  } else if (edit_row) {
+    body[row + row_offset, ] <- ascii
+  }
+  if (headerized) {
+    colnames(body) <- header
+    out <- body
+  } else {
+    out <- rbind(header, body)
+  }
+  out
 }
 
 #' Change specific row into df header
@@ -200,9 +204,11 @@ make_ascii <- function(df, col = NULL, row = NULL,
 #' @param row Position of the row to make df header
 #' @export
 headerize <- function(df, row) {
-  df <- as.data.frame(df)
+  df   <- as.data.frame(df)
   body <- df[-row, ]
-  head <- df[row, ]
+  head <- df[row, ] %>%
+    as.character() %>%
+    make.unique()
   magrittr::set_colnames(body, head)
 }
 
@@ -274,7 +280,6 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
   if (offset[1] == -1 && offset[2] == 0) {
     out[1, 1] <- out[2, 1]
     out <- out[-2, ]
-    head(out)
   }
   if (!is.null(info)) {
     row_info  <- row + info$offset[1]
@@ -325,4 +330,26 @@ sheet2var <- function(df, as) {
     dplyr::mutate(!! as := sheetname)
 }
 
-#' Merge data from different sheets into single df
+#' Convert fiscal year column into true year
+#'
+#' @inheritParams make_rect
+#' @inheritParams unfiscalize_vec
+#' @param ycol Position of fiscal year column
+#' @param mcol Position of month column
+#' @export
+unfiscalize <- function(df, ycol, mcol, month_start, rule) {
+  df         <- as.data.frame(df)
+  df[, ycol] <- as.integer(df[, ycol])
+  df[, mcol] <- as.integer(df[, mcol])
+  plist <- list(fisyr = df[, ycol],
+                month = df[, mcol],
+                month_start = month_start,
+                rule = rule)
+  trueyr <- purrr::pmap_int(plist, unfiscalize_vec)
+  if (any(stringr::str_detect(colnames(df), "year"))) {
+    df$trueyr <- trueyr
+  } else {
+    df$year   <- trueyr
+  }
+  tibble::as_tibble(df)
+}

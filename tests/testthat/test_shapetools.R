@@ -148,11 +148,25 @@ test_that("make_ascii() throws an error", {
   expect_error(make_ascii(data, headerized = TRUE))
 })
 
+test_that("make_ascii() handlez vector", {
+  vec  <- c("１", "２", "３")
+  expect_equal(make_ascii(vec), as.character(1:3))
+  expect_equal(make_ascii(paste0(vec, "a")), paste0(1:3, "a"))
+  expect_equal(make_ascii(paste0(vec, "a"), numerize = TRUE),
+               as.character(1:3))
+})
+
 test_that("headerize() change specific row into df header", {
   df <- data.frame(a = 1:10, b = 11:20, c = 21:30)
   expect_equal(colnames(headerize(df, 1)), c("1", "11", "21"))
   expect_equal(colnames(headerize(df, 2)), c("2", "12", "22"))
   expect_equal(colnames(headerize(df, 3)), c("3", "13", "23"))
+
+  df      <- data.frame(a = 1:10, b = 11:20, c = 21:30)
+  df[1, ] <- rep("foo", 3)
+  df
+  headerize(df, 1) %>% data.frame()
+  expect_equal(colnames(headerize(df, 1)), c("foo", "foo.1", "foo.2"))
 })
 
 
@@ -191,4 +205,21 @@ test_that("sheet2var() convert sheetname to variable", {
   expect_equal(unique(conv$misc), "foo")
   conv <- sheet2var(data, as = "bar")
   expect_equal(unique(conv$bar), "foo")
+})
+
+test_that("unfiscalize() converts fiscal year column of given df", {
+  df_fiscal_jp <- data.frame(fisy = rep(2019, 12), month = c(4:12, 1:3))
+  df_trueyear  <- unfiscalize(df_fiscal_jp, ycol = 1, mcol = 2,
+                           month_start = 4, rule = "tail")
+  expect_equal(df_trueyear$year, c(rep(2019, 9), rep(2020, 3)))
+
+  df_fiscal_us <- data.frame(fisy = rep(2020, 12), month = c(10:12, 1:9))
+  df_trueyear  <- unfiscalize(df_fiscal_us, ycol = 1, mcol = 2,
+                           month_start = 10, rule = "head")
+  expect_equal(df_trueyear$year, c(rep(2019, 3), rep(2020, 9)))
+
+  df_fiscal_us <- data.frame(year = rep(2020, 12), month = c(10:12, 1:9))
+  df_trueyear  <- unfiscalize(df_fiscal_us, ycol = 1, mcol = 2,
+                           month_start = 10, rule = "head")
+  expect_equal(df_trueyear$trueyr, c(rep(2019, 3), rep(2020, 9)))
 })
