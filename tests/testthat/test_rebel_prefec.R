@@ -6,7 +6,7 @@ test_that("rebel_sheet() beat aomori data up", {
   year  <- 2019
   y_regex <- paste0("^", year)
   maiwashi <- rebel_sheet(path = fname, sheet = sheet,
-                        cluster = list(dir = "row",
+                        cluster = list(dir = "v",
                                        pos = 1,
                                        regex = "^年",
                                        offset = c(0, 0),
@@ -33,7 +33,7 @@ test_that("rebel_sheet() beat aomori data up", {
 
   sheet <- "カタクチ"
   katakuchi <- rebel_sheet(path = fname, sheet = sheet,
-                        cluster = list(dir = "row",
+                        cluster = list(dir = "v",
                                        pos = 1,
                                        regex = "^年",
                                        offset = c(0, 0),
@@ -61,7 +61,7 @@ test_that("rebel_sheet() beat iwate data up", {
   row_regex <- paste0("^", 2018)
 
   maiwashi <- rebel_sheet(path = fname, sheet = sheet,
-                          cluster = list(dir = "row",
+                          cluster = list(dir = "v",
                                          pos = 1,
                                          regex = ".+によるマイワシ.+",
                                          offset = c(2, 0),

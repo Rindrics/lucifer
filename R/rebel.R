@@ -5,7 +5,8 @@
 #' @param col_merged Column position of merged rownames
 #' @param cluster List of parameters to control \code{\link{extract_clusters}}.
 #'  \describe{
-#'    \item{dir}{direction of the cluster evolution}
+#'    \item{dir}{direction of the cluster evolution either of
+#'    \code{"h"} (horizontal) or \code{"v"} (vertical)}
 #'    \item{pos}{row- or column- position of the key to locate the cluster}
 #'    \item{regex}{same as that of \code{\link{extract_clusters}}}
 #'    \item{offset}{same as that of \code{\link{extract_clusters}}}
@@ -61,11 +62,11 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     offset <- cluster$offset
     ends   <- cluster$ends
     info   <- cluster$info
-    if (dir == "row") {
+    if (dir == "v") {
       out <- extract_clusters(df = out, regex = regex, col = pos,
                               offset = offset, ends = ends, info = info)  %>%
         lapply(make_ascii, row = pos)
-    } else if (dir == "col") {
+    } else if (dir == "h") {
       out <- extract_clusters(df = out, regex = regex, row = pos,
                               offset = offset, ends = ends, info = info)
     } else {

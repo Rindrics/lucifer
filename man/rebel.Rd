@@ -19,7 +19,8 @@ rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
 
 \item{cluster}{List of parameters to control \code{\link{extract_clusters}}.
 \describe{
-  \item{dir}{direction of the cluster evolution}
+  \item{dir}{direction of the cluster evolution either of
+  \code{"h"} (horizontal) or \code{"v"} (vertical)}
   \item{pos}{row- or column- position of the key to locate the cluster}
   \item{regex}{same as that of \code{\link{extract_clusters}}}
   \item{offset}{same as that of \code{\link{extract_clusters}}}
