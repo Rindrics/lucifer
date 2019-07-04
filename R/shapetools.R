@@ -288,8 +288,12 @@ extract_a_cluster <- function(pos.key, find_from, direction, df,
     ncol_info <- info$dim[2]
     infos     <- df[row_info:(row_info + nrow_info - 1),
                     col_info:(col_info + ncol_info - 1)]
-    info_list <- as.list(stats::setNames(infos[[2]], infos[[1]]))
-    out       <- append_info(info = info_list, df = out, headerized = FALSE)
+    if (ncol_info == 1) {
+      info_list <- as.list(stats::setNames(infos[[1]], "info"))
+    } else {
+      info_list <- as.list(stats::setNames(infos[[2]], infos[[1]]))
+    }
+    out <- append_info(info = info_list, df = out, headerized = FALSE)
   }
   out
 }
