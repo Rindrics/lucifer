@@ -36,20 +36,16 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   out <- load_alldata(path, sheet = sheet)
 
   if (!is.null(cluster)) {
-    dir    <- cluster$dir
-    pos    <- cluster$pos
-    regex  <- cluster$regex
-    offset <- cluster$offset
-    ends   <- cluster$ends
-    info   <- cluster$info
-    if (dir == "v") {
-      out <- extract_clusters(df = out, regex = regex, col = pos,
-                              offset = offset, ends = ends, info = info)  %>%
-        lapply(make_ascii, row = pos)
-    } else if (dir == "h") {
-      out <- extract_clusters(df = out, regex = regex, row = pos,
-                              offset = offset, ends = ends, info = info) %>%
-          lapply(make_ascii, col = pos)
+    if (cluster$dir == "v") {
+      out <- extract_clusters(df = out, regex = cluster$regex, col = cluster$pos,
+                              offset = cluster$offset,
+                              ends = cluster$ends, info = cluster$info)  %>%
+        lapply(make_ascii, row = cluster$pos)
+    } else if (cluster$dir == "h") {
+      out <- extract_clusters(df = out, regex = cluster$regex, row = cluster$pos,
+                              offset = cluster$offset,
+                              ends = cluster$ends, info = cluster$info) %>%
+          lapply(make_ascii, col = cluster$pos)
     } else {
       stop("Unknown direction was given to 'extract_clusters()'.
  Give me either of 'h' (horizontal) or 'v' (vertical).")
