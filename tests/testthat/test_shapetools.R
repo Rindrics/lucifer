@@ -218,4 +218,8 @@ test_that("unfiscalize() converts fiscal year column of given df", {
                            month_start = 10, rule = "head")
   expect_equal(df_trueyear$year, c(rep(2019, 3), rep(2020, 9)))
 
+  df_fiscal_us <- data.frame(year = rep(2020, 12), month = c(10:12, 1:9))
+  df_trueyear  <- unfiscalize(df_fiscal_us, ycol = 1, mcol = 2,
+                           month_start = 10, rule = "head")
+  expect_equal(df_trueyear$trueyr, c(rep(2019, 3), rep(2020, 9)))
 })
