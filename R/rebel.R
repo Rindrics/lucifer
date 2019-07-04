@@ -3,15 +3,15 @@
 #' @inheritParams readxl::read_excel
 #' @param row_merged Row position of merged colnames
 #' @param col_merged Column position of merged rownames
-#' @param cluster List of parameters to control \code{\link{extract_clusters}}.
+#' @param cluster List of parameters to control \code{\link{unclusterize}}.
 #'  \describe{
 #'    \item{dir}{direction of the cluster evolution either of
 #'    \code{"h"} (horizontal) or \code{"v"} (vertical)}
 #'    \item{pos}{row- or column- position of the key to locate the cluster}
-#'    \item{regex}{same as that of \code{\link{extract_clusters}}}
-#'    \item{offset}{same as that of \code{\link{extract_clusters}}}
-#'    \item{dim}{same as that of \code{\link{extract_clusters}}}
-#'    \item{info}{same as that of \code{\link{extract_clusters}}}
+#'    \item{regex}{same as that of \code{\link{unclusterize}}}
+#'    \item{offset}{same as that of \code{\link{unclusterize}}}
+#'    \item{dim}{same as that of \code{\link{unclusterize}}}
+#'    \item{info}{same as that of \code{\link{unclusterize}}}
 #'  }
 #' @param row_type Type of row one of
 #'  \describe{
@@ -36,19 +36,13 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   out <- load_alldata(path, sheet = sheet)
 
   if (!is.null(cluster)) {
+    out <- unclusterize(df = out, regex = cluster$regex, direction = cluster$dir,
+                        pos = cluster$pos, offset = cluster$offset,
+                        ends = cluster$ends, info = cluster$info)
     if (cluster$dir == "v") {
-      out <- extract_clusters(df = out, regex = cluster$regex, col = cluster$pos,
-                              offset = cluster$offset,
-                              ends = cluster$ends, info = cluster$info)  %>%
-        lapply(make_ascii, row = cluster$pos)
+      out <- lapply(out, make_ascii, row = cluster$pos)
     } else if (cluster$dir == "h") {
-      out <- extract_clusters(df = out, regex = cluster$regex, row = cluster$pos,
-                              offset = cluster$offset,
-                              ends = cluster$ends, info = cluster$info) %>%
-          lapply(make_ascii, col = cluster$pos)
-    } else {
-      stop("Unknown direction was given to 'extract_clusters()'.
- Give me either of 'h' (horizontal) or 'v' (vertical).")
+      out <- lapply(out, make_ascii, col = cluster$pos)
     }
   }
 

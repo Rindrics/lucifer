@@ -4,11 +4,11 @@
 \alias{extract_a_cluster}
 \title{Extract a cluster from df using the keyword}
 \usage{
-extract_a_cluster(pos.key, find_from, direction, df, offset = c(0, 0),
+extract_a_cluster(pos_key, find_from, direction, df, offset = c(0, 0),
   ends, info = NULL)
 }
 \arguments{
-\item{pos.key}{Position where the \code{regex} of \code{extract_clusters()}
+\item{pos_key}{Position where the \code{regex} of \code{extract_clusters()}
 matched the keyword}
 
 \item{find_from}{The row or column position

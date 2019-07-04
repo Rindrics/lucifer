@@ -21,15 +21,15 @@ sheet.}
 
 \item{col_merged}{Column position of merged rownames}
 
-\item{cluster}{List of parameters to control \code{\link{extract_clusters}}.
+\item{cluster}{List of parameters to control \code{\link{unclusterize}}.
 \describe{
   \item{dir}{direction of the cluster evolution either of
   \code{"h"} (horizontal) or \code{"v"} (vertical)}
   \item{pos}{row- or column- position of the key to locate the cluster}
-  \item{regex}{same as that of \code{\link{extract_clusters}}}
-  \item{offset}{same as that of \code{\link{extract_clusters}}}
-  \item{dim}{same as that of \code{\link{extract_clusters}}}
-  \item{info}{same as that of \code{\link{extract_clusters}}}
+  \item{regex}{same as that of \code{\link{unclusterize}}}
+  \item{offset}{same as that of \code{\link{unclusterize}}}
+  \item{dim}{same as that of \code{\link{unclusterize}}}
+  \item{info}{same as that of \code{\link{unclusterize}}}
 }}
 
 \item{row_type}{Type of row one of

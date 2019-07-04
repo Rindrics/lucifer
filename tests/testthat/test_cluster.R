@@ -70,16 +70,18 @@ test_that("clusters distributed in column direction can be extracted", {
   data  <- data.frame(rbind(rep(c("foo", "bar", "baz", "bum", "bup"), 2),
                             1:10, 11:20, 21:30, 31:40),
                       stringsAsFactors = FALSE)
-  data2 <- extract_clusters(data, "foo", row = 1,
-                            ends = list(row = "^1$|^6$", col = "bar"))
+  data2 <- unclusterize(data, regex = "foo",
+                        direction = "h", pos = 1,
+                        ends = list(row = "^1$|^6$", col = "bar"))
   expect_equal(data2[[1]][, 1], c("foo", 1))
   expect_equal(data2[[1]][, 2], c("bar", 2))
   expect_equal(data2[[2]][, 1], c("foo", 6))
   expect_equal(data2[[2]][, 2], c("bar", 7))
 
-  data2 <- extract_clusters(data, "foo", row = 1,
-                            offset = c(1, 1),
-                            ends = list(row = "3.", col = "4|9"))
+  data2 <- unclusterize(data, regex = "foo",
+                         direction = "h", pos = 1,
+                         offset = c(1, 1),
+                         ends = list(row = "3.", col = "4|9"))
   expect_equal(data2[[1]][1, ] %>% as.numeric(), 2:4)
   expect_equal(data2[[1]][2, ] %>% as.numeric(), 12:14)
   expect_equal(data2[[2]][1, ] %>% as.numeric(), 7:9)
@@ -90,8 +92,9 @@ test_that("clusters distributed in column direction can be extracted", {
                      b = 1:10, c = 11:20,
                      stringsAsFactors = FALSE)
 
-  data2 <- extract_clusters(data, "foo", col = 1,
-                            ends = list(row = "baz", col = "11|16"))
+  data2 <- unclusterize(data, regex = "foo",
+                        direction = "v", pos = 1,
+                        ends = list(row = "baz", col = "11|16"))
   expect_equal(data2[[1]]$a, c("foo", "bar", "baz"))
   expect_equal(data2[[1]]$b, 1:3)
   expect_equal(data2[[1]]$c, 11:13)
@@ -99,9 +102,9 @@ test_that("clusters distributed in column direction can be extracted", {
   expect_equal(data2[[2]]$b, 6:8)
   expect_equal(data2[[2]]$c, 16:18)
 
-  data2 <- extract_clusters(data, "foo", col = 1,
-                            offset = c(2, 1),
-                            ends = list(row = "5|10", col = "13|18"))
+  data2 <- unclusterize(data, regex = "foo", pos = 1,
+                        direction = "v", offset = c(2, 1),
+                        ends = list(row = "5|10", col = "13|18"))
   expect_equal(data2[[1]]$b, 3:5)
   expect_equal(data2[[1]]$c, 13:15)
   expect_equal(data2[[2]]$b, 8:10)
@@ -112,11 +115,12 @@ test_that("'dim' can be controled by variable", {
   year <- 2019
   col2search <- 1
   data <- load_alldata("clustered.xlsx", sheet = "repeated")
-  data2 <- extract_clusters(data, regex = "year", col = col2search,
-                            offset = c(0, 0),
-                            ends = list(row = as.character(year), col = "baz"),
-                            info = list(offset = c(-4, 0),
-                                        dim = c(4, 2)))
+  data2 <- unclusterize(data, regex = "year", direction = "v",
+                        pos = col2search,
+                        offset = c(0, 0),
+                        ends = list(row = as.character(year), col = "baz"),
+                        info = list(offset = c(-4, 0),
+                                    dim = c(4, 2)))
   expect_equal(vectorize_row(data2[[1]], 1),
                c("year", "month", "foo", "bar", "baz",
                  "this", "is", "a", "info"))
