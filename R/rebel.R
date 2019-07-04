@@ -26,22 +26,14 @@
 #' @param col_type List of parameters to control \code{\link{gather_cols}}
 #' @param col_omit List of parameters to control \code{\link{rm_matchcol}}
 #' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
-#' @param fullwidth List of parameters to cotrol \code{\link{make_ascii}}
 #' @param unfiscalize List of parameters to control \code{\link{unfiscalize}}
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                         cluster = NULL, row_type = NULL, col_type = NULL,
-                        row_omit = NULL, col_omit = NULL, fullwidth = NULL,
+                        row_omit = NULL, col_omit = NULL,
                         unfiscalize = c(month_start = NULL, rule = NULL)) {
 
   out <- load_alldata(path, sheet = sheet)
-
-  if (!is.null(fullwidth)) {
-    out <- make_ascii(out,
-                      col = fullwidth$col,
-                      row = fullwidth$row,
-                      numerize = fullwidth$numerize)
-  }
 
   if (!is.null(cluster)) {
     dir    <- cluster$dir
@@ -56,7 +48,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
         lapply(make_ascii, row = pos)
     } else if (dir == "h") {
       out <- extract_clusters(df = out, regex = regex, row = pos,
-                              offset = offset, ends = ends, info = info)
+                              offset = offset, ends = ends, info = info) %>%
+          lapply(make_ascii, col = pos)
     } else {
       stop("Unknown direction was given to 'extract_clusters()'.
  Give me either of 'h' (horizontal) or 'v' (vertical).")
@@ -140,7 +133,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @export
 rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                   cluster = NULL, row_type = NULL, col_type = NULL,
-                  row_omit = NULL, col_omit = NULL, fullwidth = NULL,
+                  row_omit = NULL, col_omit = NULL, 
                   unfiscalize = c(month_start = NULL, rule = NULL)) {
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
@@ -151,7 +144,6 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                        row_type = row_type,
                        col_type = col_type,
                        row_omit = row_omit, col_omit = col_omit,
-                       fullwidth = fullwidth,
                        unfiscalize)
   tibble::as_tibble(out)
 }

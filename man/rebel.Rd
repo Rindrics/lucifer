@@ -6,8 +6,8 @@
 \usage{
 rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
   cluster = NULL, row_type = NULL, col_type = NULL,
-  row_omit = NULL, col_omit = NULL, fullwidth = NULL,
-  unfiscalize = c(month_start = NULL, rule = NULL))
+  row_omit = NULL, col_omit = NULL, unfiscalize = c(month_start =
+  NULL, rule = NULL))
 }
 \arguments{
 \item{path}{Path to the xls/xlsx file.}
@@ -45,8 +45,6 @@ rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
 \item{row_omit}{List of parameters to control \code{\link{rm_matchrow}}}
 
 \item{col_omit}{List of parameters to control \code{\link{rm_matchcol}}}
-
-\item{fullwidth}{List of parameters to cotrol \code{\link{make_ascii}}}
 
 \item{unfiscalize}{List of parameters to control \code{\link{unfiscalize}}}
 }
