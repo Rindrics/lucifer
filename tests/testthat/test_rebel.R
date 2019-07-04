@@ -24,7 +24,7 @@ test_that("rebel() throws an error", {
 
 test_that("rebel() beat up file with clustered data", {
   beaten <- rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
-                  cluster = list(dir = "col",
+                  cluster = list(dir = "h",
                                  pos = 1,
                                  regex = "b..",
                                  offset = c(1, 0),

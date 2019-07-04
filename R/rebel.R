@@ -5,7 +5,8 @@
 #' @param col_merged Column position of merged rownames
 #' @param cluster List of parameters to control \code{\link{extract_clusters}}.
 #'  \describe{
-#'    \item{dir}{direction of the cluster evolution}
+#'    \item{dir}{direction of the cluster evolution either of
+#'    \code{"h"} (horizontal) or \code{"v"} (vertical)}
 #'    \item{pos}{row- or column- position of the key to locate the cluster}
 #'    \item{regex}{same as that of \code{\link{extract_clusters}}}
 #'    \item{offset}{same as that of \code{\link{extract_clusters}}}
@@ -22,14 +23,16 @@
 #'   \item{fisYM}{fiscal year-month}
 #'   \item{fisjYM}{fiscal Japanese year-month}
 #'  }
-#' @param col_type List of parameters to control \code{\link{gather_cols}}.
+#' @param col_type List of parameters to control \code{\link{gather_cols}}
 #' @param col_omit List of parameters to control \code{\link{rm_matchcol}}
 #' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
 #' @param fullwidth List of parameters to cotrol \code{\link{make_ascii}}
+#' @param unfiscalize List of parameters to control \code{\link{unfiscalize}}
 #' @export
 rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                         cluster = NULL, row_type = NULL, col_type = NULL,
-                        row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
+                        row_omit = NULL, col_omit = NULL, fullwidth = NULL,
+                        unfiscalize = c(month_start = NULL, rule = NULL)) {
   path <- structure(path,
                     fpath = path,
                     sheet = sheet,
@@ -41,13 +44,10 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                     row_omit = row_omit,
                     col_omit = col_omit,
                     fullwidth = fullwidth)
-  path
   attributes <- attributes(path)
-
   out <- load_alldata(path, sheet = sheet)
 
   if (!is.null(fullwidth)) {
-    out
     out <- make_ascii(out,
                       col = fullwidth$col,
                       row = fullwidth$row,
@@ -61,17 +61,17 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     offset <- cluster$offset
     ends   <- cluster$ends
     info   <- cluster$info
-    if (dir == "row") {
+    if (dir == "v") {
       out <- extract_clusters(df = out, regex = regex, col = pos,
                               offset = offset, ends = ends, info = info)  %>%
         lapply(make_ascii, row = pos)
-    } else if (dir == "col") {
+    } else if (dir == "h") {
       out <- extract_clusters(df = out, regex = regex, row = pos,
                               offset = offset, ends = ends, info = info)
     } else {
-      stop("Unknown dir")
+      stop("Unknown direction was given to 'extract_clusters()'.
+ Give me either of 'h' (horizontal) or 'v' (vertical).")
     }
-    out
   }
 
   if (attributes$row_merged > 0) {
@@ -109,14 +109,6 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
       tibble::as_tibble() %>%
       add_reference(attributes$fpath, attributes$sheet)
   }
-  out
-
-  if (!is.null(attributes$row_type)) {
-    if (attributes$row_type == "Y") {
-      colnames(out)[1] <- "year"
-      out <- dplyr::mutate(out, year = as.integer(year))
-    }
-  }
 
   if (!is.null(attributes$col_type)) {
     out <- gather_cols(df = out,
@@ -126,6 +118,27 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     if (attributes$col_type$newname == "month") {
       out <- dplyr::mutate(out, month = stringr::str_remove(month, "\\D") %>%
                              as.integer())
+    }
+  }
+
+  if (!is.null(attributes$row_type)) {
+    if (attributes$row_type == "Y") {
+      colnames(out)[1] <- "year"
+      out <- dplyr::mutate(out, year = as.integer(year))
+    }
+    if (attributes$row_type == "fisY") {
+      colnames(out)[1] <- "fisy"
+      if (is.null(unfiscalize["month_start"]) ||
+          is.null(unfiscalize["month"])) {
+        rlang::abort(message = "Use 'unfiscalize = c(month_start =, rule =)'",
+                     .subclass = "rebel_error",
+                     unfiscalize = unfiscalize)
+      } else {
+        pos_monthcol <- stringr::str_which(colnames(out), "month")
+        out <- unfiscalize(out, ycol = 1, mcol = pos_monthcol,
+                           month_start = as.integer(unfiscalize["month_start"]),
+                           rule = unfiscalize["rule"])
+      }
     }
   }
   tibble::as_tibble(out)
@@ -138,7 +151,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @export
 rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                   cluster = NULL, row_type = NULL, col_type = NULL,
-                  row_omit = NULL, col_omit = NULL, fullwidth = NULL) {
+                  row_omit = NULL, col_omit = NULL, fullwidth = NULL,
+                  unfiscalize = c(month_start = NULL, rule = NULL)) {
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
   out <- purrr::map_df(sheets, rebel_sheet, path = path,
@@ -148,7 +162,7 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                        row_type = row_type,
                        col_type = col_type,
                        row_omit = row_omit, col_omit = col_omit,
-                       fullwidth = fullwidth)
-  out
-  as.data.frame(out)
+                       fullwidth = fullwidth,
+                       unfiscalize)
+  tibble::as_tibble(out)
 }

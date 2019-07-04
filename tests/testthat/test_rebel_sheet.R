@@ -14,7 +14,7 @@ test_that("rebel_sheet() beat up file with merged header", {
 
 test_that("rebel_sheet() beat up file with clustered data", {
   beaten <- rebel_sheet(path = "clustered.xlsx", sheet = "foo",
-                        cluster = list(dir = "col",
+                        cluster = list(dir = "h",
                                        pos = 1,
                                        regex = "...",
                                        offset = c(1, 0),
@@ -28,7 +28,7 @@ test_that("rebel_sheet() beat up file with clustered data", {
                as.character(c(62, 63, 72, 73, 82, 83, 92, 93)))
 
   beaten <- rebel_sheet(path = "clustered.xlsx", sheet = "foo",
-                        cluster = list(dir = "col",
+                        cluster = list(dir = "h",
                                        pos = 1,
                                        regex = "b..",
                                        offset = c(1, 2),
