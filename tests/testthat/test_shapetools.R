@@ -207,16 +207,19 @@ test_that("sheet2var() convert sheetname to variable", {
   expect_equal(unique(conv$bar), "foo")
 })
 
-test_that("unfiscal() converts fiscal year column of given df", {
+test_that("unfiscalize() converts fiscal year column of given df", {
   df_fiscal_jp <- data.frame(fisy = rep(2019, 12), month = c(4:12, 1:3))
-  df_trueyear  <- unfiscal(df_fiscal_jp, ycol = 1, mcol = 2,
+  df_trueyear  <- unfiscalize(df_fiscal_jp, ycol = 1, mcol = 2,
                            month_start = 4, rule = "tail")
   expect_equal(df_trueyear$year, c(rep(2019, 9), rep(2020, 3)))
 
   df_fiscal_us <- data.frame(fisy = rep(2020, 12), month = c(10:12, 1:9))
-  df_fiscal_us
-  df_trueyear  <- unfiscal(df_fiscal_us, ycol = 1, mcol = 2,
+  df_trueyear  <- unfiscalize(df_fiscal_us, ycol = 1, mcol = 2,
                            month_start = 10, rule = "head")
   expect_equal(df_trueyear$year, c(rep(2019, 3), rep(2020, 9)))
 
+  df_fiscal_us <- data.frame(year = rep(2020, 12), month = c(10:12, 1:9))
+  df_trueyear  <- unfiscalize(df_fiscal_us, ycol = 1, mcol = 2,
+                           month_start = 10, rule = "head")
+  expect_equal(df_trueyear$trueyr, c(rep(2019, 3), rep(2020, 9)))
 })
