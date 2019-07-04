@@ -33,18 +33,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                         cluster = NULL, row_type = NULL, col_type = NULL,
                         row_omit = NULL, col_omit = NULL, fullwidth = NULL,
                         unfiscalize = c(month_start = NULL, rule = NULL)) {
-  path <- structure(path,
-                    fpath = path,
-                    sheet = sheet,
-                    row_merged = row_merged,
-                    col_merged = col_merged,
-                    cluster = cluster,
-                    row_type = row_type,
-                    col_type = col_type,
-                    row_omit = row_omit,
-                    col_omit = col_omit,
-                    fullwidth = fullwidth)
-  attributes <- attributes(path)
+
   out <- load_alldata(path, sheet = sheet)
 
   if (!is.null(fullwidth)) {
@@ -74,27 +63,27 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
     }
   }
 
-  if (attributes$row_merged > 0) {
-    out <- unmerge_vert(out, col = attributes$row_merged)
+  if (row_merged > 0) {
+    out <- unmerge_vert(out, col = row_merged)
   }
 
-  if (attributes$col_merged > 0) {
-    out <- unmerge_horiz(out, row = attributes$col_merged) %>%
-      merge_colname(rows = 1:(attributes$col_merged + 1))
+  if (col_merged > 0) {
+    out <- unmerge_horiz(out, row = col_merged) %>%
+      merge_colname(rows = 1:(col_merged + 1))
   }
 
-  if (!is.null(attributes$row_omit)) {
+  if (!is.null(row_omit)) {
     out <- rm_matchrow(out,
-                     key = attributes$row_omit$key,
-                     colpos = attributes$row_omit$colpos,
-                     regex = attributes$row_omit$regex)
+                     key = row_omit$key,
+                     colpos = row_omit$colpos,
+                     regex = row_omit$regex)
   }
 
-  if (!is.null(attributes$col_omit)) {
+  if (!is.null(col_omit)) {
     out <- rm_matchcol(out,
-                     key = attributes$col_omit$key,
-                     rowpos = attributes$col_omit$rowpos,
-                     regex = attributes$col_omit$regex)
+                     key = col_omit$key,
+                     rowpos = col_omit$rowpos,
+                     regex = col_omit$regex)
   }
 
   if (is.list(out) & is.null(dim(out))) {
@@ -102,31 +91,31 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
       lapply(headerize, row = 1) %>%
       purrr::invoke(rbind, .) %>%
       rm_nacols() %>%
-      add_reference(attributes$fpath, attributes$sheet)
+      add_reference(path, sheet)
   } else {
     out <- headerize(as.data.frame(out), row = 1) %>%
       rm_nacols() %>%
       tibble::as_tibble() %>%
-      add_reference(attributes$fpath, attributes$sheet)
+      add_reference(path, sheet)
   }
 
-  if (!is.null(attributes$col_type)) {
+  if (!is.null(col_type)) {
     out <- gather_cols(df = out,
                        regex = col_type$regex,
                        newname = col_type$newname,
-                       varname = attributes$col_type$varname)
-    if (attributes$col_type$newname == "month") {
+                       varname = col_type$varname)
+    if (col_type$newname == "month") {
       out <- dplyr::mutate(out, month = stringr::str_remove(month, "\\D") %>%
                              as.integer())
     }
   }
 
-  if (!is.null(attributes$row_type)) {
-    if (attributes$row_type == "Y") {
+  if (!is.null(row_type)) {
+    if (row_type == "Y") {
       colnames(out)[1] <- "year"
       out <- dplyr::mutate(out, year = as.integer(year))
     }
-    if (attributes$row_type == "fisY") {
+    if (row_type == "fisY") {
       colnames(out)[1] <- "fisy"
       if (is.null(unfiscalize["month_start"]) ||
           is.null(unfiscalize["month"])) {
