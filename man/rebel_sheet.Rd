@@ -6,8 +6,8 @@
 \usage{
 rebel_sheet(sheet, path, row_merged = 0, col_merged = 0,
   cluster = NULL, row_type = NULL, col_type = NULL,
-  row_omit = NULL, col_omit = NULL, fullwidth = NULL,
-  unfiscalize = c(month_start = NULL, rule = NULL))
+  row_omit = NULL, col_omit = NULL, unfiscalize = c(month_start =
+  NULL, rule = NULL))
 }
 \arguments{
 \item{sheet}{Sheet to read. Either a string (the name of a sheet), or an
@@ -21,15 +21,15 @@ sheet.}
 
 \item{col_merged}{Column position of merged rownames}
 
-\item{cluster}{List of parameters to control \code{\link{extract_clusters}}.
+\item{cluster}{List of parameters to control \code{\link{unclusterize}}.
 \describe{
   \item{dir}{direction of the cluster evolution either of
   \code{"h"} (horizontal) or \code{"v"} (vertical)}
   \item{pos}{row- or column- position of the key to locate the cluster}
-  \item{regex}{same as that of \code{\link{extract_clusters}}}
-  \item{offset}{same as that of \code{\link{extract_clusters}}}
-  \item{dim}{same as that of \code{\link{extract_clusters}}}
-  \item{info}{same as that of \code{\link{extract_clusters}}}
+  \item{regex}{same as that of \code{\link{unclusterize}}}
+  \item{offset}{same as that of \code{\link{unclusterize}}}
+  \item{dim}{same as that of \code{\link{unclusterize}}}
+  \item{info}{same as that of \code{\link{unclusterize}}}
 }}
 
 \item{row_type}{Type of row one of
@@ -48,8 +48,6 @@ sheet.}
 \item{row_omit}{List of parameters to control \code{\link{rm_matchrow}}}
 
 \item{col_omit}{List of parameters to control \code{\link{rm_matchcol}}}
-
-\item{fullwidth}{List of parameters to cotrol \code{\link{make_ascii}}}
 
 \item{unfiscalize}{List of parameters to control \code{\link{unfiscalize}}}
 }

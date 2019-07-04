@@ -151,7 +151,7 @@ jpyr2ad <- function(x, start) {
 locate_matchend <- function(str, regex) {
   matched        <- stringr::str_which(str, regex)
   if (length(matched) == 0) {
-    rlang::abort(message = "Match failed. Please re-consider regex.",
+    rlang::abort(message = "Match failed. Re-consider regex.",
                  .subclass = "locate_matchend_error",
                  regex = regex, str = str)
   }
