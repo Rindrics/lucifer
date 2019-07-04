@@ -110,7 +110,7 @@ test_that("Fight with duplicated column and fiscal year", {
     gather_cols(".+月", newname = "month", varname = "catch") %>%
     dplyr::mutate(年度 = as.integer(年度),
                   month = make_ascii(month, numerize = TRUE)) %>%
-    unfiscal(ycol = 1, mcol = 3, month_start = 4, rule = "tail")
+    unfiscalize(ycol = 1, mcol = 3, month_start = 4, rule = "tail")
   expect_setequal(subset(saga, year == 1975)$month, c(4:12))
   expect_setequal(subset(saga, year == 1976)$month, c(1:12))
   expect_setequal(subset(saga, year == 2016)$month, c(1:12))

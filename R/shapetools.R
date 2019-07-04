@@ -333,11 +333,11 @@ sheet2var <- function(df, as) {
 #' Convert fiscal year column into true year
 #'
 #' @inheritParams make_rect
-#' @inheritParams unfiscal_vec
+#' @inheritParams unfiscalize_vec
 #' @param ycol Position of fiscal year column
 #' @param mcol Position of month column
 #' @export
-unfiscal <- function(df, ycol, mcol, month_start, rule) {
+unfiscalize <- function(df, ycol, mcol, month_start, rule) {
   df         <- as.data.frame(df)
   df[, ycol] <- as.integer(df[, ycol])
   df[, mcol] <- as.integer(df[, mcol])
@@ -345,7 +345,7 @@ unfiscal <- function(df, ycol, mcol, month_start, rule) {
                 month = df[, mcol],
                 month_start = month_start,
                 rule = rule)
-  trueyr <- purrr::pmap_int(plist, unfiscal_vec)
+  trueyr <- purrr::pmap_int(plist, unfiscalize_vec)
   if (any(stringr::str_detect(colnames(df), "year"))) {
     df$trueyr <- trueyr
   } else {
