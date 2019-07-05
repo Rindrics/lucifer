@@ -42,6 +42,7 @@ append_info <- function(info, df, headerized = FALSE) {
 #' @inheritParams make_rect
 #' @export
 unmerge_horiz <- function(df, row, regex = ".+") {
+  df         <- as.data.frame(df)
   out        <- df
   vars       <- df[row, ]
   new_col    <- stringr::str_match(vars, regex) %>%
@@ -57,6 +58,7 @@ unmerge_horiz <- function(df, row, regex = ".+") {
 #' @inheritParams make_rect
 #' @export
 unmerge_vert <- function(df, col, regex = ".+") {
+  df         <- as.data.frame(df)
   out        <- df
   vars       <- dplyr::pull(df, col)
   new_row    <- stringr::str_match(vars, regex) %>%
@@ -216,18 +218,17 @@ headerize <- function(df, row) {
 #'
 #' @inheritParams make_rect
 #' @export
-rm_nacols <- function(df) {
+rm_nacols <- function(df, except = NULL) {
   df_leftmost <- df[, 1]
   df_right    <- df[, -1]
   name_left   <- colnames(df)[1]
   name_right  <- colnames(df)[-1]
-  not_na <- !stringr::str_detect(colnames(df_right), "^NA(.[1-9]+)?$")
+  not_na      <- !stringr::str_detect(colnames(df_right), "^NA(.[1-9]+)?$")
   if (length(not_na) == 0) {
     df
   } else {
-    not_na <- tidyr::replace_na(not_na, FALSE)
-    not_na
-    out <- cbind(df_leftmost, df_right[, not_na]) %>%
+    not_na <- c(tidyr::replace_na(not_na, FALSE), except)
+    out    <- cbind(df_leftmost, df_right[, not_na]) %>%
       data.frame(stringsAsFactors = FALSE)
     colnames(out) <- c(name_left, name_right[not_na])
     out[, 1] <- as.character(out[, 1])
