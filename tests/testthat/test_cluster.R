@@ -57,8 +57,10 @@ test_that("additional info can be appended to df", {
   data2 <- extract_a_cluster(pos_key = 5, find_from = 1, direction = "row",
                              df = data, offset = c(0, 0),
                              ends = list(row = "5", col = "bar"),
-                             info = list(offset = c(-4, 0),
-                                         dim = c(4, 2)))
+                             info = list(key_offset = c(-4, 0),
+                                         key_dim = c(4, 1),
+                                         value_offset = c(-4, 1),
+                                         value_dim = c(4, 1)))
   expect_equal(data2[-1, 1], as.character(1:5))
   expect_equal(data2[-1, 2], as.character(16:20))
   expect_equal(vectorize_row(data2, 1),
@@ -119,8 +121,10 @@ test_that("'dim' can be controled by variable", {
                         pos = col2search,
                         offset = c(0, 0),
                         ends = list(row = as.character(year), col = "baz"),
-                        info = list(offset = c(-4, 0),
-                                    dim = c(4, 2)))
+                        info = list(key_offset = c(-4, 0),
+                                    key_dim = c(4, 1),
+                                    value_offset = c(-4, 1),
+                                    value_dim = c(4, 1)))
   expect_equal(vectorize_row(data2[[1]], 1),
                c("year", "month", "foo", "bar", "baz",
                  "this", "is", "a", "info"))
@@ -134,10 +138,13 @@ test_that("'dim' can be controled by variable", {
                         pos = row2search,
                         offset = c(0, 0),
                         ends = list(row = as.character(year), col = "baz"),
-                        info = list(offset = c(-4, 0),
-                                    dim = c(4, 2)))
+                        info = list(value_offset = c(-4, 1),
+                                    value_dim = c(4, 1)))
   expect_equal(data2[[1]][, 3],
                c("foo", seq(1, 106, by = 3) %>% as.character()))
+  expect_equal(data2[[1]] %>%
+                 vectorize_row(1),
+               c("year", "month", "foo", "bar", "baz", paste0("key", 1:4)))
 })
 
 test_that("extract_culsters() throws an error", {
@@ -148,8 +155,10 @@ test_that("extract_culsters() throws an error", {
                               pos = col2search,
                  offset = c(0, 0),
                  ends = list(row =  " ", col = "baz"),
-                 info = list(offset = c(-4, 0),
-                             dim = c(4, 2))),
+                 info = list(key_offset = c(-4, 0),
+                             key_dim = c(4, 1),
+                             value_offset = c(-4, 1),
+                             value_dim = c(4, 1))),
                  "Match failed. Re-consider regex"))
   expect_success(expect_error(
     unclusterize(data, regex = "year", regex = "year",
@@ -158,4 +167,25 @@ test_that("extract_culsters() throws an error", {
                  ends = list(row = "ABCDEFG", col = "baz"),
                  info = list(offset = c(-4, 0),
                              dim = c(4, 2)))))
+})
+
+test_that("separated info", {
+  data <- "separated_info.xlsx" %>%
+    rebel(sheet_regex = "Sheet.",
+          cluster = list(dir = "v",
+                         regex = "head1",
+                              pos = 1,
+                              offset = c(0, 0),
+                              ends = list(row = "[0-9]+",
+                                          col = "head4"),
+                         info = list(key_offset = c(-1, 0),
+                                     key_dim = c(1, 4),
+                                     value_offset = c(1, 0),
+                                     value_dim = c(1, 4))))
+  expect_equal(colnames(data),
+               c(paste0("head", 1:4), paste0("key", 1:4), "fname", "sheet"))
+  expect_equal(data[1, ] %>% vectorize_row(),
+               c(1, 31, 61, 91,
+                 paste0("value", 1:4), "separated_info.xlsx", "Sheet1"))
+  expect_equal(dplyr::pull(data, 1), as.character(c(1:30, 121:150)))
 })
