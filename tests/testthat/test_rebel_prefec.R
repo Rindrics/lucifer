@@ -117,3 +117,55 @@ test_that("duplicated column and fisY", {
                                                     col = "３月"))),
                  "Use 'unfiscalize = c(month_start =, rule =)'", fixed = TRUE))
 })
+
+test_that("dim = c(1, 1) info in saga", {
+  fname <- "saga2.xlsx"
+  year  <- 2018
+  regex_rend <- Nippon::jyear(year + 1) %>%
+    stringr::str_replace("平成", "H") %>%
+    paste0("3月")
+
+  saga <- fname %>%
+    lucifer::rebel_sheet(sheet = "ﾏｲﾜｼ～ｳﾙﾒ",
+                         col_type = list(regex = "定置網|まき網|その他",
+                                         newname = "fishery",
+                                         varname = "catch"),
+                         cluster = list(dir = "v",
+                                        pos = 1,
+                                        regex = ".+漁業種類別月別漁獲量（玄海漁協魚市場）",
+                                        offset = c(1, 0),
+                                        ends = list(row = regex_rend,
+                                                    col = "その他"),
+                                        info = list(offset = c(-1, 0),
+                                                    dim = c(1, 1)))) %>%
+    tidyr::separate(`NA`, sep = "年", into = c("year", "month")) %>%
+    dplyr::mutate(year = stringr::str_replace(year, "H", "平成") %>%
+                    Nippon::wareki2AD(),
+                  month = lucifer::make_ascii(month, numerize = TRUE) %>%
+                    as.integer(),
+                  catch = as.numeric(catch))
+  expect_equal(unique(saga$info),
+               c("マイワシ漁業種類別月別漁獲量（玄海漁協魚市場）",
+                 "マアジ漁業種類別月別漁獲量（玄海漁協魚市場）",
+                 "マサバ漁業種類別月別漁獲量（玄海漁協魚市場）"))
+})
+
+
+test_that("ehime", {
+  fname <- "ehime.xls"
+  converted <- fname %>%
+    lucifer::rebel(sheet_regex = "マサバ.+",
+                   cluster = list(regex = "^年$",
+                                  direction = "h",
+                                  pos = 2,
+                                  offset = c(0, 0),
+                                  ends = list(row = "2019年",
+                                              col = "マサバ")))
+  expect_equal(converted$ｺﾞﾏｻﾊﾞ,
+               seq(1, by = 2, length.out = nrow(converted)) %>%
+                 as.character())
+  expect_equal(converted$マサバ,
+               seq(2, by = 2, length.out = nrow(converted)) %>%
+                 as.character())
+  expect_equal(nrow(converted), 28)
+})

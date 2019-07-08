@@ -105,7 +105,7 @@ test_that("locate_matchend() locates end of the repeted match", {
   expect_equal(locate_matchend(str, regex), 2)
 
   expect_success(expect_error(locate_matchend(letters, regex = "123456"),
-                              "Match failed. Please re-consider regex"))
+                              "Match failed. Re-consider regex"))
 })
 
 test_that("unfiscalize_vec() convert fistal year df to true year", {

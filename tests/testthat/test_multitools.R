@@ -3,10 +3,12 @@ context("Fights using multitools")
 test_that("Fight with maiwashi sheet of aomori catch data", {
   df <- load_alldata("aomori.xlsx", sheet = "マイワシ")
   converted <- df %>%
-    extract_clusters(regex = "^年", col = 1,
-                     offset = c(0, 0), ends = list(row = "^2019", col = "12月"),
-                     info = list(offset = c(-2, 0),
-                                 dim = c(1, 2))) %>%
+    unclusterize(regex = "^年", direction = "v",
+                pos = 1,
+                offset = c(0, 0),
+                ends = list(row = "^2019", col = "12月"),
+                info = list(offset = c(-2, 0),
+                            dim = c(1, 2))) %>%
     lapply(headerize, row = 1) %>%
     purrr::invoke(rbind, .) %>%
     rm_nacols() %>%
@@ -21,10 +23,12 @@ test_that("Fight with maiwashi sheet of aomori catch data", {
 test_that("Fight with katakuchi sheet of aomori catch data", {
   df <- load_alldata("aomori.xlsx", sheet = "カタクチ")
   converted <- df %>%
-    extract_clusters(regex = "^年", col = 1,
-                     offset = c(0, 0), ends = list(row = "^2019", col = "12月"),
-                     info = list(offset = c(-2, 0),
-                                 dim = c(1, 2))) %>%
+    unclusterize(regex = "^年", direction = "v",
+                 pos = 1,
+                 offset = c(0, 0),
+                 ends = list(row = "^2019", col = "12月"),
+                 info = list(offset = c(-2, 0),
+                             dim = c(1, 2))) %>%
     lapply(headerize, row = 1) %>%
     purrr::invoke(rbind, .) %>%
     rm_nacols() %>%
@@ -39,9 +43,10 @@ test_that("Fight with katakuchi sheet of aomori catch data", {
 test_that("Fight with 'masabahi' sheet of aomori catch data", {
   df <- load_alldata("aomori.xlsx", sheet = "マサバ比  ")
   hachinohe <- df %>%
-    extract_clusters(regex = "八戸", col = 1,
-                     offset = c(1, 1),
-                     ends = list(row = "[0-9]", col = "ゴマサバ")) %>%
+    unclusterize(regex = "八戸", direction = "v",
+                 pos = 1,
+                 offset = c(1, 1),
+                 ends = list(row = "[0-9]", col = "ゴマサバ")) %>%
     headerize(1)
   expect_equal(colnames(hachinohe), c("年月日", "マサバ", "ゴマサバ"))
   expect_equal(dplyr::pull(hachinohe, 1),
@@ -51,9 +56,10 @@ test_that("Fight with 'masabahi' sheet of aomori catch data", {
   expect_equal(dplyr::pull(hachinohe, 3), as.character(99:91))
 
   tairadate <- df %>%
-    extract_clusters(regex = "平舘", col = 1,
-                     offset = c(1, 1),
-                     ends = list(row = "[0-9]", col = "ゴマサバ")) %>%
+    unclusterize(regex = "平舘", direction = "v",
+                 pos = 1,
+                 offset = c(1, 1),
+                 ends = list(row = "[0-9]", col = "ゴマサバ")) %>%
     headerize(1)
 
   expect_equal(colnames(tairadate), c("月漁獲量", "マサバ", "ゴマサバ"))
@@ -65,9 +71,10 @@ test_that("Fight with 'masabahi' sheet of aomori catch data", {
 test_that("Fight with data from hachinohe ichiba", {
   fname <- "hachinohe_ichiba.xls"
   data <- load_alldata(fname, sheet = "0613") %>%
-    extract_clusters(regex = "標本番号", col = 1,
-                     offset = c(-1, 0),
-                     ends = list(row = "[0-9]+", col = "採鱗")) %>%
+    unclusterize(regex = "標本番号", direction = "v",
+                 pos = 1,
+                 offset = c(-1, 0),
+                 ends = list(row = "[0-9]+", col = "採鱗")) %>%
     headerize(1) %>%
     data.frame()
 
@@ -84,10 +91,10 @@ test_that("Fight with 'maiwashi' sheet of iwate data", {
   df <- load_alldata("iwate.xls", sheet = "マイワシ")
 
   maiwashi <- df %>%
-    extract_clusters(regex = ".+によるマイワシ.+",
-                     col = 1,
-                     offset = c(2, 0),
-                     ends = list(row = row_regex, col = "(1|１)(2|２)月")) %>%
+    unclusterize(regex = ".+によるマイワシ.+",
+                 direction = "v", pos = 1,
+                 offset = c(2, 0),
+                 ends = list(row = row_regex, col = "(1|１)(2|２)月")) %>%
     lapply(make_ascii, row = 1) %>%
     lapply(headerize, row = 1) %>%
     purrr::invoke(rbind, .) %>%
@@ -103,8 +110,9 @@ test_that("Fight with 'maiwashi' sheet of iwate data", {
 
 test_that("Fight with duplicated column and fiscal year", {
   saga <- load_alldata("saga.xls", sheet = "Sheet1") %>%
-    extract_clusters(regex = "年度", col = 1, offset = c(0, 0),
-                     ends = list(row = "2016", col = "３月")) %>%
+    unclusterize(regex = "年度", direction = "v",
+                 pos = 1, offset = c(0, 0),
+                 ends = list(row = "2016", col = "３月")) %>%
     make_ascii(row = 1) %>%
     headerize(1) %>%
     gather_cols(".+月", newname = "month", varname = "catch") %>%
