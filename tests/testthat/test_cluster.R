@@ -113,8 +113,8 @@ test_that("clusters distributed in column direction can be extracted", {
 
 test_that("'dim' can be controled by variable", {
   year <- 2019
-  col2search <- 1
   data <- load_alldata("clustered.xlsx", sheet = "repeated")
+  col2search <- 1
   data2 <- unclusterize(data, regex = "year", direction = "v",
                         pos = col2search,
                         offset = c(0, 0),
@@ -128,6 +128,16 @@ test_that("'dim' can be controled by variable", {
                as.character(c(2017, 1, 1:3, 1:4)))
   expect_equal(vectorize_row(data2[[2]], 2),
                as.character(c(2017, 1, 109:111, 5:8)))
+
+  row2search <- 5
+  data2 <- unclusterize(data, regex = "year", direction = "h",
+                        pos = row2search,
+                        offset = c(0, 0),
+                        ends = list(row = as.character(year), col = "baz"),
+                        info = list(offset = c(-4, 0),
+                                    dim = c(4, 2)))
+  expect_equal(data2[[1]][, 3],
+               c("foo", seq(1, 106, by = 3) %>% as.character()))
 })
 
 test_that("extract_culsters() throws an error", {

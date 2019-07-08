@@ -149,3 +149,23 @@ test_that("dim = c(1, 1) info in saga", {
                  "マアジ漁業種類別月別漁獲量（玄海漁協魚市場）",
                  "マサバ漁業種類別月別漁獲量（玄海漁協魚市場）"))
 })
+
+
+test_that("ehime", {
+  fname <- "ehime.xls"
+  converted <- fname %>%
+    lucifer::rebel(sheet_regex = "マサバ.+",
+                   cluster = list(regex = "^年$",
+                                  direction = "h",
+                                  pos = 2,
+                                  offset = c(0, 0),
+                                  ends = list(row = "2019年",
+                                              col = "マサバ")))
+  expect_equal(converted$ｺﾞﾏｻﾊﾞ,
+               seq(1, by = 2, length.out = nrow(converted)) %>%
+                 as.character())
+  expect_equal(converted$マサバ,
+               seq(2, by = 2, length.out = nrow(converted)) %>%
+                 as.character())
+  expect_equal(nrow(converted), 28)
+})
