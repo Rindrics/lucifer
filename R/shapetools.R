@@ -248,7 +248,15 @@ rm_nacols <- function(df) {
 #'   the coordination of keyword
 #' @param ends List of regex to locate row- and column- ends of each cluster
 #'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}
-#' @param info Parameters to control \code{link{append_info}}
+#' @param info Parameters to make key:value list such as
+#' \describe{
+#'  \item{key_offset}{Offset \code{c(row, col)} of \code{key} topleft
+#'   from df topleft. If \code{NULL}, automatically set to \code{keyn}}
+#'  \item{key_dim}{Dimension \code{c(row, col)} of \code{key}}
+#'  \item{value_offset}{Offset \code{c(row, col)} of \code{value} topleft from
+#'   df topleft}
+#'  \item{value_dim}{Dimension \code{c(row, col)} of \code{value}}
+#' }
 extract_a_cluster <- function(pos_key, find_from, direction, df,
                               offset = c(0, 0), ends, info = NULL) {
   rofst <- offset[1]
