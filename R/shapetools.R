@@ -25,7 +25,7 @@ make_rect <- function(df, range) {
 #'   tentative colnames
 #' @inheritParams make_rect
 #' @export
-append_info <- function(info, df, headerized = FALSE) {
+append_info <- function(df, info, headerized = FALSE) {
   df_info <- list2df(info, nrow = nrow(df))
   if (headerized == FALSE) {
     df_info[1, ] <- names(info)
@@ -278,21 +278,20 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
     out[1, 1] <- out[2, 1]
     out <- out[-2, ]
   }
-  if (!is.null(info)) {
-    row_info  <- row + info$offset[1]
-    col_info  <- col + info$offset[2]
-    nrow_info <- info$dim[1]
-    ncol_info <- info$dim[2]
-    infos     <- df[row_info:(row_info + nrow_info - 1),
-                    col_info:(col_info + ncol_info - 1)]
-    if (ncol_info == 1) {
-      info_list <- as.list(stats::setNames(infos[[1]], "info"))
-    } else {
-      info_list <- as.list(stats::setNames(infos[[2]], infos[[1]]))
-    }
-    out <- append_info(info = info_list, df = out, headerized = FALSE)
+  if (is.null(info)) return(out)
+  row_info  <- row + info$offset[1]
+  col_info  <- col + info$offset[2]
+  nrow_info <- info$dim[1]
+  ncol_info <- info$dim[2]
+  infos     <- df[row_info:(row_info + nrow_info - 1),
+                  col_info:(col_info + ncol_info - 1)]
+  if (ncol_info == 1) {
+    info_list <- as.list(stats::setNames(infos[[1]], "info"))
+  } else {
+    info_list <- as.list(stats::setNames(infos[[2]], infos[[1]]))
   }
-  out
+  out %>%
+    append_info(info = info_list, headerized = FALSE)
 }
 
 #' Extract data clusters from data frame using the keyword
