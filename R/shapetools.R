@@ -286,18 +286,31 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
     out[1, 1] <- out[2, 1]
     out <- out[-2, ]
   }
+
   if (is.null(info)) return(out)
-  row_info  <- row + info$offset[1]
-  col_info  <- col + info$offset[2]
-  nrow_info <- info$dim[1]
-  ncol_info <- info$dim[2]
-  infos     <- df[row_info:(row_info + nrow_info - 1),
-                  col_info:(col_info + ncol_info - 1)]
-  if (ncol_info == 1) {
-    info_list <- as.list(stats::setNames(infos[[1]], "info"))
+
+  value_offset <- info$value_offset
+  value_dim    <- info$value_dim
+  rvalue       <- row + value_offset[1]
+  cvalue       <- col + value_offset[2]
+  value        <- df[rvalue:(rvalue + value_dim[1] - 1),
+                     cvalue:(cvalue + value_dim[2] - 1)] %>%
+    unlist() %>%
+    as.vector()
+  if (value_offset[1] > 0) out <- out[- (value_offset[1] + 1), ]
+  if (is.null(info$key_offset)) {
+    key <- paste0("key", 1:max(value_dim))
   } else {
-    info_list <- as.list(stats::setNames(infos[[2]], infos[[1]]))
+    key_offset   <- info$key_offset
+    key_dim      <- info$key_dim
+    rkey <- row + key_offset[1]
+    ckey <- col + key_offset[2]
+    key  <- df[rkey:(rkey + key_dim[1] - 1),
+               ckey:(ckey + key_dim[2] - 1)] %>%
+      unlist() %>% as.vector()
   }
+
+  info_list <- as.list(stats::setNames(value, key))
   out %>%
     append_info(info = info_list, headerized = FALSE)
 }
