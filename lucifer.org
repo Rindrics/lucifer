@@ -1,7 +1,14 @@
 #+TITLE: lucifer プロジェクトノート
 #+PROPERTY: header-args :exports code :results scalar :session *R:lucifer*
 #+STARTUP: contents
+#+BEGIN_SRC R :results output
+  devtools::load_all(); devtools::test()
+  lintr::lint_package()
 
+  devtools::document(roclets = c("rd", "collate", "namespace"))
+  devtools::check(args = "--as-cran")
+  covr::package_coverage()
+#+END_SRC
 * 目次                                                                :TOC_3:
 - [[#開発セットアップ][開発セットアップ]]
   - [[#使用したパッケージ][使用したパッケージ]]
@@ -64,14 +71,6 @@
       a
 	#+end_src
 * 再ロードしてテストを実行
-#+BEGIN_SRC R :results output
-  devtools::load_all(); devtools::test()
-  lintr::lint_package()
-
-  devtools::document(roclets = c("rd", "collate", "namespace"))
-  devtools::check(args = "--as-cran")
-  covr::package_coverage()
-#+END_SRC
 * リリース
 #+BEGIN_SRC R
   devtools::spell_check()

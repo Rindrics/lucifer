@@ -58,16 +58,17 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 
   if (!is.null(row_omit)) {
     out <- rm_matchrow(out,
-                     key = row_omit$key,
-                     colpos = row_omit$colpos,
-                     regex = row_omit$regex)
+                       key = row_omit$key,
+                       colpos = row_omit$colpos,
+                       regex = row_omit$regex)
   }
 
   if (!is.null(col_omit)) {
-    out <- rm_matchcol(out,
-                     key = col_omit$key,
-                     rowpos = col_omit$rowpos,
-                     regex = col_omit$regex)
+    out <- out %>%
+      lapply(rm_matchcol, key = col_omit$key,
+                       rowpos = col_omit$rowpos,
+                       regex = col_omit$regex) %>%
+      purrr::invoke(rbind, .)
   }
 
   if (is.list(out) & is.null(dim(out))) {
