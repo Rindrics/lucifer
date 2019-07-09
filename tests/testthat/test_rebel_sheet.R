@@ -96,3 +96,10 @@ test_that("rebel_sheet() beat up file contaminated by summary row", {
   expect_equal(dplyr::pull(beaten, 2), as.character(c(2:10, 12:20, 22:30)))
   expect_equal(dplyr::pull(beaten, 3), as.character(c(32:40, 42:50, 52:60)))
 })
+
+test_that("early return works correctly", {
+  data <- rebel_sheet(path = "sumrow_contami.xlsx",
+                      sheet = "Sheet1")
+  expect_setequal(dplyr::pull(data, 1),
+                  c("sum", "sum", paste0("A", c(1:10, 12:20, 22:30))))
+})
