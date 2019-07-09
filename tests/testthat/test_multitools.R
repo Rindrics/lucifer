@@ -7,8 +7,10 @@ test_that("Fight with maiwashi sheet of aomori catch data", {
                 pos = 1,
                 offset = c(0, 0),
                 ends = list(row = "^2019", col = "12月"),
-                info = list(offset = c(-2, 0),
-                            dim = c(1, 2))) %>%
+                info = list(key_offset = c(-2, 0),
+                            key_dim = c(1, 1),
+                            value_offset = c(-2, 1),
+                            value_dim = c(1, 1))) %>%
     lapply(headerize, row = 1) %>%
     purrr::invoke(rbind, .) %>%
     rm_nacols() %>%
@@ -27,8 +29,10 @@ test_that("Fight with katakuchi sheet of aomori catch data", {
                  pos = 1,
                  offset = c(0, 0),
                  ends = list(row = "^2019", col = "12月"),
-                 info = list(offset = c(-2, 0),
-                             dim = c(1, 2))) %>%
+                 info = list(key_offset = c(-2, 0),
+                             key_dim = c(1, 1),
+                             value_offset = c(-2, 1),
+                             value_dim = c(1, 1))) %>%
     lapply(headerize, row = 1) %>%
     purrr::invoke(rbind, .) %>%
     rm_nacols() %>%

@@ -25,7 +25,7 @@ make_rect <- function(df, range) {
 #'   tentative colnames
 #' @inheritParams make_rect
 #' @export
-append_info <- function(info, df, headerized = FALSE) {
+append_info <- function(df, info, headerized = FALSE) {
   df_info <- list2df(info, nrow = nrow(df))
   if (headerized == FALSE) {
     df_info[1, ] <- names(info)
@@ -248,7 +248,15 @@ rm_nacols <- function(df) {
 #'   the coordination of keyword
 #' @param ends List of regex to locate row- and column- ends of each cluster
 #'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}
-#' @param info Parameters to control \code{link{append_info}}
+#' @param info Parameters to make key:value list such as
+#' \describe{
+#'  \item{key_offset}{Offset \code{c(row, col)} of \code{key} topleft
+#'   from df topleft. If \code{NULL}, automatically set to \code{keyn}}
+#'  \item{key_dim}{Dimension \code{c(row, col)} of \code{key}}
+#'  \item{value_offset}{Offset \code{c(row, col)} of \code{value} topleft from
+#'   df topleft}
+#'  \item{value_dim}{Dimension \code{c(row, col)} of \code{value}}
+#' }
 extract_a_cluster <- function(pos_key, find_from, direction, df,
                               offset = c(0, 0), ends, info = NULL) {
   rofst <- offset[1]
@@ -278,21 +286,33 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
     out[1, 1] <- out[2, 1]
     out <- out[-2, ]
   }
-  if (!is.null(info)) {
-    row_info  <- row + info$offset[1]
-    col_info  <- col + info$offset[2]
-    nrow_info <- info$dim[1]
-    ncol_info <- info$dim[2]
-    infos     <- df[row_info:(row_info + nrow_info - 1),
-                    col_info:(col_info + ncol_info - 1)]
-    if (ncol_info == 1) {
-      info_list <- as.list(stats::setNames(infos[[1]], "info"))
-    } else {
-      info_list <- as.list(stats::setNames(infos[[2]], infos[[1]]))
-    }
-    out <- append_info(info = info_list, df = out, headerized = FALSE)
+
+  if (is.null(info)) return(out)
+
+  value_offset <- info$value_offset
+  value_dim    <- info$value_dim
+  rvalue       <- row + value_offset[1]
+  cvalue       <- col + value_offset[2]
+  value        <- df[rvalue:(rvalue + value_dim[1] - 1),
+                     cvalue:(cvalue + value_dim[2] - 1)] %>%
+    unlist() %>%
+    as.vector()
+  if (value_offset[1] > 0) out <- out[- (value_offset[1] + 1), ]
+  if (is.null(info$key_offset)) {
+    key <- paste0("key", 1:max(value_dim))
+  } else {
+    key_offset   <- info$key_offset
+    key_dim      <- info$key_dim
+    rkey <- row + key_offset[1]
+    ckey <- col + key_offset[2]
+    key  <- df[rkey:(rkey + key_dim[1] - 1),
+               ckey:(ckey + key_dim[2] - 1)] %>%
+      unlist() %>% as.vector()
   }
-  out
+
+  info_list <- as.list(stats::setNames(value, key))
+  out %>%
+    append_info(info = info_list, headerized = FALSE)
 }
 
 #' Extract data clusters from data frame using the keyword
