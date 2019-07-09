@@ -247,7 +247,9 @@ rm_nacols <- function(df) {
 #' @param offset The offset (\code{c(row, pos})) of the cluster topleft from
 #'   the coordination of keyword
 #' @param ends List of regex to locate row- and column- ends of each cluster
-#'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}
+#'   Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}.
+#' Regex \code{row = } must specify the end of 'left most' columnn of df,
+#'  not that of the column with key matched by \code{regex}
 #' @param info Parameters to make key:value list such as
 #' \describe{
 #'  \item{key_offset}{Offset \code{c(row, col)} of \code{key} topleft
@@ -269,7 +271,7 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
                               ends[["row"]]) + row - 1
     maxcol <- locate_matchend(vectorize_row(df, row), ends[["col"]])
     nrow <- maxrow - pos_key - rofst + 1
-    ncol <- maxcol - cofst
+    ncol <- maxcol - cofst - (find_from - 1)
   } else {
     row <- find_from + rofst
     col <- pos_key + cofst

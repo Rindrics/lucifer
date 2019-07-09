@@ -22,7 +22,9 @@ which \code{excract_cluster()} search key}
 the coordination of keyword}
 
 \item{ends}{List of regex to locate row- and column- ends of each cluster
-Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}}
+  Form should be like \code{ends = list(row = "2019", col = "[Dd]ecember$")}.
+Regex \code{row = } must specify the end of 'left most' columnn of df,
+ not that of the column with key matched by \code{regex}}
 
 \item{info}{Parameters to make key:value list such as
 \describe{

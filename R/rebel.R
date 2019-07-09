@@ -35,18 +35,6 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 
   out <- load_alldata(path, sheet = sheet)
 
-  if (!is.null(cluster)) {
-    out <- unclusterize(df = out, regex = cluster$regex,
-                        direction = cluster$dir,
-                        pos = cluster$pos, offset = cluster$offset,
-                        ends = cluster$ends, info = cluster$info)
-    if (cluster$dir == "v") {
-      out <- lapply(out, make_ascii, row = cluster$pos)
-    } else if (cluster$dir == "h") {
-      out <- lapply(out, make_ascii, col = cluster$pos)
-    }
-  }
-
   if (row_merged > 0) {
     out <- unmerge_vert(out, col = row_merged)
   }
@@ -56,18 +44,31 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
       merge_colname(rows = 1:(col_merged + 1))
   }
 
+  if (is.null(cluster)) return(ceasefire(out, path, sheet, "cluster"))
+
+  out <- unclusterize(df = out, regex = cluster$regex,
+                      direction = cluster$dir,
+                      pos = cluster$pos, offset = cluster$offset,
+                      ends = cluster$ends, info = cluster$info)
+  if (cluster$dir == "v") {
+    out <- lapply(out, make_ascii, row = cluster$pos)
+  } else if (cluster$dir == "h") {
+    out <- lapply(out, make_ascii, col = cluster$pos)
+  }
+
   if (!is.null(row_omit)) {
     out <- rm_matchrow(out,
-                     key = row_omit$key,
-                     colpos = row_omit$colpos,
-                     regex = row_omit$regex)
+                       key = row_omit$key,
+                       colpos = row_omit$colpos,
+                       regex = row_omit$regex)
   }
 
   if (!is.null(col_omit)) {
-    out <- rm_matchcol(out,
-                     key = col_omit$key,
-                     rowpos = col_omit$rowpos,
-                     regex = col_omit$regex)
+    out <- out %>%
+      lapply(rm_matchcol, key = col_omit$key,
+                       rowpos = col_omit$rowpos,
+                       regex = col_omit$regex) %>%
+      purrr::invoke(rbind, .)
   }
 
   if (is.list(out) & is.null(dim(out))) {

@@ -3,25 +3,31 @@ context("Rebel against godly Excel workbook")
 test_that("rebel() beat up file with merged header", {
   fname <- "merged.xlsx"
   beaten <- rebel(path = fname, sheet_regex = "Sheet.",
-                        row_merged = 1, col_merged = 1) %>%
+                  row_merged = 1, col_merged = 1,
+                  cluster = list(regex = "NA_A2",
+                                 dir = "h",
+                                 pos = 1,
+                                 offset = c(0, 0),
+                                 ends = list(row = "A16",
+                                             col = "E1_H2"))) %>%
     as.data.frame()
-  beaten
-  expect_equal(as.vector(beaten[, 1]),
+  expect_equal(dplyr::pull(beaten, 1),
                rep(c(rep("A2", 7), rep("A10", 6), rep("A16", 8)), 2))
-  expect_equal(as.vector(unlist(beaten[1, ])),
-              c("A2", paste0(LETTERS[c(1, 3:8)], 3), fname, "Sheet1"))
-  expect_equal(as.vector(unlist(beaten[22, ])),
-              c("A2", paste0(LETTERS[c(1, 3:8)], 13), fname, "Sheet2"))
+  expect_equal(vectorize_row(beaten, 2),
+              c("A2", paste0(LETTERS[c(1, 3:8)], 4), fname, "Sheet1"))
+  expect_equal(vectorize_row(beaten, 23),
+              c("A2", paste0(LETTERS[c(1, 3:8)], 14), fname, "Sheet2"))
 })
 
 test_that("rebel() throws an error", {
     expect_success(
-      expect_warning(rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
-                     cluster = list(direction = "foo",
-                                    pos = 1, regex = "b..",
-                                    offset = c(1, 0),
-                                    ends = list(row = "A5", col = "test"))),
-                     "Set 'direction' correctly"))
+      expect_warning(
+        rebel(path = "clustered.xlsx", sheet_regex = "[0-9]+",
+              cluster = list(direction = "foo",
+                             pos = 1, regex = "b..",
+                             offset = c(1, 0),
+                             ends = list(row = "A5", col = "test"))),
+         "Set 'direction' correctly"))
 })
 
 test_that("rebel() beat up file with clustered data", {
@@ -43,10 +49,16 @@ test_that("rebel() beat up file with clustered data", {
 
 test_that("rebel() beat up file with YrowMcol data", {
   beaten <- rebel(path = "YrowMcol.xlsx", sheet_regex = "Sheet.",
-                        row_type = "Y",
-                        col_type = list(regex = "^1?[0-9]月?",
-                                        newname = "month",
-                                        varname = "given_varname"))
+                  cluster = list(dir = "v",
+                                 regex = "year",
+                                 pos = 1,
+                                 offset = c(0, 0),
+                                 ends = c(row = "2000",
+                                          col = "12")),
+                  row_type = "Y",
+                  col_type = list(regex = "^1?[0-9]月?",
+                                  newname = "month",
+                                  varname = "given_varname"))
   expect_equal(colnames(beaten),
                c("year", "fname", "sheet", "month", "given_varname"))
   expect_equal(unique(beaten$year), 1969:2000)
@@ -56,55 +68,62 @@ test_that("rebel() beat up file with YrowMcol data", {
 
 test_that("rebel() beat up file contaminated by summary row", {
   beaten <- rebel(path = "sumrow_contami.xlsx", sheet_regex = "Sheet.",
+                  cluster = list(regex = "A1$",
+                                 dir = "h",
+                                 pos = 1,
+                                 offset = c(0, 0),
+                                 ends = list(row = "A30",
+                                             col = "H1")),
                   row_omit = list(key = "sum",
                                   colpos = 1,
                                   regex = FALSE))
   expect_equal(colnames(beaten), c(paste0(LETTERS[1:8], 1), "fname", "sheet"))
-  beaten <- beaten %>%
-    dplyr::mutate(B1 = as.numeric(B1),
-                  C1 = as.numeric(C1)) %>%
-    dplyr::arrange(B1)
-  expect_equal(unique(beaten$B1),
-               c(2:10, 12:20, 22:30, 212:220, 222:230, 232:240))
+  expect_setequal(
+    dplyr::pull(beaten, 2),
+    as.character(c(2:10, 12:20, 22:30, 212:220, 222:230, 232:240)))
 
   beaten <- rebel(path = "sumrow_contami.xlsx", sheet_regex = "Sheet.",
+                  cluster = list(regex = "A1$",
+                                 dir = "h",
+                                 pos = 1,
+                                 offset = c(0, 0),
+                                 ends = list(row = "A30",
+                                             col = "H1")),
                   row_omit = list(key = "s..",
                                   colpos = 1,
                                   regex = TRUE))
-  beaten
   expect_equal(colnames(beaten), c(paste0(LETTERS[1:8], 1), "fname", "sheet"))
-  beaten <- beaten %>%
-    dplyr::mutate(B1 = as.numeric(B1),
-                  C1 = as.numeric(C1)) %>%
-    dplyr::arrange(B1)
-  expect_equal(unique(beaten$B1),
-               c(2:10, 12:20, 22:30, 212:220, 222:230, 232:240))
+  expect_setequal(
+    dplyr::pull(beaten, 2),
+    as.character(c(2:10, 12:20, 22:30, 212:220, 222:230, 232:240)))
 })
 
 test_that("rebel() beat up file contaminated by summary column", {
   beaten <- rebel(path = "sumcol_contami.xlsx", sheet_regex = "Sheet.",
+                  cluster = list(regex = "A1$",
+                                 dir = "h",
+                                 pos = 1,
+                                 offset = c(0, 0),
+                                 ends = list(row = "A30",
+                                             col = "H1")),
                   col_omit = list(key = "sum",
                                   rowpos = 1,
                                   regex = FALSE))
-  beaten
   expect_equal(colnames(beaten),
                c(paste0(LETTERS[c(1:3, 5:6, 8)], 1), "fname", "sheet"))
-  beaten <- beaten %>%
-    dplyr::mutate(B1 = as.numeric(B1),
-                  C1 = as.numeric(C1)) %>%
-    dplyr::arrange(B1)
-  expect_equal(unique(beaten$B1), c(2:30, 212:240))
+  expect_setequal(dplyr::pull(beaten, 2), as.character(c(2:30, 212:240)))
 
   beaten <- rebel(path = "sumcol_contami.xlsx", sheet_regex = "Sheet.",
+                  cluster = list(dir = "v",
+                                 regex = "A1$",
+                                 pos = 1,
+                                 offset = c(0, 0),
+                                 ends = c(row = "A30",
+                                          col = "H1")),
                   col_omit = list(key = "s..",
                                   rowpos = 1,
                                   regex = TRUE))
-  beaten
   expect_equal(colnames(beaten),
                c(paste0(LETTERS[c(1:3, 5:6, 8)], 1), "fname", "sheet"))
-  beaten <- beaten %>%
-    dplyr::mutate(B1 = as.numeric(B1),
-                  C1 = as.numeric(C1)) %>%
-    dplyr::arrange(B1)
-  expect_equal(unique(beaten$B1), c(2:30, 212:240))
+  expect_setequal(dplyr::pull(beaten, 2), as.character(c(2:30, 212:240)))
 })
