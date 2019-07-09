@@ -269,7 +269,7 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
                               ends[["row"]]) + row - 1
     maxcol <- locate_matchend(vectorize_row(df, row), ends[["col"]])
     nrow <- maxrow - pos_key - rofst + 1
-    ncol <- maxcol - cofst
+    ncol <- maxcol - cofst - (find_from - 1)
   } else {
     row <- find_from + rofst
     col <- pos_key + cofst
