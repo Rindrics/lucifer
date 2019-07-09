@@ -14,8 +14,17 @@ add_reference <- function(df, fname, sheet) {
 #' @param path File path to be used by \code{add_reference}
 #' @param sheet Sheet name to be used by \code{add_reference}
 #' @param funcname Name of function to create message for user
-ceasefire <- function(df, path, sheet, funcname) {
-  print(paste0("Good. Specify '", funcname,  "' next."))
-  add_reference(df, path, sheet) %>%
-    rm_nacols()
+#' @param posnames If TRUE, row- and col- names are set to 'pos=' format for
+#' following cluster extraction
+ceasefire <- function(df, path, sheet, funcname, posnames = TRUE) {
+  message(paste0("Good. Specify '", funcname, "' next."))
+  if (posnames == TRUE) {
+    df %>%
+      magrittr::set_colnames(paste0("(dir='v',pos=", 1:ncol(df), ")")) %>%
+      add_reference(path, sheet) %>%
+      as.data.frame() %>%
+      magrittr::set_rownames(paste0("(dir='h',pos=", 1:nrow(df), ")"))
+  } else {
+    add_reference(df, path, sheet)
+  }
 }
