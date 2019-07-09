@@ -35,18 +35,6 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 
   out <- load_alldata(path, sheet = sheet)
 
-  if (!is.null(cluster)) {
-    out <- unclusterize(df = out, regex = cluster$regex,
-                        direction = cluster$dir,
-                        pos = cluster$pos, offset = cluster$offset,
-                        ends = cluster$ends, info = cluster$info)
-    if (cluster$dir == "v") {
-      out <- lapply(out, make_ascii, row = cluster$pos)
-    } else if (cluster$dir == "h") {
-      out <- lapply(out, make_ascii, col = cluster$pos)
-    }
-  }
-
   if (row_merged > 0) {
     out <- unmerge_vert(out, col = row_merged)
   }
@@ -54,6 +42,18 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   if (col_merged > 0) {
     out <- unmerge_horiz(out, row = col_merged) %>%
       merge_colname(rows = 1:(col_merged + 1))
+  }
+
+  if (is.null(cluster)) return(ceasefire(out, path, sheet, "cluster"))
+
+  out <- unclusterize(df = out, regex = cluster$regex,
+                      direction = cluster$dir,
+                      pos = cluster$pos, offset = cluster$offset,
+                      ends = cluster$ends, info = cluster$info)
+  if (cluster$dir == "v") {
+    out <- lapply(out, make_ascii, row = cluster$pos)
+  } else if (cluster$dir == "h") {
+    out <- lapply(out, make_ascii, col = cluster$pos)
   }
 
   if (!is.null(row_omit)) {
