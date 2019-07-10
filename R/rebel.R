@@ -35,6 +35,15 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 
   out <- load_alldata(path, sheet = sheet)
 
+  ## if (length(row_merged) > 1) browser()
+
+  ## out
+  ## cluster
+  ## row_merged
+  ## col_merged
+  ## bad_rowhead <- out[-(1:max(col_merged)), row_merged]
+  ## items <- itemize(bad_rowhead, only_item = TRUE)
+  
   if (row_merged > 0) {
     out <- unmerge_vert(out, col = row_merged)
   }
