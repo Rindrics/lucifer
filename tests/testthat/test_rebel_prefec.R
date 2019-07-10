@@ -6,19 +6,21 @@ test_that("rebel_sheet() beat aomori data up", {
   year  <- 2019
   y_regex <- paste0("^", year)
   maiwashi <- rebel_sheet(path = fname, sheet = sheet,
-                        cluster = list(dir = "v",
-                                       pos = 1,
-                                       regex = "^年",
-                                       offset = c(0, 0),
-                                       ends = list(row = y_regex,
-                                                   col = "12月"),
-                                       info = list(offset = c(-2, 0),
-                                                   dim = c(1, 2),
-                                                   headerized = FALSE)),
-                        row_type = "Y",
-                        col_type = list(regex = "^1?[0-9]月?",
-                                        newname = "month",
-                                        varname = "catch"))
+                          cluster = list(dir = "v",
+                                         pos = 1,
+                                         regex = "^年",
+                                         offset = c(0, 0),
+                                         ends = list(row = y_regex,
+                                                     col = "12月"),
+                                         info = list(key_offset = c(-2, 0),
+                                                     key_dim = c(1, 1),
+                                                     value_offset = c(-2, 1),
+                                                     value_dim = c(1, 1),
+                                                     headerized = FALSE)),
+                          row_type = "Y",
+                          col_type = list(regex = "^1?[0-9]月?",
+                                          newname = "month",
+                                          varname = "catch"))
   expect_equal(dplyr::filter(maiwashi, year == 1997, month == 6,
                              漁法 == "定置網漁業（底建網含む）") %>%
                dplyr::select(catch) %>%
@@ -39,8 +41,10 @@ test_that("rebel_sheet() beat aomori data up", {
                                        offset = c(0, 0),
                                        ends = list(row = y_regex,
                                                    col = "12月"),
-                                       info = list(offset = c(-2, 0),
-                                                   dim = c(1, 2),
+                                       info = list(key_offset = c(-2, 0),
+                                                   key_dim = c(1, 1),
+                                                   value_offset = c(-2, 1),
+                                                   value_dim = c(1, 1),
                                                    headerized = FALSE)),
                         row_type = "Y",
                         col_type = list(regex = "^1?[0-9]月?",
@@ -126,26 +130,50 @@ test_that("dim = c(1, 1) info in saga", {
     paste0("3月")
 
   saga <- fname %>%
-    lucifer::rebel_sheet(sheet = "ﾏｲﾜｼ～ｳﾙﾒ",
-                         col_type = list(regex = "定置網|まき網|その他",
-                                         newname = "fishery",
-                                         varname = "catch"),
-                         cluster = list(dir = "v",
-                                        pos = 1,
-                                        regex = ".+漁業種類別月別漁獲量（玄海漁協魚市場）",
-                                        offset = c(1, 0),
-                                        ends = list(row = regex_rend,
-                                                    col = "その他"),
-                                        info = list(offset = c(-1, 0),
-                                                    dim = c(1, 1)))) %>%
+    lucifer::rebel_sheet(
+               sheet = "ﾏｲﾜｼ～ｳﾙﾒ",
+               col_type = list(regex = "定置網|まき網|その他",
+                               newname = "fishery",
+                               varname = "catch"),
+               cluster = list(dir = "v",
+                              pos = 1,
+                              regex = ".+漁業種類別月別漁獲量（玄海漁協魚市場）",
+                              offset = c(1, 0),
+                              ends = list(row = regex_rend,
+                                          col = "その他"),
+                              info = list(value_offset = c(-1, 0),
+                                          value_dim = c(1, 1)))) %>%
     tidyr::separate(`NA`, sep = "年", into = c("year", "month")) %>%
     dplyr::mutate(year = stringr::str_replace(year, "H", "平成") %>%
                     Nippon::wareki2AD(),
                   month = lucifer::make_ascii(month, numerize = TRUE) %>%
                     as.integer(),
                   catch = as.numeric(catch))
-  expect_equal(unique(saga$info),
+  expect_setequal(colnames(saga),
+                  c("year", "month", "key1",
+                    "fname", "sheet", "fishery", "catch"))
+  expect_equal(unique(saga$key1),
                c("マイワシ漁業種類別月別漁獲量（玄海漁協魚市場）",
                  "マアジ漁業種類別月別漁獲量（玄海漁協魚市場）",
                  "マサバ漁業種類別月別漁獲量（玄海漁協魚市場）"))
+})
+
+
+test_that("ehime", {
+  fname <- "ehime.xls"
+  converted <- fname %>%
+    lucifer::rebel(sheet_regex = "マサバ.+",
+                   cluster = list(regex = "^年$",
+                                  direction = "h",
+                                  pos = 2,
+                                  offset = c(0, 0),
+                                  ends = list(row = "2019年",
+                                              col = "マサバ")))
+  expect_equal(converted$ｺﾞﾏｻﾊﾞ,
+               seq(1, by = 2, length.out = nrow(converted)) %>%
+                 as.character())
+  expect_equal(converted$マサバ,
+               seq(2, by = 2, length.out = nrow(converted)) %>%
+                 as.character())
+  expect_equal(nrow(converted), 28)
 })

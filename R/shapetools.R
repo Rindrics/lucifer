@@ -25,7 +25,7 @@ make_rect <- function(df, range) {
 #'   tentative colnames
 #' @inheritParams make_rect
 #' @export
-append_info <- function(info, df, headerized = FALSE) {
+append_info <- function(df, info, headerized = FALSE) {
   df_info <- list2df(info, nrow = nrow(df))
   if (headerized == FALSE) {
     df_info[1, ] <- names(info)

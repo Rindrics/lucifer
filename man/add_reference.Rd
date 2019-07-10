@@ -4,7 +4,7 @@
 \alias{add_reference}
 \title{Add columns 'fname' and 'sheet' to df}
 \usage{
-add_reference(df, fname, sheet)
+add_reference(df, fname = NULL, sheet = NULL)
 }
 \arguments{
 \item{df}{Data frame to be processed}
