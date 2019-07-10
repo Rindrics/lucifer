@@ -12,7 +12,7 @@ test_that("add_reference() add 'fname' and 'sheet' columns to df", {
 test_that("ceasefire() returns massage and df", {
   df     <- data.frame(a = 1:5, b = 6:10)
   expect_message(
-    return <- ceasefire(df, path = "foo", sheet = "bar", funcname = "baz"),
+    return <- ceasefire(df, fname = "foo", sheet = "bar", funcname = "baz"),
     "Good. Specify 'baz' next."
   )
   expect_equal(colnames(return),
@@ -23,7 +23,7 @@ test_that("ceasefire() returns massage and df", {
   expect_equal(return[, 3], rep("foo", 5))
   expect_equal(return[, 4], rep("bar", 5))
 
-  return <- ceasefire(df, path = "foo", sheet = "bar",
+  return <- ceasefire(df, fname = "foo", sheet = "bar",
                       funcname = "baz", posnames = FALSE)
   expect_equal(colnames(return),
                c(letters[1:2], "fname", "sheet"))

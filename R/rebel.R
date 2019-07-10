@@ -127,15 +127,16 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                   cluster = NULL, row_type = NULL, col_type = NULL,
                   row_omit = NULL, col_omit = NULL,
                   unfiscalize = c(month_start = NULL, rule = NULL)) {
+
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
-  out <- purrr::map_df(sheets, rebel_sheet, path = path,
-                       row_merged = row_merged,
-                       col_merged = col_merged,
-                       cluster = cluster,
-                       row_type = row_type,
-                       col_type = col_type,
-                       row_omit = row_omit, col_omit = col_omit,
-                       unfiscalize)
-  tibble::as_tibble(out)
+
+  out <- lapply(sheets, rebel_sheet, path = path,
+                row_merged = row_merged, col_merged = col_merged,
+                cluster = cluster, row_type = row_type, col_type = col_type,
+                row_omit = row_omit, col_omit = col_omit, unfiscalize) %>%
+          purrr::invoke(rbind, .)
+
+    if (is.null(cluster)) return(ceasefire(out, funcname = "cluster"))
+    tibble::as_tibble(out)
 }
