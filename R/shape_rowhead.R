@@ -9,31 +9,31 @@ rm_space <- function(x) {
 }
 
 #' Itemize table 
-itemize <- function(tbl, only_item = FALSE) {
+itemize <- function(tbl, header_of, only_item = FALSE) {
   itemize_ <- function(row, tbl) {
     vec2list <- function(vec) {
       vec <- vec %>%
-        rev() %>%
         rm_na() %>%
         rm_space()
-      list <- vector("list", length(vec))
+      olist <- vector("list", length(vec))
       for (i in seq_along(vec)) {
-        list[[i]] <- vec[i]
+        olist[[i]] <- vec[i]
       }
       lvec <- length(vec)
       if (lvec > 1) {
-        assertthat::assert_that(length(list) == lvec,
+        assertthat::assert_that(length(olist) == lvec,
                                 msg = "nrow differs between df and reference")
-        names(list) <- c("item", paste0("group", 1:(length(vec) - 1)))
+        names(olist) <- c(paste0("group", 1:(length(vec) - 1)), "item")
       } else {
-        names(list) <- "item"
+        names(olist) <- "item"
       }
-      list
+      olist
     }
     tbl %>%
        vectorize_row(row) %>%
        vec2list()
   }
+  if (header_of == "col") tbl <- t(tbl)
   out <- purrr::map_df(1:nrow(tbl), itemize_, tbl = tbl)
   if (only_item == TRUE) return(out$item)
   out
