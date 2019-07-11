@@ -12,6 +12,7 @@ rm_space <- function(x) {
 itemize <- function(tbl, header_of, only_item = FALSE) {
   itemize_ <- function(row, tbl) {
     vec2list <- function(vec) {
+      if (all(is.na(vec))) return(list(item = ""))
       vec <- vec %>%
         rm_na() %>%
         rm_space()
@@ -30,8 +31,8 @@ itemize <- function(tbl, header_of, only_item = FALSE) {
       olist
     }
     tbl %>%
-       vectorize_row(row) %>%
-       vec2list()
+      vectorize_row(row) %>%
+      vec2list()
   }
   if (header_of == "col") tbl <- t(tbl)
   out <- purrr::map_df(1:nrow(tbl), itemize_, tbl = tbl)
@@ -39,12 +40,36 @@ itemize <- function(tbl, header_of, only_item = FALSE) {
   out
 }
 
-tidy_rowhead <- function(df, range_header, into) {
-  bad <- df[, range_header] %>%
-    itemize(only_item = TRUE)
-  body <- df[, -range_header]
-
-  assertthat::assert_that(all(into$item == bad),
-                          msg = "Row header changed")
-  tibble::as_tibble(cbind(into[, seq(dim(into)[2],1)], body))
+tidy_header <- function(df, type, range, ideal = NULL) {
+  if (type == "row") {
+    header <- df[, range] %>%
+      itemize(header_of = "row") %>%
+      as.matrix()
+    body   <- df[, -(1:max(range))] %>%
+      as.matrix()
+    if (is.null(ideal)) {
+      tibble::as_tibble(cbind(header[, seq(dim(header)[2],1)], body))
+    } else {
+      header <- header[1:nrow(ideal), ]
+      body   <- body[1:nrow(ideal), ]
+      assertthat::assert_that(all(ideal$item == header[, "item"]),
+                              msg = "Row header changed")
+      tibble::as_tibble(cbind(ideal[, seq(dim(ideal)[2], 1)], body))
+    }
+  } else {
+    header <- df[range, ] %>%
+      itemize(header_of = "col") %>%
+      as.matrix()
+    body   <- df[-(1:max(range)), ] %>%
+      as.matrix()
+    if (is.null(ideal)) {
+      tibble::as_tibble(rbind(t(header[seq(1, dim(header)[1]), ]), body))
+    } else {
+      header <- header[, 1:ncol(ideal)]
+      body   <- body[, 1:ncol(ideal)]
+      assertthat::assert_that(all(ideal$item == header[, "item"]),
+                              msg = "Column header changed")
+      tibble::as_tibble(rbind(ideal[seq(1, dim(ideal)[1]), ], body))
+    }
+  }
 }
