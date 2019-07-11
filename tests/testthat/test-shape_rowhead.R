@@ -3,7 +3,7 @@ context("Test shapetools for merged headers")
 fname <- "nourin.xlsx"
 
 test_that("itemize works for row header", {
-  header <- readxl::read_excel(fname, sheet = "goodheader",
+  header <- readxl::read_excel(fname, sheet = "ideal",
                                range = "B10:F44", col_names = FALSE) %>%
     as.matrix()
 
@@ -17,7 +17,7 @@ test_that("itemize works for row header", {
 })
 
 test_that("itemize works for col header", {
-  header <- readxl::read_excel(fname, sheet = "goodheader",
+  header <- readxl::read_excel(fname, sheet = "ideal",
                                range = "H6:CM8", col_names = FALSE) %>%
     as.matrix()
   shaped <- itemize(header, header_of = "col")
