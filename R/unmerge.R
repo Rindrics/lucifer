@@ -1,33 +1,25 @@
-#' Fill NAs of merged columns by 'varname'
+#' Fill NAs of data frame by varname matched by regex
 #'
-#' @param row Row position of the cells to be filled by 'varname'
-#' @param regex Regex matches varname for filling
 #' @inheritParams make_rect
+#' @param along \code{row} or \code{col}, along which NAs of df are filled up
+#' @param pos Position of column or row to be processed
 #' @export
-unmerge_horiz <- function(df, row, regex = ".+") {
-  df         <- as.data.frame(df)
-  out        <- df
-  vars       <- df[row, ]
-  new_col    <- stringr::str_match(vars, regex) %>%
+fill_na <- function(df, along, pos) {
+  df  <- as.data.frame(df)
+  if (along == "v") {
+    vars <- dplyr::pull(df, pos)
+  } else {
+    vars <- df[pos, ]
+  }
+  newvec <- stringr::str_match(vars, ".+") %>%
     rep_na_rep()
-  out[row, ] <- new_col
-  out
-}
-
-#' Fill NAs of merged rows by 'varname'
-#'
-#' @param col Col position of the cells to be filled by 'varname'
-#' @param regex Regex matches varname for filling
-#' @inheritParams make_rect
-#' @export
-unmerge_vert <- function(df, col, regex = ".+") {
-  df         <- as.data.frame(df)
-  out        <- df
-  vars       <- dplyr::pull(df, col)
-  new_row    <- stringr::str_match(vars, regex) %>%
-    rep_na_rep()
-  out[, col] <- new_row
-  out
+  out    <- df
+  if (along == "v") {
+    out[, pos] <- newvec
+  } else {
+    out[pos, ] <- newvec
+  }
+  as.data.frame(out)
 }
 
 #' Merge colnames of multiple rows
