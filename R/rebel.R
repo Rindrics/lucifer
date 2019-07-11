@@ -48,11 +48,11 @@ rebel_sheet <- function(sheet, path,
   ## itemize(bad_rowhead, header_of = "row", only_item = TRUE)
   ## itemize(bad_colhead, header_of = "col", only_item = TRUE)
   
-  if (!is.null(col_header)) {
+  if (!is.null(col_header) && length(col_header) == 1) {
     out <- fill_na(out, along = "h", pos = col_header)
   }
 
-  if (!is.null(row_header)) {
+  if (!is.null(row_header) && length(row_header) == 1) {
     out <- fill_na(out, along = "v", pos = row_header) %>%
       merge_colname(rows = 1:(row_header + 1))
   }
