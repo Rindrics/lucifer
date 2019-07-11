@@ -1,19 +1,15 @@
 context("Test unmerge tools")
 
 test_that("unmerge_horiz() fill NAs of merged columns", {
-  merged  <- load_alldata("merged.xlsx", sheet = "Sheet1")
-  newname <- unmerge_horiz(merged, 1) %>%
-    dplyr::slice(1) %>%
-    unlist(use.names = FALSE)
-  expect_equal(newname, c(NA, rep("A1", 3), rep("E1", 4)))
-})
+  with_na  <- load_alldata("merged.xlsx", sheet = "Sheet1")
 
-test_that("unmerge_vert() fill NAs of merged rows", {
-  merged  <- load_alldata("merged.xlsx", sheet = "Sheet1")
-  newname <- unmerge_vert(merged, 1) %>%
-    dplyr::pull(1) %>%
-    as.vector()
-  expect_equal(newname, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
+  filled <- fill_na(with_na, along = "h", pos = 1)
+  expect_equal(vectorize_row(filled, 1), c(NA, rep("A1", 3), rep("E1", 4)))
+
+  filled <- fill_na(with_na, along = "v", pos = 1)
+  expect_equal(dplyr::pull(filled, 1) %>%
+               as.vector(),
+               c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
 })
 
 test_that("merge_colname() concatenates colnames in multiple rows", {
