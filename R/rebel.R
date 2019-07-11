@@ -1,8 +1,8 @@
 #' Rebel against godly Excel worksheet
 #'
 #' @inheritParams readxl::read_excel
-#' @param row_merged Row position of merged colnames
-#' @param col_merged Column position of merged rownames
+#' @param col_header Row position of colnames extend across rows
+#' @param row_header Column position of rownames extend accross colmns
 #' @param cluster List of parameters to control \code{\link{unclusterize}}.
 #'  \describe{
 #'    \item{dir}{direction of the cluster evolution either of
@@ -28,29 +28,33 @@
 #' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
 #' @param unfiscalize List of parameters to control \code{\link{unfiscalize}}
 #' @export
-rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
+rebel_sheet <- function(sheet, path,
+                        col_header = NULL, row_header = NULL,
                         cluster = NULL, row_type = NULL, col_type = NULL,
                         row_omit = NULL, col_omit = NULL,
                         unfiscalize = c(month_start = NULL, rule = NULL)) {
 
   out <- load_alldata(path, sheet = sheet)
 
-  ## if (length(row_merged) > 1) browser()
+  ## if (!is.null(row_header)) browser()
 
   ## out
-  ## cluster
-  ## row_merged
-  ## col_merged
-  ## bad_rowhead <- out[-(1:max(col_merged)), row_merged]
-  ## items <- itemize(bad_rowhead, only_item = TRUE)
+  ## col_header
+  ## row_header
+  ## out
+  ## bad_rowhead <- out[-(1:max(col_header)), row_header]
+  ## bad_colhead <- out[col_header, -row_header]
+  ## data.frame(bad_colhead)
+  ## itemize(bad_rowhead, header_of = "row", only_item = TRUE)
+  ## itemize(bad_colhead, header_of = "col", only_item = TRUE)
   
-  if (row_merged > 0) {
-    out <- unmerge_vert(out, col = row_merged)
+  if (!is.null(col_header)) {
+    out <- fill_na(out, along = "h", pos = col_header)
   }
 
-  if (col_merged > 0) {
-    out <- unmerge_horiz(out, row = col_merged) %>%
-      merge_colname(rows = 1:(col_merged + 1))
+  if (!is.null(row_header)) {
+    out <- fill_na(out, along = "v", pos = row_header) %>%
+      merge_colname(rows = 1:(row_header + 1))
   }
 
   if (is.null(cluster)) return(ceasefire(out, path, sheet, "cluster"))
@@ -132,7 +136,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @inheritParams rebel_sheet
 #' @param sheet_regex Regular expression to match sheetname
 #' @export
-rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
+rebel <- function(path, sheet_regex, col_header = NULL, row_header = NULL,
                   cluster = NULL, row_type = NULL, col_type = NULL,
                   row_omit = NULL, col_omit = NULL,
                   unfiscalize = c(month_start = NULL, rule = NULL)) {
@@ -141,7 +145,7 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
     stats::na.omit()
 
   out <- lapply(sheets, rebel_sheet, path = path,
-                row_merged = row_merged, col_merged = col_merged,
+                col_header = col_header, row_header = row_header,
                 cluster = cluster, row_type = row_type, col_type = col_type,
                 row_omit = row_omit, col_omit = col_omit, unfiscalize) %>%
           purrr::invoke(rbind, .)
