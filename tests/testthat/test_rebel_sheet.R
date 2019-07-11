@@ -4,7 +4,7 @@ test_that("rebel_sheet() beat up file with merged header", {
   fname <- "merged.xlsx"
   sheet <- "Sheet1"
   beaten <- rebel_sheet(path = fname, sheet = sheet,
-                        row_merged = 1, col_merged = 1,
+                        row_header = 1, col_header = 1,
                         cluster = list(dir = "v",
                                        regex = "NA_A2",
                                        pos = 1,
