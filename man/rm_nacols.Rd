@@ -4,7 +4,7 @@
 \alias{rm_nacols}
 \title{Remove column whose colname is NA}
 \usage{
-rm_nacols(df)
+rm_nacols(df, except = NULL)
 }
 \arguments{
 \item{df}{Data frame to be processed}
