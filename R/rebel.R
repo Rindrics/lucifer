@@ -32,21 +32,33 @@ rebel_sheet <- function(sheet, path,
                         col_header = NULL, row_header = NULL,
                         cluster = NULL, row_type = NULL, col_type = NULL,
                         row_omit = NULL, col_omit = NULL,
-                        unfiscalize = c(month_start = NULL, rule = NULL)) {
+                        unfiscalize = c(month_start = NULL, rule = NULL),
+                        ideal = NULL) {
 
   out <- load_alldata(path, sheet = sheet)
 
-  ## if (!is.null(row_header)) browser()
+  if (!is.null(row_header) && length(row_header) > 1) {
+    rows_colhead <- 1:max(col_header)
+    upperside    <- out[rows_colhead, ]
+    lowerside    <- out[-rows_colhead, ]
+    out <- tidy_header(df = lowerside,
+                       type = "row", range = row_header, ideal = ideal$row) %>%
+      as.matrix() %>%
+      rbind(as.matrix(upperside), .) %>%
+      as.data.frame(stringsAsFactors = FALSE)
+  }
 
-  ## out
-  ## col_header
-  ## row_header
-  ## out
-  ## bad_rowhead <- out[-(1:max(col_header)), row_header]
-  ## bad_colhead <- out[col_header, -row_header]
-  ## data.frame(bad_colhead)
-  ## itemize(bad_rowhead, header_of = "row", only_item = TRUE)
-  ## itemize(bad_colhead, header_of = "col", only_item = TRUE)
+  if (!is.null(col_header) && length(col_header) > 1) {
+    cols_rowhead <- 1:max(row_header)
+    rightside <- out[, -cols_rowhead]
+    leftside  <- out[, cols_rowhead]
+    out <- tidy_header(df = rightside,
+                       type = "col", range = col_header, ideal = ideal$col) %>%
+      as.matrix()
+    leftside <- leftside[rev(seq(nrow(out), by = -1, length.out = nrow(out))), ]
+    out <- cbind(as.matrix(leftside), out) %>%
+      as.data.frame(stringsAsFactors = FALSE)
+  }
   
   if (!is.null(col_header) && length(col_header) == 1) {
     out <- fill_na(out, along = "h", pos = col_header)
@@ -139,7 +151,8 @@ rebel_sheet <- function(sheet, path,
 rebel <- function(path, sheet_regex, col_header = NULL, row_header = NULL,
                   cluster = NULL, row_type = NULL, col_type = NULL,
                   row_omit = NULL, col_omit = NULL,
-                  unfiscalize = c(month_start = NULL, rule = NULL)) {
+                  unfiscalize = c(month_start = NULL, rule = NULL),
+                  ideal = NULL) {
 
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
@@ -147,7 +160,8 @@ rebel <- function(path, sheet_regex, col_header = NULL, row_header = NULL,
   out <- lapply(sheets, rebel_sheet, path = path,
                 col_header = col_header, row_header = row_header,
                 cluster = cluster, row_type = row_type, col_type = col_type,
-                row_omit = row_omit, col_omit = col_omit, unfiscalize) %>%
+                row_omit = row_omit, col_omit = col_omit, unfiscalize,
+                ideal = ideal) %>%
           purrr::invoke(rbind, .)
 
     if (is.null(cluster)) return(ceasefire(out, funcname = "cluster"))
