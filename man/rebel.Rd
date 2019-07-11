@@ -4,7 +4,7 @@
 \alias{rebel}
 \title{Rebel against godly Excel workbook}
 \usage{
-rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
+rebel(path, sheet_regex, col_header = NULL, row_header = NULL,
   cluster = NULL, row_type = NULL, col_type = NULL,
   row_omit = NULL, col_omit = NULL, unfiscalize = c(month_start =
   NULL, rule = NULL))
@@ -14,9 +14,9 @@ rebel(path, sheet_regex, row_merged = 0, col_merged = 0,
 
 \item{sheet_regex}{Regular expression to match sheetname}
 
-\item{row_merged}{Row position of merged colnames}
+\item{col_header}{Row position of colnames extend across rows}
 
-\item{col_merged}{Column position of merged rownames}
+\item{row_header}{Column position of rownames extend accross colmns}
 
 \item{cluster}{List of parameters to control \code{\link{unclusterize}}.
 \describe{
