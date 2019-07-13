@@ -129,7 +129,7 @@ test_that("rebel() beat up file contaminated by summary column", {
 })
 
 test_that("early return", {
- returned <- rebel(path = "sumcol_contami.xlsx", sheet_regex = "Sheet.")
+  returned <- rebel(path = "sumcol_contami.xlsx", sheet_regex = "Sheet.")
   expect_equal(colnames(returned)[1:3], paste0("(dir='v',pos=", 1:3, ")"))
   expect_equal(rownames(returned)[1:3], paste0("(dir='h',pos=", 1:3, ")"))
 })

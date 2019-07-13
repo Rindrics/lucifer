@@ -17,8 +17,6 @@ ceasefire(df, path = NULL, sheet = NULL, funcname, posnames = TRUE)
 
 \item{posnames}{If TRUE, row- and col- names are set to 'pos=' format for
 following cluster extraction}
-
-\item{fname}{File path to be used by \code{add_reference}}
 }
 \description{
 Make df with reference for early return
