@@ -27,12 +27,12 @@ ceasefire <- function(df, path = NULL, sheet = NULL,
   if (posnames == TRUE) {
     df %>%
       magrittr::set_colnames(paste0("(dir='v',pos=", 1:ncol(df), ")")) %>%
-      add_reference(path, sheet) %>%
+      add_reference(fname, sheet) %>%
       as.data.frame() %>%
       magrittr::set_rownames(paste0("(dir='h',pos=", 1:nrow(df), ")")) %T>%
       myhead() %>%
       return()
   } else {
-    add_reference(df, path, sheet)
+    add_reference(df, fname, sheet)
   }
 }

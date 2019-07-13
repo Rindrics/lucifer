@@ -9,6 +9,8 @@ ceasefire(df, path = NULL, sheet = NULL, funcname, posnames = TRUE)
 \arguments{
 \item{df}{Data frame to return}
 
+\item{path}{File path to be used by \code{add_reference}}
+
 \item{sheet}{Sheet name to be used by \code{add_reference}}
 
 \item{funcname}{Name of function to create message for user}
