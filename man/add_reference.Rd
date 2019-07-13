@@ -4,12 +4,12 @@
 \alias{add_reference}
 \title{Add columns 'fname' and 'sheet' to df}
 \usage{
-add_reference(df, fname = NULL, sheet = NULL)
+add_reference(df, path = NULL, sheet = NULL)
 }
 \arguments{
 \item{df}{Data frame to be processed}
 
-\item{fname}{String to add df as column 'fname'}
+\item{path}{String to add df as column 'fname'}
 
 \item{sheet}{String to add df as column 'sheet'}
 }

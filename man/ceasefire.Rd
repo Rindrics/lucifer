@@ -4,12 +4,12 @@
 \alias{ceasefire}
 \title{Make df with reference for early return}
 \usage{
-ceasefire(df, fname = NULL, sheet = NULL, funcname, posnames = TRUE)
+ceasefire(df, path = NULL, sheet = NULL, funcname, posnames = TRUE)
 }
 \arguments{
 \item{df}{Data frame to return}
 
-\item{fname}{File path to be used by \code{add_reference}}
+\item{path}{File path to be used by \code{add_reference}}
 
 \item{sheet}{Sheet name to be used by \code{add_reference}}
 
