@@ -14,7 +14,12 @@
 #' @importFrom magrittr %<>%
 #' @usage lhs \%<>\% rhs
 
-#' #' #' @name :=
+#' #' @name %T>%
+#' @keywords internal
+#' @export
+#' @importFrom magrittr %T>%
+
+#' @name :=
 #' @rdname unquoeq
 #' @keywords internal
 #' @export
