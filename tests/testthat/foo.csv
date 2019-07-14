@@ -1,0 +1,2 @@
+"nrow","ncol","colnames","params.object","params.path","params.sheet_regex","params.row_merged","params.col_merged","params.cluster.dir","params.cluster.pos","params.cluster.regex","params.cluster.offset","params.cluster.ends.row","params.cluster.ends.col","params.row_type","params.col_type.regex","params.col_type.newname","params.col_type.varname","params.unfiscalize.month_start","params.unfiscalize.rule"
+42,10,"NA_A2,A1_A2,A1_C2,A1_D2,E1_E2,E1_F2,E1_G2,E1_H2","merged","merged.xlsx","Sheet.",1,1,"h",1,"NA_A2","c(0, 0)","A16","E1_H2",NA,NA,NA,NA,NA,NA
