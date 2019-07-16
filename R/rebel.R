@@ -35,18 +35,6 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 
   out <- load_alldata(path, sheet = sheet)
 
-  if (!is.null(cluster)) {
-    out <- unclusterize(df = out, regex = cluster$regex,
-                        direction = cluster$dir,
-                        pos = cluster$pos, offset = cluster$offset,
-                        ends = cluster$ends, info = cluster$info)
-    if (cluster$dir == "v") {
-      out <- lapply(out, make_ascii, row = cluster$pos)
-    } else if (cluster$dir == "h") {
-      out <- lapply(out, make_ascii, col = cluster$pos)
-    }
-  }
-
   if (row_merged > 0) {
     out <- unmerge_vert(out, col = row_merged)
   }
@@ -56,18 +44,31 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
       merge_colname(rows = 1:(col_merged + 1))
   }
 
+  if (is.null(cluster)) return(ceasefire(out, path, sheet, "cluster"))
+
+  out <- unclusterize(df = out, regex = cluster$regex,
+                      direction = cluster$dir,
+                      pos = cluster$pos, offset = cluster$offset,
+                      ends = cluster$ends, info = cluster$info)
+  if (cluster$dir == "v") {
+    out <- lapply(out, make_ascii, row = cluster$pos)
+  } else if (cluster$dir == "h") {
+    out <- lapply(out, make_ascii, col = cluster$pos)
+  }
+
   if (!is.null(row_omit)) {
     out <- rm_matchrow(out,
-                     key = row_omit$key,
-                     colpos = row_omit$colpos,
-                     regex = row_omit$regex)
+                       key = row_omit$key,
+                       colpos = row_omit$colpos,
+                       regex = row_omit$regex)
   }
 
   if (!is.null(col_omit)) {
-    out <- rm_matchcol(out,
-                     key = col_omit$key,
-                     rowpos = col_omit$rowpos,
-                     regex = col_omit$regex)
+    out <- out %>%
+      lapply(rm_matchcol, key = col_omit$key,
+                       rowpos = col_omit$rowpos,
+                       regex = col_omit$regex) %>%
+      purrr::invoke(rbind, .)
   }
 
   if (is.list(out) & is.null(dim(out))) {
@@ -126,15 +127,16 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                   cluster = NULL, row_type = NULL, col_type = NULL,
                   row_omit = NULL, col_omit = NULL,
                   unfiscalize = c(month_start = NULL, rule = NULL)) {
+
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
-  out <- purrr::map_df(sheets, rebel_sheet, path = path,
-                       row_merged = row_merged,
-                       col_merged = col_merged,
-                       cluster = cluster,
-                       row_type = row_type,
-                       col_type = col_type,
-                       row_omit = row_omit, col_omit = col_omit,
-                       unfiscalize)
-  tibble::as_tibble(out)
+
+  out <- lapply(sheets, rebel_sheet, path = path,
+                row_merged = row_merged, col_merged = col_merged,
+                cluster = cluster, row_type = row_type, col_type = col_type,
+                row_omit = row_omit, col_omit = col_omit, unfiscalize) %>%
+          purrr::invoke(rbind, .)
+
+    if (is.null(cluster)) return(ceasefire(out, funcname = "cluster"))
+    tibble::as_tibble(out)
 }

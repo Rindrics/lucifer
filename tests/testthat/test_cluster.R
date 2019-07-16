@@ -189,3 +189,20 @@ test_that("separated info", {
                  paste0("value", 1:4), "separated_info.xlsx", "Sheet1"))
   expect_equal(dplyr::pull(data, 1), as.character(c(1:30, 121:150)))
 })
+
+test_that("offset(, -1) works correctly", {
+  data <- "hachinohe_ichiba.xls"  %>%
+    lucifer::rebel_sheet(sheet = "1008_若鷹",
+                         cluster = list(regex = "性別",
+                                        dir = "v",
+                                        pos = 2,
+                                        offset = c(0, -1),
+                                        ends = list(row = ".+",
+                                                    col = "^採鱗$"),
+                                        info = list(key_offset = c(-1, 1),
+                                                    key_dim = c(1, 7),
+                                                    value_offset = c(1, 1),
+                                                    value_dim = c(1, 7))))
+  expect_equal(colnames(data)[12], "漁獲年")
+  expect_equal("肥満度" %in% colnames(data), FALSE)
+})
