@@ -90,7 +90,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                        newname = col_type$newname,
                        varname = col_type$varname)
     if (col_type$newname == "month") {
-      out <- dplyr::mutate(out, month = stringr::str_remove(month, "\\D") %>%
+      out <- dplyr::mutate(out, month = make_ascii(month, numerize = TRUE) %>%
                              as.integer())
     }
   }
@@ -98,7 +98,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   if (!is.null(row_type)) {
     if (row_type == "Y") {
       colnames(out)[1] <- "year"
-      out <- dplyr::mutate(out, year = as.integer(year))
+      out <- dplyr::mutate(out, year = make_ascii(year, numerize = TRUE) %>%
+                             as.integer())
     }
     if (row_type == "fisY") {
       colnames(out)[1] <- "fisy"
