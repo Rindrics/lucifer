@@ -26,6 +26,7 @@ ensure_csv <- function(fname) {
 #' @param objnm Name of the Object choosen from 'object' column in param sheet
 #' @param tbl_fname Path to the parameter sheet
 #' @param reportf Name of the report file to export
+#' @export
 tbl2rebel <- function(objnm, tbl_fname, reportf = NULL) {
   params <- load_param(fname = tbl_fname)
   rebel(path = params$path, sheet_regex = params$sheet_regex,
