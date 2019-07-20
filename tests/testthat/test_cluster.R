@@ -262,3 +262,28 @@ test_that("position of scan starts correctly", {
                c("2019年", as.character(4489:4500),
                  "excels/miyagi.xlsx", "Sheet1"))
 })
+
+test_that("fight with NA colname", {
+  data <- rebel("excels/ibaraki.xlsx", sheet_regex = "Sheet1",
+                cluster = list(dir = "h",
+                               pos = 1,
+                               regex = "表2.+",
+                               offset = c(1, 1),
+                               ends = list(row = ".+",
+                                           col = "12")))
+  expect_equal(nrow(data), 155)
+  expect_equal(ncol(data), 15)
+  expect_equal(colnames(data), c("NA", as.character(1:12), "fname", "sheet"))
+
+  data <- rebel("excels/ibaraki.xlsx", sheet_regex = "Sheet1",
+                cluster = list(dir = "v",
+                               pos = 1,
+                               regex = "区分",
+                               offset = c(0, 1),
+                               ends = list(row = ".+",
+                                           col = "12")))
+  expect_equal(nrow(data), 155)
+  expect_equal(ncol(data), 15)
+  expect_equal(colnames(data), c("colname",
+                                 as.character(1:12), "fname", "sheet"))
+})
