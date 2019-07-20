@@ -72,7 +72,7 @@ test_that("rebel_sheet() beat iwate data up", {
                                          ends = list(row = row_regex,
                                                      col = "(1|１)(2|２)月")),
                           row_type = "Y",
-                          col_type = list(regex = "^1?[0-9]月",
+                          col_type = list(regex = "^(1|１)?.月",
                                           newname = "month",
                                           varname = "catch"))
 
@@ -143,7 +143,7 @@ test_that("dim = c(1, 1) info in saga", {
                                           col = "その他"),
                               info = list(value_offset = c(-1, 0),
                                           value_dim = c(1, 1)))) %>%
-    tidyr::separate(`NA`, sep = "年", into = c("year", "month")) %>%
+    tidyr::separate(colname, sep = "年", into = c("year", "month")) %>%
     dplyr::mutate(year = stringr::str_replace(year, "H", "平成") %>%
                     Nippon::wareki2AD(),
                   month = lucifer::make_ascii(month, numerize = TRUE) %>%
