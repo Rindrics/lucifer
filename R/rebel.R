@@ -74,11 +74,13 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   if (is.list(out) & is.null(dim(out))) {
     out <- out %>%
       lapply(headerize, row = 1) %>%
+      lapply(fill_colname_topleft) %>%
       purrr::invoke(dplyr::bind_rows, .) %>%
       rm_nacols() %>%
       add_reference(path, sheet)
   } else {
     out <- headerize(as.data.frame(out), row = 1) %>%
+      fill_colname_topleft() %>%
       rm_nacols() %>%
       tibble::as_tibble() %>%
       add_reference(path, sheet)
@@ -140,4 +142,12 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
 
     if (is.null(cluster)) return(ceasefire(out, funcname = "cluster"))
     tibble::as_tibble(out)
+}
+
+#' Coerce df topleft have namespace
+#'
+#' @param df data frame to be processed
+fill_colname_topleft <- function(df) {
+  if (!is.na(colnames(df)[1])) return(df)
+  magrittr::set_colnames(df, c("colname", colnames(df)[-1]))
 }
