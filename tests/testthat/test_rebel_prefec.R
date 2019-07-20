@@ -1,7 +1,7 @@
 context("Rebel prefectures using rebel()")
 
 test_that("rebel_sheet() beat aomori data up", {
-  fname <- "aomori.xlsx"
+  fname <- "excels/aomori.xlsx"
   sheet <- "マイワシ"
   year  <- 2019
   y_regex <- paste0("^", year)
@@ -59,7 +59,7 @@ test_that("rebel_sheet() beat aomori data up", {
 })
 
 test_that("rebel_sheet() beat iwate data up", {
-  fname <- "iwate.xls"
+  fname <- "excels/iwate.xls"
   sheet <- "マイワシ"
   year  <- 2018
   row_regex <- paste0("^", 2018)
@@ -82,7 +82,7 @@ test_that("rebel_sheet() beat iwate data up", {
 })
 
 test_that("duplicated column and fisY", {
-  fname <- "saga.xls"
+  fname <- "excels/saga.xls"
   year  <- 2016
   saga  <- fname %>%
     rebel(sheet_regex = "Sheet.",
@@ -123,7 +123,7 @@ test_that("duplicated column and fisY", {
 })
 
 test_that("dim = c(1, 1) info in saga", {
-  fname <- "saga2.xlsx"
+  fname <- "excels/saga2.xlsx"
   year  <- 2018
   regex_rend <- Nippon::jyear(year + 1) %>%
     stringr::str_replace("平成", "H") %>%
@@ -160,7 +160,7 @@ test_that("dim = c(1, 1) info in saga", {
 
 
 test_that("ehime", {
-  fname <- "ehime.xls"
+  fname <- "excels/ehime.xls"
   converted <- fname %>%
     lucifer::rebel(sheet_regex = "マサバ.+",
                    cluster = list(regex = "^年$",

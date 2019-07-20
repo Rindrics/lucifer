@@ -2,7 +2,7 @@ context("rebel data with zenkaku column")
 
 test_that("miyagi", {
   year <- 2019
-  miyagi <- rebel(path = "miyagi.xlsx", sheet_regex = "Sheet1",
+  miyagi <- rebel(path = "excels/miyagi.xlsx", sheet_regex = "Sheet1",
         cluster = list(dir = "h", pos = 1 , regex = ".+", offset = c(2,0),
                        ends = list(row = paste0(year,"年"), col = "１２月"),
                        info = list(value_offset = c(-1,0),

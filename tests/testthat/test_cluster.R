@@ -53,7 +53,7 @@ test_that("clusters distributed in row direction can be extracted", {
 })
 
 test_that("additional info can be appended to df", {
-  data  <- load_alldata("cluster_info.xlsx", sheet = "Sheet1")
+  data  <- load_alldata("excels/cluster_info.xlsx", sheet = "Sheet1")
   data2 <- extract_a_cluster(pos_key = 5, find_from = 1, direction = "row",
                              df = data, offset = c(0, 0),
                              ends = list(row = "5", col = "bar"),
@@ -115,7 +115,7 @@ test_that("clusters distributed in column direction can be extracted", {
 
 test_that("'dim' can be controled by variable", {
   year <- 2019
-  data <- load_alldata("clustered.xlsx", sheet = "repeated")
+  data <- load_alldata("excels/clustered.xlsx", sheet = "repeated")
   col2search <- 1
   data2 <- unclusterize(data, regex = "year", direction = "v",
                         pos = col2search,
@@ -149,7 +149,7 @@ test_that("'dim' can be controled by variable", {
 
 test_that("extract_culsters() throws an error", {
   col2search <- 1
-  data <- load_alldata("clustered.xlsx", sheet = "repeated")
+  data <- load_alldata("excels/clustered.xlsx", sheet = "repeated")
   expect_success(
     expect_error(unclusterize(data, regex = "year", direction = "v",
                               pos = col2search,
@@ -170,7 +170,7 @@ test_that("extract_culsters() throws an error", {
 })
 
 test_that("separated info", {
-  data <- "separated_info.xlsx" %>%
+  data <- "excels/separated_info.xlsx" %>%
     rebel(sheet_regex = "Sheet.",
           cluster = list(dir = "v",
                          regex = "head1",
@@ -186,12 +186,12 @@ test_that("separated info", {
                c(paste0("head", 1:4), paste0("key", 1:4), "fname", "sheet"))
   expect_equal(data[1, ] %>% vectorize_row(),
                c(1, 31, 61, 91,
-                 paste0("value", 1:4), "separated_info.xlsx", "Sheet1"))
+                 paste0("value", 1:4), "excels/separated_info.xlsx", "Sheet1"))
   expect_equal(dplyr::pull(data, 1), as.character(c(1:30, 121:150)))
 })
 
 test_that("offset(, -1) works correctly", {
-  data <- "hachinohe_ichiba.xls"  %>%
+  data <- "excels/hachinohe_ichiba.xls"  %>%
     lucifer::rebel_sheet(sheet = "1008_若鷹",
                          cluster = list(regex = "性別",
                                         dir = "v",

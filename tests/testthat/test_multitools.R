@@ -1,7 +1,7 @@
 context("Fights using multitools")
 
 test_that("Fight with maiwashi sheet of aomori catch data", {
-  df <- load_alldata("aomori.xlsx", sheet = "マイワシ")
+  df <- load_alldata("excels/aomori.xlsx", sheet = "マイワシ")
   converted <- df %>%
     unclusterize(regex = "^年", direction = "v",
                 pos = 1,
@@ -23,7 +23,7 @@ test_that("Fight with maiwashi sheet of aomori catch data", {
 })
 
 test_that("Fight with katakuchi sheet of aomori catch data", {
-  df <- load_alldata("aomori.xlsx", sheet = "カタクチ")
+  df <- load_alldata("excels/aomori.xlsx", sheet = "カタクチ")
   converted <- df %>%
     unclusterize(regex = "^年", direction = "v",
                  pos = 1,
@@ -45,7 +45,7 @@ test_that("Fight with katakuchi sheet of aomori catch data", {
 })
 
 test_that("Fight with 'masabahi' sheet of aomori catch data", {
-  df <- load_alldata("aomori.xlsx", sheet = "マサバ比  ")
+  df <- load_alldata("excels/aomori.xlsx", sheet = "マサバ比  ")
   hachinohe <- df %>%
     unclusterize(regex = "八戸", direction = "v",
                  pos = 1,
@@ -73,7 +73,7 @@ test_that("Fight with 'masabahi' sheet of aomori catch data", {
 })
 
 test_that("Fight with data from hachinohe ichiba", {
-  fname <- "hachinohe_ichiba.xls"
+  fname <- "excels/hachinohe_ichiba.xls"
   data <- load_alldata(fname, sheet = "0613") %>%
     unclusterize(regex = "標本番号", direction = "v",
                  pos = 1,
@@ -92,7 +92,7 @@ test_that("Fight with data from hachinohe ichiba", {
 test_that("Fight with 'maiwashi' sheet of iwate data", {
   year <- 2018
   row_regex <- paste0("^", year)
-  df <- load_alldata("iwate.xls", sheet = "マイワシ")
+  df <- load_alldata("excels/iwate.xls", sheet = "マイワシ")
 
   maiwashi <- df %>%
     unclusterize(regex = ".+によるマイワシ.+",
@@ -113,7 +113,7 @@ test_that("Fight with 'maiwashi' sheet of iwate data", {
 })
 
 test_that("Fight with duplicated column and fiscal year", {
-  saga <- load_alldata("saga.xls", sheet = "Sheet1") %>%
+  saga <- load_alldata("excels/saga.xls", sheet = "Sheet1") %>%
     unclusterize(regex = "年度", direction = "v",
                  pos = 1, offset = c(0, 0),
                  ends = list(row = "2016", col = "３月")) %>%
