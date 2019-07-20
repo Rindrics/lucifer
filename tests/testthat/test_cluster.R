@@ -210,10 +210,10 @@ test_that("offset(, -1) works correctly", {
 test_that("position of scan starts correctly", {
   saba <- lucifer::rebel(path = "excels/miyagi.xlsx",
                          sheet_regex = ".+",
-                         cluster = list(dir ="v",
+                         cluster = list(dir = "v",
                                         pos = 17,
                                         regex = "大中型|定置網|その他",
-                                        offset = c(1,0),
+                                        offset = c(1, 0),
                                         ends = list(row = "2019年$",
                                                     col = "１２月$")))
   expect_equal(nrow(saba), 25 * 3)
@@ -227,10 +227,10 @@ test_that("position of scan starts correctly", {
 
   maiwashi <- lucifer::rebel(path = "excels/miyagi.xlsx",
                              sheet_regex = ".+",
-                             cluster = list(dir ="v",
+                             cluster = list(dir = "v",
                                             pos = 33,
                                             regex = "大中型|定置網|その他",
-                                            offset = c(1,0),
+                                            offset = c(1, 0),
                                             ends = list(row = "2019年$",
                                                         col = "１２月$")))
   expect_equal(nrow(maiwashi), 25 * 3)
@@ -245,10 +245,10 @@ test_that("position of scan starts correctly", {
                  "excels/miyagi.xlsx", "Sheet1"))
   katakuchi <- lucifer::rebel(path = "excels/miyagi.xlsx",
                              sheet_regex = ".+",
-                             cluster = list(dir ="v",
+                             cluster = list(dir = "v",
                                             pos = 49,
                                             regex = "大中型|定置網|その他",
-                                            offset = c(1,0),
+                                            offset = c(1, 0),
                                             ends = list(row = "2019年$",
                                                         col = "１２月$")))
   expect_equal(nrow(katakuchi), 25 * 3)
