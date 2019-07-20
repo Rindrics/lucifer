@@ -206,3 +206,59 @@ test_that("offset(, -1) works correctly", {
   expect_equal(colnames(data)[12], "漁獲年")
   expect_equal("肥満度" %in% colnames(data), FALSE)
 })
+
+test_that("position of scan starts correctly", {
+  saba <- lucifer::rebel(path = "excels/miyagi.xlsx",
+                         sheet_regex = ".+",
+                         cluster = list(dir ="v",
+                                        pos = 17,
+                                        regex = "大中型|定置網|その他",
+                                        offset = c(1,0),
+                                        ends = list(row = "2019年$",
+                                                    col = "１２月$")))
+  expect_equal(nrow(saba), 25 * 3)
+  expect_equal(ncol(saba), 15)
+  expect_equal(vectorize_row(saba, 1),
+               c("1995年", as.character(1201:1212),
+                 "excels/miyagi.xlsx", "Sheet1"))
+  expect_equal(vectorize_row(saba, 75),
+               c("2019年", as.character(2089:2100),
+                 "excels/miyagi.xlsx", "Sheet1"))
+
+  maiwashi <- lucifer::rebel(path = "excels/miyagi.xlsx",
+                             sheet_regex = ".+",
+                             cluster = list(dir ="v",
+                                            pos = 33,
+                                            regex = "大中型|定置網|その他",
+                                            offset = c(1,0),
+                                            ends = list(row = "2019年$",
+                                                        col = "１２月$")))
+  expect_equal(nrow(maiwashi), 25 * 3)
+  expect_equal(ncol(maiwashi), 15)
+  maiwashi$年
+  saba$年
+  expect_equal(vectorize_row(maiwashi, 1),
+               c("1995年", as.character(2401:2412),
+                 "excels/miyagi.xlsx", "Sheet1"))
+  expect_equal(vectorize_row(maiwashi, 75),
+               c("2019年", as.character(3289:3300),
+                 "excels/miyagi.xlsx", "Sheet1"))
+  katakuchi <- lucifer::rebel(path = "excels/miyagi.xlsx",
+                             sheet_regex = ".+",
+                             cluster = list(dir ="v",
+                                            pos = 49,
+                                            regex = "大中型|定置網|その他",
+                                            offset = c(1,0),
+                                            ends = list(row = "2019年$",
+                                                        col = "１２月$")))
+  expect_equal(nrow(katakuchi), 25 * 3)
+  expect_equal(ncol(katakuchi), 15)
+  katakuchi$年
+  saba$年
+  expect_equal(vectorize_row(katakuchi, 1),
+               c("1995年", as.character(3601:3612),
+                 "excels/miyagi.xlsx", "Sheet1"))
+  expect_equal(vectorize_row(katakuchi, 75),
+               c("2019年", as.character(4489:4500),
+                 "excels/miyagi.xlsx", "Sheet1"))
+})
