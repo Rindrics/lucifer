@@ -51,9 +51,9 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                       pos = cluster$pos, offset = cluster$offset,
                       ends = cluster$ends, info = cluster$info)
   if (cluster$dir == "v") {
-    out <- lapply(out, make_ascii, row = cluster$pos)
+    out <- lapply(out, make_ascii, col = 1)
   } else if (cluster$dir == "h") {
-    out <- lapply(out, make_ascii, col = cluster$pos)
+    out <- lapply(out, make_ascii, row = 1)
   }
 
   if (!is.null(row_omit)) {
@@ -68,13 +68,13 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
       lapply(rm_matchcol, key = col_omit$key,
                        rowpos = col_omit$rowpos,
                        regex = col_omit$regex) %>%
-      purrr::invoke(rbind, .)
+      purrr::invoke(dplyr::bind_rows, .)
   }
 
   if (is.list(out) & is.null(dim(out))) {
     out <- out %>%
       lapply(headerize, row = 1) %>%
-      purrr::invoke(rbind, .) %>%
+      purrr::invoke(dplyr::bind_rows, .) %>%
       rm_nacols() %>%
       add_reference(path, sheet)
   } else {
@@ -90,7 +90,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                        newname = col_type$newname,
                        varname = col_type$varname)
     if (col_type$newname == "month") {
-      out <- dplyr::mutate(out, month = stringr::str_remove(month, "\\D") %>%
+      out <- dplyr::mutate(out, month = make_ascii(month, numerize = TRUE) %>%
                              as.integer())
     }
   }
@@ -98,7 +98,8 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   if (!is.null(row_type)) {
     if (row_type == "Y") {
       colnames(out)[1] <- "year"
-      out <- dplyr::mutate(out, year = as.integer(year))
+      out <- dplyr::mutate(out, year = make_ascii(year, numerize = TRUE) %>%
+                             as.integer())
     }
     if (row_type == "fisY") {
       colnames(out)[1] <- "fisy"
@@ -135,7 +136,7 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
                 row_merged = row_merged, col_merged = col_merged,
                 cluster = cluster, row_type = row_type, col_type = col_type,
                 row_omit = row_omit, col_omit = col_omit, unfiscalize) %>%
-          purrr::invoke(rbind, .)
+          purrr::invoke(dplyr::bind_rows, .)
 
     if (is.null(cluster)) return(ceasefire(out, funcname = "cluster"))
     tibble::as_tibble(out)

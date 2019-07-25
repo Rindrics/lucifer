@@ -269,9 +269,10 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
     col <- find_from + cofst
     maxrow <- locate_matchend(dplyr::pull(df, col)[row:nrow(df)],
                               ends[["row"]]) + row - 1
-    maxcol <- locate_matchend(vectorize_row(df, row), ends[["col"]])
-    nrow <- maxrow - pos_key - rofst + 1
-    ncol <- maxcol - cofst - (find_from - 1)
+    maxcol <- locate_matchend(vectorize_row(df, row)[find_from:ncol(df)],
+                              ends[["col"]])
+    nrow <- maxrow - row + 1
+    ncol <- maxcol - cofst
   } else {
     row <- find_from + rofst
     col <- pos_key + cofst
@@ -282,7 +283,8 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
     ncol <- maxcol - pos_key - cofst + 1
   }
 
-  out <- df[row:(row + nrow - 1), col:(col + ncol - 1)]
+  out <- df[row:(row + nrow - 1), col:(col + ncol - 1)] %>%
+    make_ascii(row = 1)
 
   if (offset[1] == -1 && offset[2] == 0) {
     out[1, 1] <- out[2, 1]
@@ -340,7 +342,7 @@ unclusterize <- function(df, regex, direction, pos,
                offset = offset, ends = ends, info = info)
   } else {
     warning("Set 'direction' correctly")
-    return(df)
+    df
   }
 }
 

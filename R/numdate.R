@@ -68,7 +68,7 @@ stdz_date <- function(x, year) {
   switch(format,
          "heisei" = {
            split  <- lucifer::split_jpdate(x)
-           year <- paste0(split$era, split$year, "年") %>%
+           year <- paste0(split$era, split$year, "U+5E74") %>%
              Nippon::wareki2AD()
            date <-
              lubridate::ymd(paste(year, split$month, split$day, sep = "-"))

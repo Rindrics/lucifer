@@ -13,7 +13,7 @@ test_that("make_rect() makes weired df into rectangular shape", {
 })
 
 test_that("unmerge_horiz() fill NAs of merged columns", {
-  merged  <- load_alldata("merged.xlsx", sheet = "Sheet1")
+  merged  <- load_alldata("excels/merged.xlsx", sheet = "Sheet1")
   newname <- unmerge_horiz(merged, 1) %>%
     dplyr::slice(1) %>%
     unlist(use.names = FALSE)
@@ -21,7 +21,7 @@ test_that("unmerge_horiz() fill NAs of merged columns", {
 })
 
 test_that("unmerge_vert() fill NAs of merged rows", {
-  merged  <- load_alldata("merged.xlsx", sheet = "Sheet1")
+  merged  <- load_alldata("excels/merged.xlsx", sheet = "Sheet1")
   newname <- unmerge_vert(merged, 1) %>%
     dplyr::pull(1) %>%
     as.vector()
@@ -40,7 +40,7 @@ test_that("append_info() append information stored in a list to df as column", {
 })
 
 test_that("rm_matchrow() remove summary rows from df", {
-  contami <- load_alldata("sumrow_contami.xlsx", sheet = "Sheet1")
+  contami <- load_alldata("excels/sumrow_contami.xlsx", sheet = "Sheet1")
   expect_equal(rm_matchrow(contami, key = "sum", colpos = 1, regex = FALSE) %>%
                  dplyr::pull(1),
                c(paste0("A", c(1:10, 12:20, 22:30))))
@@ -50,7 +50,7 @@ test_that("rm_matchrow() remove summary rows from df", {
 })
 
 test_that("rm_matchcol() remove summary cols from df", {
-  contami <- load_alldata("sumcol_contami.xlsx", sheet = "Sheet1")
+  contami <- load_alldata("excels/sumcol_contami.xlsx", sheet = "Sheet1")
   expect_equal(rm_matchcol(contami, key = "sum", rowpos = 1, regex = FALSE) %>%
                  dplyr::slice(1) %>%
                  unlist() %>%
@@ -66,7 +66,7 @@ test_that("rm_matchcol() remove summary cols from df", {
 })
 
 test_that("merge_colname() concatenates colnames in multiple rows", {
-  multi  <- load_alldata("multi_colnames.xlsx", sheet = "Sheet1")
+  multi  <- load_alldata("excels/multi_colnames.xlsx", sheet = "Sheet1")
   expect_equal(merge_colname(multi, 1:3)[1, ] %>%
                  unlist() %>%
                  as.vector(),
@@ -89,7 +89,7 @@ test_that("merge_colname() concatenates colnames in multiple rows", {
 })
 
 test_that("make_ascii() convert full-width numbers into ASCII numbers", {
-  zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1")
+  zenkaku  <- load_alldata("excels/fullwidth.xlsx", sheet = "Sheet1")
   expect_equal(make_ascii(zenkaku, row = 2) %>% vectorize_row(2),
                c("1", "11", "21", "311", "11", "1月", "1トン"))
   expect_equal(make_ascii(zenkaku, row = 2, numerize = TRUE) %>%
@@ -127,7 +127,7 @@ test_that("make_ascii() convert full-width numbers into ASCII numbers", {
 })
 
 test_that("make_ascii() handle df with NA", {
-  zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1")
+  zenkaku  <- load_alldata("excels/fullwidth.xlsx", sheet = "Sheet1")
   zenkaku[1, 1] <- NA
   expect_equal(make_ascii(zenkaku, row = 1, headerized = FALSE) %>%
                vectorize_row(1),
@@ -136,7 +136,7 @@ test_that("make_ascii() handle df with NA", {
 })
 
 test_that("make_ascii() handle headerized df", {
-  zenkaku  <- load_alldata("fullwidth.xlsx", sheet = "Sheet1") %>%
+  zenkaku  <- load_alldata("excels/fullwidth.xlsx", sheet = "Sheet1") %>%
     headerize(1)
   expect_equal(make_ascii(zenkaku, row = 1, headerized = TRUE) %>%
                  vectorize_row(1),
@@ -198,7 +198,7 @@ test_that("gather_cols() gather ycol data correctly", {
 })
 
 test_that("sheet2var() convert sheetname to variable", {
-  data <- load_alldata("sheetname.xlsx", sheet = "foo") %>%
+  data <- load_alldata("excels/sheetname.xlsx", sheet = "foo") %>%
     headerize(1) %>%
     structure(sheetname = "foo")
   conv <- sheet2var(data, as = "misc")

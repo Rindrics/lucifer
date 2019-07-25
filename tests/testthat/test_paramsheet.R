@@ -71,5 +71,5 @@ test_that("tbl2rebel rebels bad data driven by paramsheet", {
   )
   expect_setequal(vectorize_row(res, 1),
                   c("A2", paste0(LETTERS[c(1, 3:8)], 3),
-                    "merged.xlsx", "Sheet1"))
+                    "excels/merged.xlsx", "Sheet1"))
 })
