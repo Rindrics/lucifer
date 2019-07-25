@@ -283,7 +283,8 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
     ncol <- maxcol - pos_key - cofst + 1
   }
 
-  out <- df[row:(row + nrow - 1), col:(col + ncol - 1)]
+  out <- df[row:(row + nrow - 1), col:(col + ncol - 1)] %>%
+    make_ascii(row = 1)
 
   if (offset[1] == -1 && offset[2] == 0) {
     out[1, 1] <- out[2, 1]
