@@ -62,7 +62,7 @@ test_that("rebel_sheet() beat iwate data up", {
   fname <- "excels/iwate.xls"
   sheet <- "マイワシ"
   year  <- 2018
-  row_regex <- paste0("^", 2018)
+  row_regex <- paste0("^", year, "")
 
   maiwashi <- rebel_sheet(path = fname, sheet = sheet,
                           cluster = list(dir = "v",
@@ -70,15 +70,16 @@ test_that("rebel_sheet() beat iwate data up", {
                                          regex = ".+によるマイワシ.+",
                                          offset = c(2, 0),
                                          ends = list(row = row_regex,
-                                                     col = "(1|１)(2|２)月")),
+                                                     col = "(1|１)(2|２)月$")),
                           row_type = "Y",
-                          col_type = list(regex = "^(1|１)?.月",
+                          col_type = list(regex = "^(1|１)?.月$",
                                           newname = "month",
                                           varname = "catch"))
 
   expect_equal(unique(maiwashi$year), 1968:2018)
   expect_equal(unique(maiwashi$month), 1:12)
   expect_setequal(unique(maiwashi$catch), as.character(1:1224))
+  expect_equal(nrow(maiwashi), 1224)
 })
 
 test_that("duplicated column and fisY", {
@@ -143,7 +144,7 @@ test_that("dim = c(1, 1) info in saga", {
                                           col = "その他"),
                               info = list(value_offset = c(-1, 0),
                                           value_dim = c(1, 1)))) %>%
-    tidyr::separate(colname, sep = "年", into = c("year", "month")) %>%
+    tidyr::separate(`NA`, sep = "年", into = c("year", "month")) %>%
     dplyr::mutate(year = stringr::str_replace(year, "H", "平成") %>%
                     Nippon::wareki2AD(),
                   month = lucifer::make_ascii(month, numerize = TRUE) %>%

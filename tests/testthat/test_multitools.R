@@ -16,7 +16,7 @@ test_that("Fight with maiwashi sheet of aomori catch data", {
     rm_nacols() %>%
     gather_cols(regex = "1?[0-9]月",
                 newname = "month", varname = "catch")
-  expect_equal(colnames(converted), c("年／月", "漁法", "month", "catch"))
+  expect_equal(colnames(converted), c("年/月", "漁法", "month", "catch"))
   expect_equal(unique(converted$漁法), c("まき網漁業", "定置網漁業（底建網含む）"))
   expect_equal(unique(converted$month), paste0(1:12, "月"))
   expect_setequal(converted$catch, as.character(seq(1, 39 * 24)))
@@ -38,7 +38,7 @@ test_that("Fight with katakuchi sheet of aomori catch data", {
     rm_nacols() %>%
     gather_cols(regex = "1?[0-9]月",
                 newname = "month", varname = "catch")
-  expect_equal(colnames(converted), c("年／月", "漁法", "month", "catch"))
+  expect_equal(colnames(converted), c("年/月", "漁法", "month", "catch"))
   expect_equal(unique(converted$漁法), c("まき網漁業", "定置網漁業（底建網含む）"))
   expect_equal(unique(converted$month), paste0(1:12, "月"))
   expect_setequal(converted$catch, as.character(seq(1, 39 * 24)))
