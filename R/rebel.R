@@ -51,9 +51,9 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
                       pos = cluster$pos, offset = cluster$offset,
                       ends = cluster$ends, info = cluster$info)
   if (cluster$dir == "v") {
-    out <- lapply(out, make_ascii, row = cluster$pos)
+    out <- lapply(out, make_ascii, col = 1)
   } else if (cluster$dir == "h") {
-    out <- lapply(out, make_ascii, col = cluster$pos)
+    out <- lapply(out, make_ascii, row = 1)
   }
 
   if (!is.null(row_omit)) {

@@ -11,7 +11,7 @@ test_that("colname", {
       expect)))
   }
 
-  test_reference_output(path = "YrowMcol.xlsx", sheet = "Sheet1",
+  test_reference_output(path = "excels/YrowMcol.xlsx", sheet = "Sheet1",
                         expect = c("year", paste0("X", 1:12), "fname", "sheet"))
 })
 

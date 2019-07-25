@@ -1,2 +1,2 @@
 object,path,sheet_regex,row_merged,col_merged,cluster/dir,cluster/pos,cluster/regex,cluster/offset,cluster/ends/row,cluster/ends/col,row_type,col_type/regex,col_type/newname,col_type/varname,unfiscalize/month_start,unfiscalize/rule
-merged,merged.xlsx,Sheet.,1,1,h,1,NA_A2,"0, 0",A16,E1_H2,,,,,,
+merged,excels/merged.xlsx,Sheet.,1,1,h,1,NA_A2,"0, 0",A16,E1_H2,,,,,,

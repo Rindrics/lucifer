@@ -1,7 +1,7 @@
 context("Rebel against godly Excel sheet")
 
 test_that("rebel_sheet() beat up file with merged header", {
-  fname <- "merged.xlsx"
+  fname <- "excels/merged.xlsx"
   sheet <- "Sheet1"
   beaten <- rebel_sheet(path = fname, sheet = sheet,
                         row_merged = 1, col_merged = 1,
@@ -19,7 +19,7 @@ test_that("rebel_sheet() beat up file with merged header", {
 })
 
 test_that("rebel_sheet() beat up file with clustered data", {
-  beaten <- rebel_sheet(path = "clustered.xlsx", sheet = "foo",
+  beaten <- rebel_sheet(path = "excels/clustered.xlsx", sheet = "foo",
                         cluster = list(dir = "h",
                                        pos = 1,
                                        regex = "...",
@@ -33,7 +33,7 @@ test_that("rebel_sheet() beat up file with clustered data", {
   expect_equal(dplyr::pull(beaten, 4),
                as.character(c(62, 63, 72, 73, 82, 83, 92, 93)))
 
-  beaten <- rebel_sheet(path = "clustered.xlsx", sheet = "foo",
+  beaten <- rebel_sheet(path = "excels/clustered.xlsx", sheet = "foo",
                         cluster = list(dir = "h",
                                        pos = 1,
                                        regex = "b..",
@@ -45,7 +45,7 @@ test_that("rebel_sheet() beat up file with clustered data", {
 })
 
 test_that("rebel_sheet() beat up file with YrowMcol data", {
-  beaten <- rebel_sheet(path = "YrowMcol.xlsx", sheet = "Sheet1",
+  beaten <- rebel_sheet(path = "excels/YrowMcol.xlsx", sheet = "Sheet1",
                         cluster = list(regex = "year",
                                        dir = "v",
                                        pos = 1,
@@ -64,7 +64,7 @@ test_that("rebel_sheet() beat up file with YrowMcol data", {
 })
 
 test_that("rebel_sheet() beat up file contaminated by summary column", {
-  beaten <- rebel_sheet(path = "sumcol_contami.xlsx", sheet = "Sheet1",
+  beaten <- rebel_sheet(path = "excels/sumcol_contami.xlsx", sheet = "Sheet1",
                         cluster = list(regex = "^A1$",
                                        dir = "v",
                                        pos = 1,
@@ -81,7 +81,7 @@ test_that("rebel_sheet() beat up file contaminated by summary column", {
 })
 
 test_that("rebel_sheet() beat up file contaminated by summary row", {
-  beaten <- rebel_sheet(path = "sumrow_contami.xlsx", sheet = "Sheet1",
+  beaten <- rebel_sheet(path = "excels/sumrow_contami.xlsx", sheet = "Sheet1",
                         cluster = list(regex = "A1$",
                                        dir = "v",
                                        pos = 1,
@@ -98,7 +98,7 @@ test_that("rebel_sheet() beat up file contaminated by summary row", {
 })
 
 test_that("early return works correctly", {
-  data <- rebel_sheet(path = "sumrow_contami.xlsx",
+  data <- rebel_sheet(path = "excels/sumrow_contami.xlsx",
                       sheet = "Sheet1")
   expect_setequal(dplyr::pull(data, 1),
                   c("sum", "sum", paste0("A", c(1:10, 12:20, 22:30))))
