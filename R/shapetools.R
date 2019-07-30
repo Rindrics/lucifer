@@ -60,13 +60,16 @@ fill_colhead <- function(df, rows = 1, regex = ".+") {
 #' @param regex Regex matches varname for filling
 #' @inheritParams make_rect
 #' @export
-unmerge_vert <- function(df, col, regex = ".+") {
-  out        <- df
-  vars       <- dplyr::pull(df, col)
-  new_row    <- stringr::str_match(vars, regex) %>%
-    rep_na_rep()
-  out[, col] <- new_row
-  out
+fill_rowhead <- function(df, cols = 1, regex = ".+") {
+  fill_rowhead_ <- function(col, df, regex) {
+    stringr::str_match(dplyr::pull(df, col), regex) %>%
+      rep_na_rep() %>%
+      as.data.frame(stringsAsFactors = FALSE) %>%
+      magrittr::set_colnames(colnames(df)[col])
+  }
+  tibble::as_tibble(dplyr::bind_cols(purrr::map_dfc(cols, fill_rowhead_,
+                                                df = df, regex = regex),
+                                     df[, -cols]))
 }
 
 #' Gather columns to variable

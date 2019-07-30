@@ -36,7 +36,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   out <- load_alldata(path, sheet = sheet)
 
   if (row_merged > 0) {
-    out <- unmerge_vert(out, col = row_merged)
+    out <- fill_rowhead(out, col = row_merged)
   }
 
   if (col_merged > 0) {

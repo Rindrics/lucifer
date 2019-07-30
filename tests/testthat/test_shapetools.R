@@ -20,13 +20,37 @@ test_that("unmerge_horiz() fill NAs of merged columns", {
   expect_equal(newname, c(NA, rep("A1", 3), rep("E1", 4)))
 })
 
-test_that("unmerge_vert() fill NAs of merged rows", {
-  merged  <- load_alldata("excels/merged.xlsx", sheet = "Sheet1")
-  newname <- unmerge_vert(merged, 1) %>%
+test_that("fill_rowhead() fill NAs of merged rows", {
+  merged <- load_alldata("merged.xlsx", sheet = "Sheet1")
+  newcol <- fill_rowhead(merged, cols = 1) %>%
     dplyr::pull(1) %>%
     as.vector()
-  expect_equal(newname, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
+  expect_equal(newcol, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
 })
+
+test_that("fill_rowhead() fill NAs of multiple merged rows", {
+  merged <- load_alldata("multi_merged.xlsx", sheet = "Sheet1")
+
+  col1 <- fill_rowhead(merged, cols = 1:3) %>%
+    dplyr::pull(1) %>%
+    as.vector()
+  expect_equal(col1, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
+
+  col2 <- fill_rowhead(merged, cols = 1:3) %>%
+    dplyr::pull(2) %>%
+    as.vector()
+  expect_equal(col2, c("A1", "A2", rep("A3", 3), rep("A6", 4), rep("A10", 3),
+                       rep("A13", 3), rep("A16", 4), rep("A20", 4)))
+
+  col3 <- fill_rowhead(merged, cols = 1:3) %>%
+    dplyr::pull(3) %>%
+    as.vector()
+  expect_equal(col3,
+               c(rep(NA, 2), "C3", rep("C4", 2), rep("C6", 2),
+                 rep("C8", 2), rep("C10", 2), "C12", rep("C13", 2), "C15",
+                 rep("C16", 2), rep("C18", 2), rep("C20", 2), rep("C22", 2)))
+})
+
 test_that("append_info() append information stored in a list to df as column", {
 
   info  <- list(foo = 1, bar = 2, baz = 3)
