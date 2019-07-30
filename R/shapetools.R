@@ -35,19 +35,23 @@ append_info <- function(df, info, headerized = FALSE) {
   cbind(df, df_info)
 }
 
-#' Fill NAs of merged columns by 'varname'
+#' Fill NAs of merged column headers by left element
 #'
-#' @param row Row position of the cells to be filled by 'varname'
+#' @param rows Row positions of the cells to be processed
 #' @param regex Regex matches varname for filling
 #' @inheritParams make_rect
 #' @export
-unmerge_horiz <- function(df, row, regex = ".+") {
-  out        <- df
-  vars       <- df[row, ]
-  new_col    <- stringr::str_match(vars, regex) %>%
-    rep_na_rep()
-  out[row, ] <- new_col
-  out
+fill_colhead <- function(df, rows = 1, regex = ".+") {
+  fill_colhead_ <- function(row, df, regex) {
+    stringr::str_match(df[row, ], regex) %>%
+      rep_na_rep() %>%
+      t() %>%
+      as.data.frame(stringsAsFactors = FALSE) %>%
+      magrittr::set_colnames(colnames(df))
+  }
+  tibble::as_tibble(dplyr::bind_rows(purrr::map_df(rows, fill_colhead_,
+                                                   df = df, regex = regex),
+                                     df[-rows, ]))
 }
 
 #' Fill NAs of merged rows by 'varname'

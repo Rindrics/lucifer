@@ -40,7 +40,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
   }
 
   if (col_merged > 0) {
-    out <- unmerge_horiz(out, row = col_merged) %>%
+    out <- fill_colhead(out, rows = col_merged) %>%
       merge_colname(rows = 1:(col_merged + 1))
   }
 
