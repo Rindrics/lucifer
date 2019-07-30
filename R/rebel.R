@@ -33,16 +33,10 @@ rebel_sheet <- function(sheet, path, row_headers = NULL, col_headers = NULL,
                         row_omit = NULL, col_omit = NULL,
                         unfiscalize = c(month_start = NULL, rule = NULL)) {
 
-  out <- load_alldata(path, sheet = sheet)
-
-  if (row_merged > 0) {
-    out <- fill_rowhead(out, cols = row_merged)
-  }
-
-  if (col_merged > 0) {
-    out <- fill_colhead(out, rows = col_merged) %>%
-      merge_colname(rows = 1:(col_merged + 1))
-  }
+  out <- load_alldata(path, sheet = sheet) %>%
+    fill_rowhead(cols = row_headers) %>%
+    fill_colhead(rows = col_headers) %>%
+    merge_colname(rows = col_headers)
 
   if (is.null(cluster)) return(ceasefire(out, path, sheet, "cluster"))
 
