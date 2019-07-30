@@ -51,6 +51,18 @@ test_that("fill_rowhead() fill NAs of multiple merged rows", {
                  rep("C16", 2), rep("C18", 2), rep("C20", 2), rep("C22", 2)))
 })
 
+test_that("handle data with multiple merged col and row headers", {
+  merged <- load_alldata("multi_merged.xlsx", sheet = "Sheet1")
+
+  foo <- merged %>%
+    fill_rowhead(cols = 1:3) %>%
+    fill_colhead(rows = 1:3)
+  bar <- merged %>%
+    fill_colhead(rows = 1:3) %>%
+    fill_rowhead(cols = 1:3)
+  expect_equal(foo, bar)
+})
+
 test_that("append_info() append information stored in a list to df as column", {
 
   info  <- list(foo = 1, bar = 2, baz = 3)
