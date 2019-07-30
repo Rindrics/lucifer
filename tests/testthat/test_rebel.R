@@ -3,7 +3,7 @@ context("Rebel against godly Excel workbook")
 test_that("rebel() beat up file with merged header", {
   fname <- "excels/merged.xlsx"
   beaten <- rebel(path = fname, sheet_regex = "Sheet.",
-                  row_merged = 1, col_merged = 1,
+                  row_headers = 1:2, col_headers = 1:2,
                   cluster = list(regex = "NA_A2",
                                  dir = "h",
                                  pos = 1,
