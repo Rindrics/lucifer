@@ -86,23 +86,6 @@ rm_matchcol <- function(df, key, rowpos, regex) {
   }
 }
 
-#' Merge colnames of multiple rows
-#'
-#' @param rows Rows of the target colnames to be concatenated
-#' @param cols Numbers of target columns if given
-#' @inheritParams make_rect
-#' @export
-merge_colname <- function(df, rows, cols = NULL) {
-  cname   <- df[rows[1], ]
-  nocname <- df[-rows, ]
-  if (is.null(cols)) {
-    cols <- 1:ncol(df)
-  }
-  cname[cols] <- purrr::map(cols, paste_rows, rows, df) %>%
-  stringr::str_remove_all("_\\s|_NA")
-  rbind(cname, nocname)
-}
-
 #' Convert full-width numbers in df into ASCII numbers
 #'
 #' @param x Data frame or vector to be processed

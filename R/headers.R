@@ -34,3 +34,17 @@ fill_rowhead <- function(df, cols = 1, regex = ".+") {
                                                 df = df, regex = regex),
                                      df[, -cols]))
 }
+
+#' Merge colnames of multiple rows
+#'
+#' @param rows Rows of the target colnames to be concatenated
+#' @inheritParams make_rect
+#' @export
+merge_colname <- function(df, rows = NULL) {
+  if (is.null(rows) || length(rows) == 1) return(df)
+  header <- df[rows[1], ]
+  body   <- df[-rows, ]
+  header <- purrr::map(1:ncol(df), paste_rows, rows, df) %>%
+  stringr::str_remove_all("_\\s|_NA")
+  rbind(header, body)
+}
