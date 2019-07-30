@@ -1,14 +1,14 @@
 context("cleanse row|col headers")
 
 test_that("fill_colhead() fill NAs of merged columns", {
-  merged  <- load_alldata("merged.xlsx", sheet = "Sheet1")
+  merged  <- load_alldata("excels/merged.xlsx", sheet = "Sheet1")
   newrow <- fill_colhead(merged, 1) %>%
     vectorize_row(1)
   expect_equal(newrow, c(NA, rep("A1", 3), rep("E1", 4)))
 })
 
 test_that("fill_colhead() fill NAs of multiple merged columns", {
-  merged  <- load_alldata("multi_merged.xlsx", sheet = "Sheet1")
+  merged  <- load_alldata("excels/multi_merged.xlsx", sheet = "Sheet1")
   row1 <- fill_colhead(merged, 1:3) %>%
     vectorize_row(1)
   expect_equal(row1, c(NA, rep("A1", 3), rep("E1", 4)))
@@ -23,7 +23,7 @@ test_that("fill_colhead() fill NAs of multiple merged columns", {
 })
 
 test_that("fill_rowhead() fill NAs of merged rows", {
-  merged <- load_alldata("merged.xlsx", sheet = "Sheet1")
+  merged <- load_alldata("excels/merged.xlsx", sheet = "Sheet1")
   newcol <- fill_rowhead(merged, cols = 1) %>%
     dplyr::pull(1) %>%
     as.vector()
@@ -31,7 +31,7 @@ test_that("fill_rowhead() fill NAs of merged rows", {
 })
 
 test_that("fill_rowhead() fill NAs of multiple merged rows", {
-  merged <- load_alldata("multi_merged.xlsx", sheet = "Sheet1")
+  merged <- load_alldata("excels/multi_merged.xlsx", sheet = "Sheet1")
 
   col1 <- fill_rowhead(merged, cols = 1:3) %>%
     dplyr::pull(1) %>%
@@ -54,7 +54,7 @@ test_that("fill_rowhead() fill NAs of multiple merged rows", {
 })
 
 test_that("handle data with multiple merged col and row headers", {
-  merged <- load_alldata("multi_merged.xlsx", sheet = "Sheet1")
+  merged <- load_alldata("excels/multi_merged.xlsx", sheet = "Sheet1")
 
   foo <- merged %>%
     fill_rowhead(cols = 1:3) %>%
@@ -66,7 +66,7 @@ test_that("handle data with multiple merged col and row headers", {
 })
 
 test_that("fill_colhead do nothing to clean headers", {
-  good <- load_alldata("various_class.xlsx", sheet = "Sheet1")
+  good <- load_alldata("excels/various_class.xlsx", sheet = "Sheet1")
 
   expect_equal(vectorize_row(fill_colhead(good, 1), 1),
                vectorize_row(good, 1))
@@ -75,7 +75,7 @@ test_that("fill_colhead do nothing to clean headers", {
 })
 
 test_that("fill_rowhead do nothing to clean headers", {
-  good <- load_alldata("various_class.xlsx", sheet = "Sheet1")
+  good <- load_alldata("excels/various_class.xlsx", sheet = "Sheet1")
 
   expect_equal(vectorize_row(fill_rowhead(good, 1), 1),
                vectorize_row(good, 1))
