@@ -64,3 +64,21 @@ test_that("handle data with multiple merged col and row headers", {
     fill_rowhead(cols = 1:3)
   expect_equal(foo, bar)
 })
+
+test_that("fill_colhead do nothing to clean headers", {
+  good <- load_alldata("various_class.xlsx", sheet = "Sheet1")
+
+  expect_equal(vectorize_row(fill_colhead(good, 1), 1),
+               vectorize_row(good, 1))
+  expect_equal(vectorize_row(fill_colhead(good, 1:2), 2),
+               vectorize_row(good, 2))
+})
+
+test_that("fill_rowhead do nothing to clean headers", {
+  good <- load_alldata("various_class.xlsx", sheet = "Sheet1")
+
+  expect_equal(vectorize_row(fill_rowhead(good, 1), 1),
+               vectorize_row(good, 1))
+  expect_equal(vectorize_row(fill_rowhead(good, 1:2), 2),
+               vectorize_row(good, 2))
+})
