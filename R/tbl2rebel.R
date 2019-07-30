@@ -30,8 +30,8 @@ ensure_csv <- function(fname) {
 tbl2rebel <- function(objnm, tbl_fname, reportf = NULL) {
   params <- load_param(fname = tbl_fname)
   rebel(path = params$path, sheet_regex = params$sheet_regex,
-        row_merged = params$row_merged,
-        col_merged = params$col_merged,
+        row_headers = eval(parse(text = params$row_headers)),
+        col_headers = eval(parse(text = params$col_headers)),
         cluster = list(regex = params$`cluster/regex`,
                        dir = params$`cluster/dir`,
                        pos = params$`cluster/pos`,

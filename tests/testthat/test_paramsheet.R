@@ -1,7 +1,8 @@
 context("Revel using paramerer sheet")
 
 params         <- load_param("params.csv")
-colname_params <- c("object", "path", "sheet_regex", "row_merged", "col_merged",
+colname_params <- c("object", "path", "sheet_regex",
+                    "row_headers", "col_headers",
                     "cluster/dir", "cluster/pos", "cluster/regex",
                     "cluster/offset", "cluster/ends/row", "cluster/ends/col",
                     "row_type", "col_type/regex", "col_type/newname",
@@ -14,8 +15,8 @@ test_that("load_param loads parameter sheet correctly", {
   params <- load_param("params.csv")
   merged <- dplyr::filter(params, object == "merged")
   expect_equal(colnames(params), colname_params)
-  expect_equal(merged$row_merged, 1)
-  expect_equal(merged$col_merged, 1)
+  expect_equal(merged$row_headers, "1:2")
+  expect_equal(merged$col_headers, "1:2")
   expect_equal(merged$`cluster/offset`, "c(0, 0)")
 })
 

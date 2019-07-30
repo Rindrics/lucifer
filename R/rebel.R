@@ -1,8 +1,8 @@
 #' Rebel against godly Excel worksheet
 #'
 #' @inheritParams readxl::read_excel
-#' @param row_merged Row position of merged colnames
-#' @param col_merged Column position of merged rownames
+#' @param row_headers Row position of merged colnames
+#' @param col_headers Column position of merged rownames
 #' @param cluster List of parameters to control \code{\link{unclusterize}}.
 #'  \describe{
 #'    \item{dir}{direction of the cluster evolution either of
@@ -28,7 +28,7 @@
 #' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
 #' @param unfiscalize List of parameters to control \code{\link{unfiscalize}}
 #' @export
-rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
+rebel_sheet <- function(sheet, path, row_headers = NULL, col_headers = NULL,
                         cluster = NULL, row_type = NULL, col_type = NULL,
                         row_omit = NULL, col_omit = NULL,
                         unfiscalize = c(month_start = NULL, rule = NULL)) {
@@ -124,7 +124,7 @@ rebel_sheet <- function(sheet, path, row_merged = 0, col_merged = 0,
 #' @inheritParams rebel_sheet
 #' @param sheet_regex Regular expression to match sheetname
 #' @export
-rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
+rebel <- function(path, sheet_regex, row_headers = NULL, col_headers = NULL,
                   cluster = NULL, row_type = NULL, col_type = NULL,
                   row_omit = NULL, col_omit = NULL,
                   unfiscalize = c(month_start = NULL, rule = NULL)) {
@@ -133,7 +133,7 @@ rebel <- function(path, sheet_regex, row_merged = 0, col_merged = 0,
     stats::na.omit()
 
   out <- lapply(sheets, rebel_sheet, path = path,
-                row_merged = row_merged, col_merged = col_merged,
+                row_headers = row_headers, col_headers = col_headers,
                 cluster = cluster, row_type = row_type, col_type = col_type,
                 row_omit = row_omit, col_omit = col_omit, unfiscalize) %>%
           purrr::invoke(dplyr::bind_rows, .)

@@ -4,7 +4,8 @@
 #' @param regex Regex matches varname for filling
 #' @inheritParams make_rect
 #' @export
-fill_colhead <- function(df, rows = 1, regex = ".+") {
+fill_colhead <- function(df, rows = NULL, regex = ".+") {
+  if (is.null(rows)) return(df)
   fill_colhead_ <- function(row, df, regex) {
     stringr::str_match(df[row, ], regex) %>%
       rep_na_rep() %>%
@@ -19,11 +20,12 @@ fill_colhead <- function(df, rows = 1, regex = ".+") {
 
 #' Fill NAs of merged rows by 'varname'
 #'
-#' @param col Col position of the cells to be filled by 'varname'
+#' @param cols Col positions of the cells to be filled by 'varname'
 #' @param regex Regex matches varname for filling
 #' @inheritParams make_rect
 #' @export
-fill_rowhead <- function(df, cols = 1, regex = ".+") {
+fill_rowhead <- function(df, cols = NULL, regex = ".+") {
+  if (is.null(cols)) return(df)
   fill_rowhead_ <- function(col, df, regex) {
     stringr::str_match(dplyr::pull(df, col), regex) %>%
       rep_na_rep() %>%
