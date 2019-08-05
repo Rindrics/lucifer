@@ -264,7 +264,7 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
   rofst <- offset[1]
   cofst <- offset[2]
 
-  if (direction == "row") {
+  if (direction == "v") {
     row <- pos_key + rofst
     col <- find_from + cofst
     maxrow <- locate_matchend(dplyr::pull(df, col)[row:nrow(df)],
@@ -273,7 +273,7 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
                               ends[["col"]])
     nrow <- maxrow - row + 1
     ncol <- maxcol - cofst
-  } else {
+  } else if (direction == "h"){
     row <- find_from + rofst
     col <- pos_key + cofst
     maxrow <- locate_matchend(dplyr::pull(df, col)[row:nrow(df)],
@@ -334,12 +334,12 @@ unclusterize <- function(df, regex, direction, pos,
   if (direction == "h") {
     pos_key <- locate_keys(df = df, row = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
-               direction = "col", df = df,
+               direction = "h", df = df,
                offset = offset, ends = ends, info = info)
   } else if (direction == "v") {
     pos_key <- locate_keys(df = df, col = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
-               direction = "row", df = df,
+               direction = "v", df = df,
                offset = offset, ends = ends, info = info)
   } else {
     warning("Set 'direction' correctly")
