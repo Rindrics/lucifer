@@ -271,6 +271,24 @@ test_that("position of scan starts correctly", {
                  "excels/miyagi.xlsx", "Sheet1"))
 })
 
+test_that("position of scan for ends(row=) starts correctly", {
+  teichi <- rebel(path = "excels/miyagi.xlsx",
+                  sheet_regex = "Sheet1",
+                           cluster = list(dir = "h", pos = 33, regex = "定置網",
+                                          offset = c(1, 0),
+                                          ends = list(row = "2019年",
+                                                      col = "１２月")))
+  expect_equal(nrow(teichi), 25 * 4)
+  expect_equal(ncol(teichi), 15)
+  expect_equal(vectorize_row(teichi, 1),
+               c("1995年", as.character(301:312),
+                 "excels/miyagi.xlsx", "Sheet1"))
+  expect_equal(vectorize_row(teichi, 75),
+               c("2019年", as.character(2989:3000),
+                 "excels/miyagi.xlsx", "Sheet1"))
+
+})
+
 test_that("fight with NA colname", {
   data <- rebel("excels/ibaraki.xlsx", sheet_regex = "Sheet1",
                 cluster = list(dir = "h",
