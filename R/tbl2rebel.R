@@ -32,10 +32,6 @@ na2null <- function(x) {
  NULL
 }
 
-parse_escape <- function(x) {
-  stringr::str_replace_all(x, '\\"', "'")
-}
-
 #' Drive rebel() loading parameters written in .csv file
 #'
 #' @param objname Name of the Object choosen from 'object' column in param sheet
