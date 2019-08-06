@@ -1,6 +1,5 @@
 context("Revel using paramerer sheet")
 
-params         <- load_param("params.csv")
 colname_params <- c("object", "path", "sheet_regex",
                     "row_headers", "col_headers",
                     "cluster/dir", "cluster/pos", "cluster/regex",
@@ -12,7 +11,7 @@ colnames_report <- c(c("nrow", "ncol", "colnames",
                    gsub("/", "\\.", paste0("params.", colname_params))))
 
 test_that("load_param loads parameter sheet correctly", {
-  params <- load_param("params.csv")
+  params <- load_param("params.tsv")
   merged <- dplyr::filter(params, object == "merged")
   expect_equal(colnames(params), colname_params)
   expect_equal(merged$row_headers, "1:2")
@@ -37,12 +36,16 @@ test_that("ensure_csv retrns fname ends with '.csv'", {
 })
 
 test_that("mk_summary makes report from df and params", {
+  params <- readr::read_tsv("params.tsv", quote = "")
   res <- mk_summary(data.frame(a = 1:5, b = 6:10), param = params)
   expect_equal(colnames(res), colnames_report)
+  expect_equal(res$nrow, 5)
+  expect_equal(res$ncol, 2)
 })
 
 test_that("report returns summary", {
   df           <- data.frame(a = 1:5, b = 6:10)
+  params <- readr::read_tsv("params.tsv", quote = "")
   write_report <- report(df, params = params, reportf = "report.csv")
   expect_equal(report(df, reportf = NULL), df)
   expect_success(
@@ -62,7 +65,7 @@ test_that("cat_colnames concatenates colnames of df", {
 })
 
 test_that("tbl2rebel rebels bad data driven by paramsheet", {
-  res <- tbl2rebel(tbl = "params.csv", obj = "merged")
+  res <- tbl2rebel(objname = "merged", paramfname = "params.tsv")
   expect_setequal(colnames(res),
                   c("NA_A2", "A1_A2", "A1_C2", "A1_D2", "E1_E2", "E1_F2",
                     "E1_G2", "E1_H2", "fname", "sheet"))
@@ -73,4 +76,18 @@ test_that("tbl2rebel rebels bad data driven by paramsheet", {
   expect_setequal(vectorize_row(res, 1),
                   c("A2", paste0(LETTERS[c(1, 3:8)], 3),
                     "excels/merged.xlsx", "Sheet1"))
+})
+
+test_that("na2null", {
+  expect_equal(na2null(NA), NULL)
+  expect_equal(na2null(NULL), NULL)
+  expect_equal(na2null(1), 1)
+  expect_equal(na2null("a"), "a")
+})
+
+test_that("rebel2aomori", {
+  year <- 2019
+  aomori <- tbl2rebel(objname = "aomori", paramfname = "par_aomori.tsv")
+  expect_equal(nrow(aomori), 312)
+  expect_equal(unique(dplyr::pull(aomori, 1)), as.character(1981:2019))
 })
