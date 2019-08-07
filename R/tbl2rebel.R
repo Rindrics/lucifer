@@ -2,7 +2,10 @@
 #'
 #' @param fname file path to param sheet
 load_param <- function(fname) {
-  readr::read_tsv(fname, quote = "")
+  suppressWarnings(
+    readr::read_delim(fname, delim = "&", quote = "", trim_ws = TRUE) %>%
+      dplyr::select(-1, -19)
+  )
 }
 
 #' Indicate whether the given fname has '.csv' extension
