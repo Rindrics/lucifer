@@ -82,3 +82,12 @@ test_that("fill_rowhead do nothing to clean headers", {
   expect_equal(vectorize_row(fill_rowhead(good, 1:2), 2),
                vectorize_row(good, 2))
 })
+
+test_that("fill_colhead works when rows > 1", {
+  bad <- load_alldata("excels/cluster_info_merged.xlsx", sheet = "Sheet1")
+  filled <- bad %>%
+    fill_colhead(rows = 5)
+  expect_equal(vectorize_row(filled, 5),
+               c(rep("foo", 3), rep("bar", 2),  "baz"))
+  bad[1:5, ]
+})

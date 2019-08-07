@@ -13,9 +13,16 @@ fill_colhead <- function(df, rows = NULL, regex = ".+") {
       as.data.frame(stringsAsFactors = FALSE) %>%
       magrittr::set_colnames(colnames(df))
   }
-  tibble::as_tibble(dplyr::bind_rows(purrr::map_df(rows, fill_colhead_,
-                                                   df = df, regex = regex),
-                                     df[-rows, ]))
+  if (rows[1] == 1) {
+    tibble::as_tibble(dplyr::bind_rows(purrr::map_df(rows, fill_colhead_,
+                                                     df = df, regex = regex),
+                                       df[-rows, ]))
+  } else {
+    tibble::as_tibble(dplyr::bind_rows(df[1:(rows[1] - 1), ],
+                                       purrr::map_df(rows, fill_colhead_,
+                                                     df = df, regex = regex),
+                                       df[(max(rows) + 1):nrow(df), ]))
+  }
 }
 
 #' Fill NAs of merged rows by 'varname'
