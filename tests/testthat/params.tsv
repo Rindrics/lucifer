@@ -1,2 +1,0 @@
-object	path	sheet_regex	row_headers	col_headers	cluster/dir	cluster/pos	cluster/regex	cluster/offset	cluster/ends/row	cluster/ends/col	row_type	col_type/regex	col_type/newname	col_type/varname	unfiscalize/month_start	unfiscalize/rule
-merged	"excels/merged.xlsx"	"Sheet."	1:2	1:2	"h"	1	"NA_A2"	c(0, 0)	"A16"	"E1_H2"						
