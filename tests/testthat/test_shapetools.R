@@ -12,21 +12,6 @@ test_that("make_rect() makes weired df into rectangular shape", {
                     data.frame(B = 11:15, C = 21:25))
 })
 
-test_that("unmerge_horiz() fill NAs of merged columns", {
-  merged  <- load_alldata("excels/merged.xlsx", sheet = "Sheet1")
-  newname <- unmerge_horiz(merged, 1) %>%
-    dplyr::slice(1) %>%
-    unlist(use.names = FALSE)
-  expect_equal(newname, c(NA, rep("A1", 3), rep("E1", 4)))
-})
-
-test_that("unmerge_vert() fill NAs of merged rows", {
-  merged  <- load_alldata("excels/merged.xlsx", sheet = "Sheet1")
-  newname <- unmerge_vert(merged, 1) %>%
-    dplyr::pull(1) %>%
-    as.vector()
-  expect_equal(newname, c(NA, rep("A2", 8), rep("A10", 6), rep("A16", 8)))
-})
 test_that("append_info() append information stored in a list to df as column", {
 
   info  <- list(foo = 1, bar = 2, baz = 3)

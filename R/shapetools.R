@@ -35,36 +35,6 @@ append_info <- function(df, info, headerized = FALSE) {
   cbind(df, df_info)
 }
 
-#' Fill NAs of merged columns by 'varname'
-#'
-#' @param row Row position of the cells to be filled by 'varname'
-#' @param regex Regex matches varname for filling
-#' @inheritParams make_rect
-#' @export
-unmerge_horiz <- function(df, row, regex = ".+") {
-  out        <- df
-  vars       <- df[row, ]
-  new_col    <- stringr::str_match(vars, regex) %>%
-    rep_na_rep()
-  out[row, ] <- new_col
-  out
-}
-
-#' Fill NAs of merged rows by 'varname'
-#'
-#' @param col Col position of the cells to be filled by 'varname'
-#' @param regex Regex matches varname for filling
-#' @inheritParams make_rect
-#' @export
-unmerge_vert <- function(df, col, regex = ".+") {
-  out        <- df
-  vars       <- dplyr::pull(df, col)
-  new_row    <- stringr::str_match(vars, regex) %>%
-    rep_na_rep()
-  out[, col] <- new_row
-  out
-}
-
 #' Gather columns to variable
 #'
 #' @inheritParams make_rect
@@ -114,23 +84,6 @@ rm_matchcol <- function(df, key, rowpos, regex) {
     key_noregex <- paste0("^", key, "$")
     df[, -stringr::str_which(target, pattern = key_noregex)]
   }
-}
-
-#' Merge colnames of multiple rows
-#'
-#' @param rows Rows of the target colnames to be concatenated
-#' @param cols Numbers of target columns if given
-#' @inheritParams make_rect
-#' @export
-merge_colname <- function(df, rows, cols = NULL) {
-  cname   <- df[rows[1], ]
-  nocname <- df[-rows, ]
-  if (is.null(cols)) {
-    cols <- 1:ncol(df)
-  }
-  cname[cols] <- purrr::map(cols, paste_rows, rows, df) %>%
-  stringr::str_remove_all("_\\s|_NA")
-  rbind(cname, nocname)
 }
 
 #' Convert full-width numbers in df into ASCII numbers
@@ -264,7 +217,7 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
   rofst <- offset[1]
   cofst <- offset[2]
 
-  if (direction == "row") {
+  if (direction == "v") {
     row <- pos_key + rofst
     col <- find_from + cofst
     maxrow <- locate_matchend(dplyr::pull(df, col)[row:nrow(df)],
@@ -273,13 +226,14 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
                               ends[["col"]])
     nrow <- maxrow - row + 1
     ncol <- maxcol - cofst
-  } else {
+  } else if (direction == "h"){
     row <- find_from + rofst
     col <- pos_key + cofst
-    maxrow <- locate_matchend(dplyr::pull(df, col), ends[["row"]])
+    maxrow <- locate_matchend(dplyr::pull(df, col)[row:nrow(df)],
+                              ends[["row"]]) + row - 1
     maxcol <- locate_matchend(vectorize_row(df, row)[col:ncol(df)],
                               ends[["col"]]) + col - 1
-    nrow <- maxrow - rofst - (find_from - 1)
+    nrow <- maxrow - row + 1
     ncol <- maxcol - pos_key - cofst + 1
   }
 
@@ -333,12 +287,12 @@ unclusterize <- function(df, regex, direction, pos,
   if (direction == "h") {
     pos_key <- locate_keys(df = df, row = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
-               direction = "col", df = df,
+               direction = "h", df = df,
                offset = offset, ends = ends, info = info)
   } else if (direction == "v") {
     pos_key <- locate_keys(df = df, col = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
-               direction = "row", df = df,
+               direction = "v", df = df,
                offset = offset, ends = ends, info = info)
   } else {
     warning("Set 'direction' correctly")

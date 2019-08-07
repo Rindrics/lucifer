@@ -4,12 +4,12 @@
 \alias{tbl2rebel}
 \title{Drive rebel() loading parameters written in .csv file}
 \usage{
-tbl2rebel(objnm, tbl_fname, reportf = NULL)
+tbl2rebel(objname, paramfname, reportf = NULL)
 }
 \arguments{
-\item{objnm}{Name of the Object choosen from 'object' column in param sheet}
+\item{objname}{Name of the Object choosen from 'object' column in param sheet}
 
-\item{tbl_fname}{Path to the parameter sheet}
+\item{paramfname}{Path to the parameter sheet}
 
 \item{reportf}{Name of the report file to export}
 }
