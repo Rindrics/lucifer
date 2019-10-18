@@ -19,7 +19,7 @@ add_reference <- function(df, path = NULL, sheet = NULL) {
 #' @param posnames If TRUE, row- and col- names are set to 'pos=' format for
 #' following cluster extraction
 ceasefire <- function(df, path = NULL, sheet = NULL,
-                      funcname, posnames = TRUE) {
+                      funcname, posnames = FALSE) {
   head10 <- function(x) {
     print(utils::head(x, 10))
   }
