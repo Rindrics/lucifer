@@ -7,7 +7,7 @@
 rebel_sheet(sheet, path, row_headers = NULL, col_headers = NULL,
   cluster = NULL, row_type = NULL, col_type = NULL,
   row_omit = NULL, col_omit = NULL, unfiscalize = c(month_start =
-  NULL, rule = NULL))
+  NULL, rule = NULL), print_posnames = FALSE)
 }
 \arguments{
 \item{sheet}{Sheet to read. Either a string (the name of a sheet), or an
@@ -50,6 +50,8 @@ sheet.}
 \item{col_omit}{List of parameters to control \code{\link{rm_matchcol}}}
 
 \item{unfiscalize}{List of parameters to control \code{\link{unfiscalize}}}
+
+\item{print_posnames}{Same as that of \code{\link{ceasefire}}}
 }
 \description{
 Rebel against godly Excel worksheet
