@@ -78,7 +78,8 @@ list2df <- function(list, nrow) {
 #' @param row Row position of df where the keyword appears
 #' @param col Column position of df where the keyword appears
 #' @param regex Regex to match keyword
-locate_keys <- function(df, row = NULL, col = NULL, regex){
+#' @param stop_at \code{regex} search stops if \{stop_at\} matched
+locate_keys <- function(df, row = NULL, col = NULL, regex, stop_at = NULL){
   if ( (!is.null(row) & !is.null(col)) |
       (is.null(row) & is.null(col))) {
     stop("Give either 'row' or 'col'")
@@ -87,7 +88,10 @@ locate_keys <- function(df, row = NULL, col = NULL, regex){
   } else if (!is.null(col)){
     str <- dplyr::pull(df, col)
   }
-  stringr::str_which(str, regex)
+
+  if (is.null(stop_at)) return(stringr::str_which(str, regex))
+
+  stringr::str_which(str[1:stringr::str_which(str, stop_at)], regex)
 }
 
 #' Return the location of decrese in given vector

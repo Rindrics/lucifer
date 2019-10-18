@@ -4,7 +4,7 @@
 \alias{locate_keys}
 \title{Locate keywords in row or column of the given data frame}
 \usage{
-locate_keys(df, row = NULL, col = NULL, regex)
+locate_keys(df, row = NULL, col = NULL, regex, stop_at = NULL)
 }
 \arguments{
 \item{df}{Data frame to be processed}
@@ -14,6 +14,8 @@ locate_keys(df, row = NULL, col = NULL, regex)
 \item{col}{Column position of df where the keyword appears}
 
 \item{regex}{Regex to match keyword}
+
+\item{stop_at}{\code{regex} search stops if \{stop_at\} matched}
 }
 \description{
 Locate keywords in row or column of the given data frame
