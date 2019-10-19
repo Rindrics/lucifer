@@ -313,17 +313,3 @@ test_that("fight with NA colname", {
   expect_equal(colnames(data), c("NA",
                                  as.character(1:12), "fname", "sheet"))
 })
-
-test_that("stop search along 'dir' at match by 'stop_regex'", {
-  data <- rebel("excels/saba_handmade_database.xlsx", sheet_regex = "Sheet.",
-                cluster = list(dir = "v",
-                               pos = 1,
-                               regex = "key",
-                               offset = c(0, 1),
-                               ends = list(row = "baz",
-                                           col = ".+"),
-                               stop_at = "stop"))
-  expect_equal(data$`1`,
-               c("11", "21", "101", "111", "201", "211",
-                 "431", "441", "521", "531", "621", "631"))
-})

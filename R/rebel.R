@@ -10,8 +10,8 @@
 #'    \item{pos}{row- or column- position of the key to locate the cluster}
 #'    \item{regex}{same as that of \code{\link{unclusterize}}}
 #'    \item{offset}{same as that of \code{\link{unclusterize}}}
+#'    \item{dim}{same as that of \code{\link{unclusterize}}}
 #'    \item{info}{same as that of \code{\link{unclusterize}}}
-#'    \item{stop_at}{same as that of \code{\link{unclusterize}}}
 #'  }
 #' @param row_type Type of row one of
 #'  \describe{
@@ -46,8 +46,7 @@ rebel_sheet <- function(sheet, path, row_headers = NULL, col_headers = NULL,
   out <- unclusterize(df = out, regex = cluster$regex,
                       direction = cluster$dir,
                       pos = cluster$pos, offset = cluster$offset,
-                      ends = cluster$ends, info = cluster$info,
-                      stop_at = cluster$stop_at)
+                      ends = cluster$ends, info = cluster$info)
   if (cluster$dir == "v") {
     out <- lapply(out, make_ascii, col = 1)
   } else if (cluster$dir == "h") {

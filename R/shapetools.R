@@ -281,20 +281,16 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
 #' @param regex Regular expression to match keywords
 #' @param direction Directoin of the cluster revolution
 #' @param pos Positon of row/column to scan using \code{regex}
-#' @param stop_at Same as that of \code{\link{locate_keys}}
 #' @export
 unclusterize <- function(df, regex, direction, pos,
-                         offset = c(0, 0), ends,
-                         info = NULL, stop_at = NULL) {
+                         offset = c(0, 0), ends, info = NULL) {
   if (direction == "h") {
-    pos_key <- locate_keys(df = df, row = pos, regex = regex,
-                           stop_at = stop_at)
+    pos_key <- locate_keys(df = df, row = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
                direction = "h", df = df,
                offset = offset, ends = ends, info = info)
   } else if (direction == "v") {
-    pos_key <- locate_keys(df = df, col = pos, regex = regex,
-                           stop_at = stop_at)
+    pos_key <- locate_keys(df = df, col = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
                direction = "v", df = df,
                offset = offset, ends = ends, info = info)

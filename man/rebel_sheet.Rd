@@ -28,8 +28,8 @@ sheet.}
   \item{pos}{row- or column- position of the key to locate the cluster}
   \item{regex}{same as that of \code{\link{unclusterize}}}
   \item{offset}{same as that of \code{\link{unclusterize}}}
+  \item{dim}{same as that of \code{\link{unclusterize}}}
   \item{info}{same as that of \code{\link{unclusterize}}}
-  \item{stop_at}{same as that of \code{\link{unclusterize}}}
 }}
 
 \item{row_type}{Type of row one of
