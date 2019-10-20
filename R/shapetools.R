@@ -213,7 +213,8 @@ rm_nacols <- function(df) {
 #'  \item{value_dim}{Dimension \code{c(row, col)} of \code{value}}
 #' }
 extract_a_cluster <- function(pos_key, find_from, direction, df,
-                              offset = c(0, 0), ends, info = NULL) {
+                              offset = c(0, 0), ends,
+                              info = NULL) {
   rofst <- offset[1]
   cofst <- offset[2]
 
@@ -281,22 +282,28 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
 #' @param regex Regular expression to match keywords
 #' @param direction Directoin of the cluster revolution
 #' @param pos Positon of row/column to scan using \code{regex}
+#' @param crop parameters from \code{crop} in list
 #' @export
 unclusterize <- function(df, regex, direction, pos,
-                         offset = c(0, 0), ends, info = NULL) {
+                         offset = c(0, 0), ends,
+                         info = NULL, crop = NULL) {
+
+  cropped <- crop(df, direction = crop$direction,
+                  pos = crop$pos, regex = crop$regex,
+                  use_after = crop$use_after)
   if (direction == "h") {
-    pos_key <- locate_keys(df = df, row = pos, regex = regex)
+    pos_key <- locate_keys(df = cropped, row = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
-               direction = "h", df = df,
+               direction = "h", df = cropped,
                offset = offset, ends = ends, info = info)
   } else if (direction == "v") {
-    pos_key <- locate_keys(df = df, col = pos, regex = regex)
+    pos_key <- locate_keys(df = cropped, col = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
-               direction = "v", df = df,
+               direction = "v", df = cropped,
                offset = offset, ends = ends, info = info)
   } else {
     warning("Set 'direction' correctly")
-    df
+    cropped
   }
 }
 
