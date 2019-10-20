@@ -333,6 +333,33 @@ unfiscalize <- function(df, ycol, mcol, month_start, rule) {
   }
   tibble::as_tibble(df)
 }
+
+#' Crop data frame at specific keyword
+#'
+#' @inheritParams make_rect
+#' @inheritParams unclusterize
+#' @param use_after If TRUE, use part after match
+crop <- function(df, direction = NULL, pos = NULL, regex = NULL,
+                 use_after = FALSE) {
+  if (is.null(direction)) return(df)
+
+  match <- pull_vector(df, direction = direction, pos = pos) %>%
+    stringr::str_which(regex)
+
+  if (direction == "h") {
+    before <- df[, 1:match]
+    after  <- df[, match:ncol(df)]
+  } else {
+    before <- df[1:match, ]
+    after  <- df[match:nrow(df), ]
+  }
+
+  if (use_after == TRUE) {
+    return(after)
+  }
+  before
+}
+
 #' Pull vector out of data frame
 #'
 #' @inheritParams make_rect
