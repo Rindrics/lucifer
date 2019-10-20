@@ -5,7 +5,7 @@
 \title{Extract data clusters from data frame using the keyword}
 \usage{
 unclusterize(df, regex, direction, pos, offset = c(0, 0), ends,
-  info = NULL, stop_at = NULL)
+  info = NULL, crop = NULL)
 }
 \arguments{
 \item{df}{Data frame to be processed}
@@ -34,7 +34,7 @@ Regex \code{row = } must specify the end of 'left most' columnn of df,
  \item{value_dim}{Dimension \code{c(row, col)} of \code{value}}
 }}
 
-\item{stop_at}{Same as that of \code{\link{locate_keys}}}
+\item{crop}{Params from \code{crop()} in list format}
 }
 \description{
 This function extracts data clusters from single Excel sheet.

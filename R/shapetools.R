@@ -213,7 +213,8 @@ rm_nacols <- function(df) {
 #'  \item{value_dim}{Dimension \code{c(row, col)} of \code{value}}
 #' }
 extract_a_cluster <- function(pos_key, find_from, direction, df,
-                              offset = c(0, 0), ends, info = NULL) {
+                              offset = c(0, 0), ends,
+                              info = NULL) {
   rofst <- offset[1]
   cofst <- offset[2]
 
@@ -278,29 +279,31 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
 #' This function extracts data clusters from single Excel sheet.
 #' @inheritParams make_rect
 #' @inheritParams extract_a_cluster
+#' @inheritParams rebel
 #' @param regex Regular expression to match keywords
 #' @param direction Directoin of the cluster revolution
 #' @param pos Positon of row/column to scan using \code{regex}
-#' @param stop_at Same as that of \code{\link{locate_keys}}
 #' @export
 unclusterize <- function(df, regex, direction, pos,
                          offset = c(0, 0), ends,
-                         info = NULL, stop_at = NULL) {
+                         info = NULL, crop = NULL) {
+
+  cropped <- crop(df, direction = crop$direction,
+                  pos = crop$pos, regex = crop$regex,
+                  use_after = crop$use_after)
   if (direction == "h") {
-    pos_key <- locate_keys(df = df, row = pos, regex = regex,
-                           stop_at = stop_at)
+    pos_key <- locate_keys(df = cropped, row = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
-               direction = "h", df = df,
+               direction = "h", df = cropped,
                offset = offset, ends = ends, info = info)
   } else if (direction == "v") {
-    pos_key <- locate_keys(df = df, col = pos, regex = regex,
-                           stop_at = stop_at)
+    pos_key <- locate_keys(df = cropped, col = pos, regex = regex)
     purrr::map(pos_key, extract_a_cluster, find_from = pos,
-               direction = "v", df = df,
+               direction = "v", df = cropped,
                offset = offset, ends = ends, info = info)
   } else {
     warning("Set 'direction' correctly")
-    df
+    cropped
   }
 }
 
@@ -336,4 +339,46 @@ unfiscalize <- function(df, ycol, mcol, month_start, rule) {
     df$year   <- trueyr
   }
   tibble::as_tibble(df)
+}
+
+#' Crop data frame at specific keyword
+#'
+#' @inheritParams make_rect
+#' @inheritParams unclusterize
+#' @param use_after If TRUE, use part after match
+crop <- function(df, direction = NULL, pos = NULL, regex = NULL,
+                 use_after = FALSE) {
+  if (is.null(direction)) return(df)
+
+  match <- pull_vector(df, direction = direction, pos = pos) %>%
+    stringr::str_which(regex)
+
+  if (direction == "h") {
+    before <- df[, 1:match]
+    after  <- df[, match:ncol(df)]
+  } else {
+    before <- df[1:match, ]
+    after  <- df[match:nrow(df), ]
+  }
+
+  if (use_after == TRUE) {
+    return(after)
+  }
+  before
+}
+
+#' Pull vector out of data frame
+#'
+#' @inheritParams make_rect
+#' @param direction Direction of the vector to be pulled from df
+#' #' \describe{
+#'  \item{"h"}{specific row of the df will be returned as avector}
+#'  \item{"v"}{specific column of the df will be returned as a vector}
+#' }
+#' @param pos Row- or column position to be searched
+pull_vector <- function(df, direction, pos) {
+  if (direction == "v") {
+    return(dplyr::pull(df, pos))
+  }
+  vectorize_row(df, pos)
 }
