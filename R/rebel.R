@@ -28,6 +28,7 @@
 #' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
 #' @param unfiscalize List of parameters to control \code{\link{unfiscalize}}
 #' @param print_posnames Same as that of \code{\link{ceasefire}}
+#' @param crop Params from \code{crop()} in list format
 #' @export
 rebel_sheet <- function(sheet, path, row_headers = NULL, col_headers = NULL,
                         cluster = NULL, row_type = NULL, col_type = NULL,

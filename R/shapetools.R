@@ -279,10 +279,10 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
 #' This function extracts data clusters from single Excel sheet.
 #' @inheritParams make_rect
 #' @inheritParams extract_a_cluster
+#' @inheritParams rebel
 #' @param regex Regular expression to match keywords
 #' @param direction Directoin of the cluster revolution
 #' @param pos Positon of row/column to scan using \code{regex}
-#' @param crop parameters from \code{crop} in list
 #' @export
 unclusterize <- function(df, regex, direction, pos,
                          offset = c(0, 0), ends,

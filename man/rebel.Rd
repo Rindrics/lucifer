@@ -7,7 +7,7 @@
 rebel(path, sheet_regex, row_headers = NULL, col_headers = NULL,
   cluster = NULL, row_type = NULL, col_type = NULL,
   row_omit = NULL, col_omit = NULL, unfiscalize = c(month_start =
-  NULL, rule = NULL), print_posnames = FALSE)
+  NULL, rule = NULL), print_posnames = FALSE, crop = NULL)
 }
 \arguments{
 \item{path}{Path to the xls/xlsx file.}
@@ -49,6 +49,8 @@ rebel(path, sheet_regex, row_headers = NULL, col_headers = NULL,
 \item{unfiscalize}{List of parameters to control \code{\link{unfiscalize}}}
 
 \item{print_posnames}{Same as that of \code{\link{ceasefire}}}
+
+\item{crop}{Params from \code{crop()} in list format}
 }
 \description{
 Rebel against godly Excel workbook
