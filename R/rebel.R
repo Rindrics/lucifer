@@ -33,7 +33,7 @@ rebel_sheet <- function(sheet, path, row_headers = NULL, col_headers = NULL,
                         cluster = NULL, row_type = NULL, col_type = NULL,
                         row_omit = NULL, col_omit = NULL,
                         unfiscalize = c(month_start = NULL, rule = NULL),
-                        print_posnames = FALSE) {
+                        print_posnames = FALSE, crop = NULL) {
 
   out <- load_alldata(path, sheet = sheet) %>%
     fill_rowhead(cols = row_headers) %>%
@@ -46,7 +46,7 @@ rebel_sheet <- function(sheet, path, row_headers = NULL, col_headers = NULL,
   out <- unclusterize(df = out, regex = cluster$regex,
                       direction = cluster$dir,
                       pos = cluster$pos, offset = cluster$offset,
-                      ends = cluster$ends, info = cluster$info)
+                      ends = cluster$ends, info = cluster$info, crop = crop)
   if (cluster$dir == "v") {
     out <- lapply(out, make_ascii, col = 1)
   } else if (cluster$dir == "h") {
@@ -125,7 +125,7 @@ rebel <- function(path, sheet_regex, row_headers = NULL, col_headers = NULL,
                   cluster = NULL, row_type = NULL, col_type = NULL,
                   row_omit = NULL, col_omit = NULL,
                   unfiscalize = c(month_start = NULL, rule = NULL),
-                  print_posnames = FALSE) {
+                  print_posnames = FALSE, crop = NULL) {
 
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
@@ -134,7 +134,7 @@ rebel <- function(path, sheet_regex, row_headers = NULL, col_headers = NULL,
                 row_headers = row_headers, col_headers = col_headers,
                 cluster = cluster, row_type = row_type, col_type = col_type,
                 row_omit = row_omit, col_omit = col_omit, unfiscalize,
-                print_posnames = print_posnames) %>%
+                print_posnames = print_posnames, crop = crop) %>%
           purrr::invoke(dplyr::bind_rows, .)
 
     if (is.null(cluster)) return(ceasefire(out, funcname = "cluster"))
