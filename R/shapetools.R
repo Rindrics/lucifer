@@ -333,3 +333,18 @@ unfiscalize <- function(df, ycol, mcol, month_start, rule) {
   }
   tibble::as_tibble(df)
 }
+#' Pull vector out of data frame
+#'
+#' @inheritParams make_rect
+#' @param direction Direction of the vector to be pulled from df
+#' #' \describe{
+#'  \item{"h"}{specific row of the df will be returned as avector}
+#'  \item{"v"}{specific column of the df will be returned as a vector}
+#' }
+#' @param pos Row- or column position to be searched
+pull_vector <- function(df, direction, pos) {
+  if (direction == "v") {
+    return(dplyr::pull(df, pos))
+  }
+  vectorize_row(df, pos)
+}

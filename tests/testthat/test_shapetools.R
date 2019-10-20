@@ -208,3 +208,18 @@ test_that("unfiscalize() converts fiscal year column of given df", {
                            month_start = 10, rule = "head")
   expect_equal(df_trueyear$trueyr, c(rep(2019, 3), rep(2020, 9)))
 })
+test_that("pull_vector() make vector from a row of df", {
+  data <- data.frame(a = letters, b = 1:26, stringsAsFactors = FALSE)
+  expect_equal(pull_vector(data, direction = "h", pos = 1),
+               c("a", "1"))
+  expect_equal(pull_vector(data, direction = "h", pos = 2),
+               c("b", "2"))
+  expect_equal(pull_vector(data, direction = "h", pos = 26),
+               c("z", "26"))
+})
+
+test_that("pull_vector() make vector from a column of df", {
+  data <- data.frame(a = letters, b = 1:26, stringsAsFactors = FALSE)
+  expect_equal(pull_vector(data, direction = "v", pos = 1), letters)
+  expect_equal(pull_vector(data, direction = "v", pos = 2), 1:26)
+})
