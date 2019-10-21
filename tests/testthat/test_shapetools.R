@@ -208,3 +208,55 @@ test_that("unfiscalize() converts fiscal year column of given df", {
                            month_start = 10, rule = "head")
   expect_equal(df_trueyear$trueyr, c(rep(2019, 3), rep(2020, 9)))
 })
+
+test_that("crop() returns cropped bf before match", {
+  data <- data.frame(a = letters, b = 1:26, stringsAsFactors = FALSE)
+  expect_equal(crop(data, direction = "v", pos = 1, regex = "p"),
+               data.frame(a = letters[1:16], b = 1:16,
+                          stringsAsFactors = FALSE))
+
+  data_horiz <- data.frame(t(data))
+  expect_equal(crop(data_horiz, direction = "h", pos = 1, regex = "p"),
+               data.frame(t(data.frame(a = letters[1:16],
+                                       b = 1:16,
+                                       stringsAsFactors = FALSE))))
+})
+
+test_that("crop() returns cropped df after match", {
+  data <- data.frame(a = letters, b = 1:26, stringsAsFactors = FALSE)
+  expect_equal(crop(data, direction = "v", pos = 1,
+                    regex = "p", use_after = TRUE),
+               data.frame(a = letters[16:26], b = 16:26,
+                          row = 16:26, stringsAsFactors = FALSE,
+                          row.names = "row"))
+
+  data_horiz <- data.frame(t(data), stringsAsFactors = FALSE)
+  expect_equal(crop(data_horiz, direction = "h", pos = 1,
+                    regex = "x", use_after = TRUE),
+               data.frame(row = c("a", "b"),
+                          X24 = c("x", "24"),
+                          X25 = c("y", "25"),
+                          X26 = c("z", "26"),
+                          row.names = "row", stringsAsFactors = FALSE))
+})
+
+test_that("crop() do nothing if direction == NULL", {
+  data <- data.frame(a = letters, b = 1:26, stringsAsFactors = FALSE)
+  expect_equal(crop(data, direction = NULL), data)
+})
+
+test_that("pull_vector() make vector from a row of df", {
+  data <- data.frame(a = letters, b = 1:26, stringsAsFactors = FALSE)
+  expect_equal(pull_vector(data, direction = "h", pos = 1),
+               c("a", "1"))
+  expect_equal(pull_vector(data, direction = "h", pos = 2),
+               c("b", "2"))
+  expect_equal(pull_vector(data, direction = "h", pos = 26),
+               c("z", "26"))
+})
+
+test_that("pull_vector() make vector from a column of df", {
+  data <- data.frame(a = letters, b = 1:26, stringsAsFactors = FALSE)
+  expect_equal(pull_vector(data, direction = "v", pos = 1), letters)
+  expect_equal(pull_vector(data, direction = "v", pos = 2), 1:26)
+})

@@ -27,23 +27,27 @@
 #' @param col_omit List of parameters to control \code{\link{rm_matchcol}}
 #' @param row_omit List of parameters to control \code{\link{rm_matchrow}}
 #' @param unfiscalize List of parameters to control \code{\link{unfiscalize}}
+#' @param print_posnames Same as that of \code{\link{ceasefire}}
+#' @param crop Params from \code{crop()} in list format
 #' @export
 rebel_sheet <- function(sheet, path, row_headers = NULL, col_headers = NULL,
                         cluster = NULL, row_type = NULL, col_type = NULL,
                         row_omit = NULL, col_omit = NULL,
-                        unfiscalize = c(month_start = NULL, rule = NULL)) {
+                        unfiscalize = c(month_start = NULL, rule = NULL),
+                        print_posnames = FALSE, crop = NULL) {
 
   out <- load_alldata(path, sheet = sheet) %>%
     fill_rowhead(cols = row_headers) %>%
     fill_colhead(rows = col_headers) %>%
     merge_colname(rows = col_headers)
 
-  if (is.null(cluster)) return(ceasefire(out, path, sheet, "cluster"))
+  if (is.null(cluster)) return(ceasefire(out, path, sheet, "cluster",
+                                         print_posnames = print_posnames))
 
   out <- unclusterize(df = out, regex = cluster$regex,
                       direction = cluster$dir,
                       pos = cluster$pos, offset = cluster$offset,
-                      ends = cluster$ends, info = cluster$info)
+                      ends = cluster$ends, info = cluster$info, crop = crop)
   if (cluster$dir == "v") {
     out <- lapply(out, make_ascii, col = 1)
   } else if (cluster$dir == "h") {
@@ -121,7 +125,8 @@ rebel_sheet <- function(sheet, path, row_headers = NULL, col_headers = NULL,
 rebel <- function(path, sheet_regex, row_headers = NULL, col_headers = NULL,
                   cluster = NULL, row_type = NULL, col_type = NULL,
                   row_omit = NULL, col_omit = NULL,
-                  unfiscalize = c(month_start = NULL, rule = NULL)) {
+                  unfiscalize = c(month_start = NULL, rule = NULL),
+                  print_posnames = FALSE, crop = NULL) {
 
   sheets <- stringr::str_extract(readxl::excel_sheets(path), sheet_regex) %>%
     stats::na.omit()
@@ -129,7 +134,8 @@ rebel <- function(path, sheet_regex, row_headers = NULL, col_headers = NULL,
   out <- lapply(sheets, rebel_sheet, path = path,
                 row_headers = row_headers, col_headers = col_headers,
                 cluster = cluster, row_type = row_type, col_type = col_type,
-                row_omit = row_omit, col_omit = col_omit, unfiscalize) %>%
+                row_omit = row_omit, col_omit = col_omit, unfiscalize,
+                print_posnames = print_posnames, crop = crop) %>%
           purrr::invoke(dplyr::bind_rows, .)
 
     if (is.null(cluster)) return(ceasefire(out, funcname = "cluster"))
