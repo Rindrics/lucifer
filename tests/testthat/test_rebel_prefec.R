@@ -1,7 +1,7 @@
 context("Rebel prefectures using rebel()")
 
 test_that("rebel_sheet() beat aomori data up", {
-  fname <- "aomori.xlsx"
+  fname <- "excels/aomori.xlsx"
   sheet <- "マイワシ"
   year  <- 2019
   y_regex <- paste0("^", year)
@@ -59,10 +59,10 @@ test_that("rebel_sheet() beat aomori data up", {
 })
 
 test_that("rebel_sheet() beat iwate data up", {
-  fname <- "iwate.xls"
+  fname <- "excels/iwate.xls"
   sheet <- "マイワシ"
   year  <- 2018
-  row_regex <- paste0("^", 2018)
+  row_regex <- paste0("^", year, "")
 
   maiwashi <- rebel_sheet(path = fname, sheet = sheet,
                           cluster = list(dir = "v",
@@ -70,19 +70,20 @@ test_that("rebel_sheet() beat iwate data up", {
                                          regex = ".+によるマイワシ.+",
                                          offset = c(2, 0),
                                          ends = list(row = row_regex,
-                                                     col = "(1|１)(2|２)月")),
+                                                     col = "(1|１)(2|２)月$")),
                           row_type = "Y",
-                          col_type = list(regex = "^1?[0-9]月",
+                          col_type = list(regex = "^(1|１)?.月$",
                                           newname = "month",
                                           varname = "catch"))
 
   expect_equal(unique(maiwashi$year), 1968:2018)
   expect_equal(unique(maiwashi$month), 1:12)
   expect_setequal(unique(maiwashi$catch), as.character(1:1224))
+  expect_equal(nrow(maiwashi), 1224)
 })
 
 test_that("duplicated column and fisY", {
-  fname <- "saga.xls"
+  fname <- "excels/saga.xls"
   year  <- 2016
   saga  <- fname %>%
     rebel(sheet_regex = "Sheet.",
@@ -123,7 +124,7 @@ test_that("duplicated column and fisY", {
 })
 
 test_that("dim = c(1, 1) info in saga", {
-  fname <- "saga2.xlsx"
+  fname <- "excels/saga2.xlsx"
   year  <- 2018
   regex_rend <- Nippon::jyear(year + 1) %>%
     stringr::str_replace("平成", "H") %>%
@@ -160,7 +161,7 @@ test_that("dim = c(1, 1) info in saga", {
 
 
 test_that("ehime", {
-  fname <- "ehime.xls"
+  fname <- "excels/ehime.xls"
   converted <- fname %>%
     lucifer::rebel(sheet_regex = "マサバ.+",
                    cluster = list(regex = "^年$",

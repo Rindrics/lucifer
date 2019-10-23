@@ -4,7 +4,7 @@
 \alias{rebel_sheet}
 \title{Rebel against godly Excel worksheet}
 \usage{
-rebel_sheet(sheet, path, row_merged = 0, col_merged = 0,
+rebel_sheet(sheet, path, row_headers = NULL, col_headers = NULL,
   cluster = NULL, row_type = NULL, col_type = NULL,
   row_omit = NULL, col_omit = NULL, unfiscalize = c(month_start =
   NULL, rule = NULL))
@@ -17,9 +17,9 @@ sheet.}
 
 \item{path}{Path to the xls/xlsx file.}
 
-\item{row_merged}{Row position of merged colnames}
+\item{row_headers}{Row position of merged colnames}
 
-\item{col_merged}{Column position of merged rownames}
+\item{col_headers}{Column position of merged rownames}
 
 \item{cluster}{List of parameters to control \code{\link{unclusterize}}.
 \describe{
