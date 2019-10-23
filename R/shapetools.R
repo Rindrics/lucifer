@@ -256,7 +256,6 @@ extract_a_cluster <- function(pos_key, find_from, direction, df,
                      cvalue:(cvalue + value_dim[2] - 1)] %>%
     unlist() %>%
     as.vector()
-  if (value_offset[1] > 0) out <- out[- (value_offset[1] + 1), ]
   if (is.null(info$key_offset)) {
     key <- paste0("key", 1:max(value_dim))
   } else {
