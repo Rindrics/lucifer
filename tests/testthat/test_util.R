@@ -39,17 +39,17 @@ test_that("format of the early returned df", {
       vectorize_row(row),
       expect)))
   }
-  expect_equal_col_name <- function(path, sheet, posnames, expect) {
+  expect_equal_col_name <- function(path, sheet, print, expect) {
     eval(bquote(expect_equal(
       ceasefire(df, path = path,
-                sheet = sheet, funcname = "foo", posnames = posnames) %>%
+                sheet = sheet, funcname = "foo", print_posnames = print) %>%
       colnames(),
       expect)))
   }
-  expect_equal_row_name <- function(path, sheet, posnames, expect) {
+  expect_equal_row_name <- function(path, sheet, print, expect) {
     eval(bquote(expect_equal(
       ceasefire(df, path = path,
-                sheet = sheet, funcname = "foo", posnames = posnames) %>%
+                sheet = sheet, funcname = "foo", print_posnames = print) %>%
       rownames(),
       expect)))
   }

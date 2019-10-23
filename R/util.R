@@ -16,15 +16,16 @@ add_reference <- function(df, path = NULL, sheet = NULL) {
 #' @param path File path to be used by \code{add_reference}
 #' @param sheet Sheet name to be used by \code{add_reference}
 #' @param funcname Name of function to create message for user
-#' @param posnames If TRUE, row- and col- names are set to 'pos=' format for
+#' @param print_posnames If TRUE,
+#'   row- and col- names are set to 'pos=' format for
 #' following cluster extraction
 ceasefire <- function(df, path = NULL, sheet = NULL,
-                      funcname, posnames = TRUE) {
+                      funcname, print_posnames = FALSE) {
   head10 <- function(x) {
     print(utils::head(x, 10))
   }
   message(paste0("Good. Specify '", funcname, "' next."))
-  if (posnames == TRUE) {
+  if (print_posnames == TRUE) {
     df %>%
       magrittr::set_colnames(paste0("(dir='v',pos=", 1:ncol(df), ")")) %>%
       dplyr::mutate(rowname = paste0("(dir='h',pos=", 1:nrow(df), ")")) %>%

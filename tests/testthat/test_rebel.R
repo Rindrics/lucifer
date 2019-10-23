@@ -129,7 +129,26 @@ test_that("rebel() beat up file contaminated by summary column", {
 })
 
 test_that("early return", {
-  returned <- rebel(path = "excels/sumcol_contami.xlsx", sheet_regex = "Sheet.")
+  returned <- rebel(path = "excels/sumcol_contami.xlsx", sheet_regex = "Sheet.",
+                    print_posnames = TRUE)
   expect_equal(colnames(returned)[1:3], paste0("(dir='v',pos=", 1:3, ")"))
-  expect_equal(rownames(returned)[1:3], paste0("(dir='h',pos=", 1:3, ")"))
+})
+
+test_that("crop worksheet before formatting", {
+  formatted <- rebel(path = "excels/crop.xlsx", sheet_regex = "Sheet.",
+                     cluster = list(dir = "v",
+                                    pos = 2,
+                                    regex = "key",
+                                    offset = c(0, 0),
+                                    ends = c(row = "baz",
+                                             col = ".+")),
+                     crop = list(direction = "v",
+                                 pos = 1,
+                                 regex = "stop",
+                                 use_after = FALSE))
+
+  expect_equal(formatted$key, rep(c("bar", "baz"), 6))
+  expect_equal(formatted$`1`,
+               as.character(c(11, 21, 101, 111, 201, 211,
+                              431, 441, 521, 531, 621, 631)))
 })

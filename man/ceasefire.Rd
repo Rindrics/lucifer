@@ -4,7 +4,8 @@
 \alias{ceasefire}
 \title{Make df with reference for early return}
 \usage{
-ceasefire(df, path = NULL, sheet = NULL, funcname, posnames = TRUE)
+ceasefire(df, path = NULL, sheet = NULL, funcname,
+  print_posnames = FALSE)
 }
 \arguments{
 \item{df}{Data frame to return}
@@ -15,7 +16,8 @@ ceasefire(df, path = NULL, sheet = NULL, funcname, posnames = TRUE)
 
 \item{funcname}{Name of function to create message for user}
 
-\item{posnames}{If TRUE, row- and col- names are set to 'pos=' format for
+\item{print_posnames}{If TRUE,
+  row- and col- names are set to 'pos=' format for
 following cluster extraction}
 }
 \description{
