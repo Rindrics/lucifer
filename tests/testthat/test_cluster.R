@@ -189,7 +189,8 @@ test_that("separated info", {
                          info = list(key_offset = c(-1, 0),
                                      key_dim = c(1, 4),
                                      value_offset = c(1, 0),
-                                     value_dim = c(1, 4))))
+                                     value_dim = c(1, 4)))) %>%
+    dplyr::filter(head1 != "value1")
   expect_equal(colnames(data),
                c(paste0("head", 1:4), paste0("key", 1:4), "fname", "sheet"))
   expect_equal(data[1, ] %>% vectorize_row(),
