@@ -244,8 +244,6 @@ test_that("position of scan starts correctly", {
                                                         col = "１２月$")))
   expect_equal(nrow(maiwashi), 25 * 3)
   expect_equal(ncol(maiwashi), 15)
-  maiwashi$年
-  saba$年
   expect_equal(vectorize_row(maiwashi, 1),
                c("1995年", as.character(2401:2412),
                  "excels/miyagi.xlsx", "Sheet1"))
@@ -262,8 +260,6 @@ test_that("position of scan starts correctly", {
                                                         col = "１２月$")))
   expect_equal(nrow(katakuchi), 25 * 3)
   expect_equal(ncol(katakuchi), 15)
-  katakuchi$年
-  saba$年
   expect_equal(vectorize_row(katakuchi, 1),
                c("1995年", as.character(3601:3612),
                  "excels/miyagi.xlsx", "Sheet1"))
@@ -300,7 +296,7 @@ test_that("fight with NA colname", {
                                            col = "12")))
   expect_equal(nrow(data), 155)
   expect_equal(ncol(data), 15)
-  expect_equal(colnames(data), c("NA", as.character(1:12), "fname", "sheet"))
+  expect_equal(colnames(data), c("topleft", as.character(1:12), "fname", "sheet"))
 
   data <- rebel("excels/ibaraki.xlsx", sheet_regex = "Sheet1",
                 cluster = list(dir = "v",
@@ -311,6 +307,6 @@ test_that("fight with NA colname", {
                                            col = "12")))
   expect_equal(nrow(data), 155)
   expect_equal(ncol(data), 15)
-  expect_equal(colnames(data), c("NA",
+  expect_equal(colnames(data), c("topleft",
                                  as.character(1:12), "fname", "sheet"))
 })

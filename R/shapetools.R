@@ -162,6 +162,7 @@ headerize <- function(df, row) {
   head <- df[row, ] %>%
     as.character() %>%
     make.unique()
+  if (head[1] == "NA") head[1] <- "topleft"
   magrittr::set_colnames(body, head)
 }
 
