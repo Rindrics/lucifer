@@ -104,8 +104,7 @@ test_that("Fight with 'maiwashi' sheet of iwate data", {
     purrr::invoke(rbind, .) %>%
     gather_cols(regex = "1?[0-9]月",
                 newname = "month", varname = "catch") %>%
-    dplyr::rename(year = `NA`)
-  head(maiwashi)
+    dplyr::rename(year = "topleft")
 
   expect_equal(unique(maiwashi$year), as.character(1968:2018))
   expect_equal(unique(maiwashi$month), paste0(1:12, "月"))
