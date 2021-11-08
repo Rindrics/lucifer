@@ -7,14 +7,14 @@
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
 #'
-#' #' @name %<>%
+#' @name %<>%
 #' @rdname doublepipe
 #' @keywords internal
 #' @export
 #' @importFrom magrittr %<>%
-#' @usage lhs \%<>\% rhs
 
-#' #' @name %T>%
+#' @name %T>%
+#' @rdname tpipe
 #' @keywords internal
 #' @export
 #' @importFrom magrittr %T>%
@@ -24,7 +24,6 @@
 #' @keywords internal
 #' @export
 #' @importFrom rlang :=
-#' @usage lhs := rhs
 
 
 if (getRversion() >= "2.15.1") {
