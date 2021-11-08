@@ -12,7 +12,6 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat,
-    covr
 RoxygenNote: 7.1.2
 URL: https://github.com/kikirinrin/lucifer
 BugReports: https://github.com/kikirinrin/lucifer/issues
