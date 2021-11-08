@@ -4,8 +4,7 @@
 \alias{crop}
 \title{Crop data frame at specific keyword}
 \usage{
-crop(df, direction = NULL, pos = NULL, regex = NULL,
-  use_after = FALSE)
+crop(df, direction = NULL, pos = NULL, regex = NULL, use_after = FALSE)
 }
 \arguments{
 \item{df}{Data frame to be processed}

@@ -4,8 +4,7 @@
 \alias{make_ascii}
 \title{Convert full-width numbers in df into ASCII numbers}
 \usage{
-make_ascii(x, col = NULL, row = NULL, numerize = FALSE,
-  headerized = FALSE)
+make_ascii(x, col = NULL, row = NULL, numerize = FALSE, headerized = FALSE)
 }
 \arguments{
 \item{x}{Data frame or vector to be processed}

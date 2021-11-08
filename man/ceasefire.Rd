@@ -4,8 +4,7 @@
 \alias{ceasefire}
 \title{Make df with reference for early return}
 \usage{
-ceasefire(df, path = NULL, sheet = NULL, funcname,
-  print_posnames = FALSE)
+ceasefire(df, path = NULL, sheet = NULL, funcname, print_posnames = FALSE)
 }
 \arguments{
 \item{df}{Data frame to return}

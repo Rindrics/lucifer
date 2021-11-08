@@ -200,7 +200,7 @@ test_that("separated info", {
 })
 
 test_that("offset(, -1) works correctly", {
-  data <- "excels/hachinohe_ichiba.xls"  %>%
+  data <- "excels/actual_cases/separated_info.xls"  %>%
     lucifer::rebel_sheet(sheet = "1008_若鷹",
                          cluster = list(regex = "性別",
                                         dir = "v",
@@ -217,7 +217,7 @@ test_that("offset(, -1) works correctly", {
 })
 
 test_that("position of scan starts correctly", {
-  saba <- lucifer::rebel(path = "excels/miyagi.xlsx",
+  saba <- lucifer::rebel(path = "excels/actual_cases/clustered_multibyte.xlsx",
                          sheet_regex = ".+",
                          cluster = list(dir = "v",
                                         pos = 17,
@@ -229,12 +229,12 @@ test_that("position of scan starts correctly", {
   expect_equal(ncol(saba), 15)
   expect_equal(vectorize_row(saba, 1),
                c("1995年", as.character(1201:1212),
-                 "excels/miyagi.xlsx", "Sheet1"))
+                 "excels/actual_cases/clustered_multibyte.xlsx", "Sheet1"))
   expect_equal(vectorize_row(saba, 75),
                c("2019年", as.character(2089:2100),
-                 "excels/miyagi.xlsx", "Sheet1"))
+                 "excels/actual_cases/clustered_multibyte.xlsx", "Sheet1"))
 
-  maiwashi <- lucifer::rebel(path = "excels/miyagi.xlsx",
+  maiwashi <- lucifer::rebel(path = "excels/actual_cases/clustered_multibyte.xlsx",
                              sheet_regex = ".+",
                              cluster = list(dir = "v",
                                             pos = 33,
@@ -246,11 +246,11 @@ test_that("position of scan starts correctly", {
   expect_equal(ncol(maiwashi), 15)
   expect_equal(vectorize_row(maiwashi, 1),
                c("1995年", as.character(2401:2412),
-                 "excels/miyagi.xlsx", "Sheet1"))
+                 "excels/actual_cases/clustered_multibyte.xlsx", "Sheet1"))
   expect_equal(vectorize_row(maiwashi, 75),
                c("2019年", as.character(3289:3300),
-                 "excels/miyagi.xlsx", "Sheet1"))
-  katakuchi <- lucifer::rebel(path = "excels/miyagi.xlsx",
+                 "excels/actual_cases/clustered_multibyte.xlsx", "Sheet1"))
+  katakuchi <- lucifer::rebel(path = "excels/actual_cases/clustered_multibyte.xlsx",
                              sheet_regex = ".+",
                              cluster = list(dir = "v",
                                             pos = 49,
@@ -262,14 +262,14 @@ test_that("position of scan starts correctly", {
   expect_equal(ncol(katakuchi), 15)
   expect_equal(vectorize_row(katakuchi, 1),
                c("1995年", as.character(3601:3612),
-                 "excels/miyagi.xlsx", "Sheet1"))
+                 "excels/actual_cases/clustered_multibyte.xlsx", "Sheet1"))
   expect_equal(vectorize_row(katakuchi, 75),
                c("2019年", as.character(4489:4500),
-                 "excels/miyagi.xlsx", "Sheet1"))
+                 "excels/actual_cases/clustered_multibyte.xlsx", "Sheet1"))
 })
 
 test_that("position of scan for ends(row=) starts correctly", {
-  teichi <- rebel(path = "excels/miyagi.xlsx",
+  teichi <- rebel(path = "excels/actual_cases/clustered_multibyte.xlsx",
                   sheet_regex = "Sheet1",
                            cluster = list(dir = "h", pos = 33, regex = "定置網",
                                           offset = c(1, 0),
@@ -279,10 +279,10 @@ test_that("position of scan for ends(row=) starts correctly", {
   expect_equal(ncol(teichi), 15)
   expect_equal(vectorize_row(teichi, 1),
                c("1995年", as.character(301:312),
-                 "excels/miyagi.xlsx", "Sheet1"))
+                 "excels/actual_cases/clustered_multibyte.xlsx", "Sheet1"))
   expect_equal(vectorize_row(teichi, 75),
                c("2019年", as.character(2989:3000),
-                 "excels/miyagi.xlsx", "Sheet1"))
+                 "excels/actual_cases/clustered_multibyte.xlsx", "Sheet1"))
 
 })
 

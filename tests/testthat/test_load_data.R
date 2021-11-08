@@ -10,7 +10,7 @@ test_that("load_alldata loads Excel file as text", {
 })
 
 test_that("load_alldata loads aomori data as text", {
-  data <- load_alldata(path = "excels/aomori.xlsx", sheet = "マイワシ")
+  data <- load_alldata(path = "excels/actual_cases/clustered_wide.xlsx", sheet = "マイワシ")
   expect_is(data, "data.frame")
   expect_equal(class(dplyr::pull(data, 1)), "character")
   expect_equal(class(dplyr::pull(data, 2)), "character")

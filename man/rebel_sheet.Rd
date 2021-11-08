@@ -4,10 +4,20 @@
 \alias{rebel_sheet}
 \title{Rebel against godly Excel worksheet}
 \usage{
-rebel_sheet(sheet, path, row_headers = NULL, col_headers = NULL,
-  cluster = NULL, row_type = NULL, col_type = NULL,
-  row_omit = NULL, col_omit = NULL, unfiscalize = c(month_start =
-  NULL, rule = NULL), print_posnames = FALSE, crop = NULL)
+rebel_sheet(
+  sheet,
+  path,
+  row_headers = NULL,
+  col_headers = NULL,
+  cluster = NULL,
+  row_type = NULL,
+  col_type = NULL,
+  row_omit = NULL,
+  col_omit = NULL,
+  unfiscalize = c(month_start = NULL, rule = NULL),
+  print_posnames = FALSE,
+  crop = NULL
+)
 }
 \arguments{
 \item{sheet}{Sheet to read. Either a string (the name of a sheet), or an

@@ -4,10 +4,20 @@
 \alias{rebel}
 \title{Rebel against godly Excel workbook}
 \usage{
-rebel(path, sheet_regex, row_headers = NULL, col_headers = NULL,
-  cluster = NULL, row_type = NULL, col_type = NULL,
-  row_omit = NULL, col_omit = NULL, unfiscalize = c(month_start =
-  NULL, rule = NULL), print_posnames = FALSE, crop = NULL)
+rebel(
+  path,
+  sheet_regex,
+  row_headers = NULL,
+  col_headers = NULL,
+  cluster = NULL,
+  row_type = NULL,
+  col_type = NULL,
+  row_omit = NULL,
+  col_omit = NULL,
+  unfiscalize = c(month_start = NULL, rule = NULL),
+  print_posnames = FALSE,
+  crop = NULL
+)
 }
 \arguments{
 \item{path}{Path to the xls/xlsx file.}
