@@ -7,3 +7,4 @@ data.git/
 output.git/
 *Rprof.out
 .history
+.DS_Store
