@@ -7,6 +7,11 @@
 lhs \%>\% rhs
 
 #' @name %<>%
+
+lhs \%<>\% rhs
+#' @name %T>%
+
+lhs := rhs
 }
 \description{
 Pipe operators

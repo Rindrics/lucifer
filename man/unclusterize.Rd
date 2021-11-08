@@ -4,8 +4,16 @@
 \alias{unclusterize}
 \title{Extract data clusters from data frame using the keyword}
 \usage{
-unclusterize(df, regex, direction, pos, offset = c(0, 0), ends,
-  info = NULL, crop = NULL)
+unclusterize(
+  df,
+  regex,
+  direction,
+  pos,
+  offset = c(0, 0),
+  ends,
+  info = NULL,
+  crop = NULL
+)
 }
 \arguments{
 \item{df}{Data frame to be processed}

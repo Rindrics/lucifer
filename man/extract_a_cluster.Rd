@@ -4,8 +4,15 @@
 \alias{extract_a_cluster}
 \title{Extract a cluster from df using the keyword}
 \usage{
-extract_a_cluster(pos_key, find_from, direction, df, offset = c(0, 0),
-  ends, info = NULL)
+extract_a_cluster(
+  pos_key,
+  find_from,
+  direction,
+  df,
+  offset = c(0, 0),
+  ends,
+  info = NULL
+)
 }
 \arguments{
 \item{pos_key}{Position where the \code{regex} of \code{unclusterize}
